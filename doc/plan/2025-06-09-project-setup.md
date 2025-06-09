@@ -51,9 +51,9 @@ This document outlines the step-by-step implementation plan for setting up the T
   const ENDPOINTS = {
     us01: 'https://api-presto.treasuredata.com',
     jp01: 'https://api-presto.treasuredata.co.jp',
-    eu01: 'https://api-presto.eu01.treasure-data.com',
-    ap02: 'https://api-presto.ap02.treasure-data.com',
-    ap03: 'https://api-presto.ap03.treasure-data.com',
+    eu01: 'https://api-presto.eu01.treasuredata.com',
+    ap02: 'https://api-presto.ap02.treasuredata.com',
+    ap03: 'https://api-presto.ap03.treasuredata.com',
     dev: 'https://api-development-presto.treasuredata.com'
   };
   ```

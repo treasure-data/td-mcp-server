@@ -27,9 +27,9 @@
     - Depending on the site, we need to use a different endpoints. us01, jp01, eu01, ap02, ap03, and dev (internal, hidden from public documentation)
 	    - us01: api-presto.treasuredata.com
 	    - jp01: api-presto.treasuredata.co.jp
-	    - eu01: api-presto.eu01.treasure-data.com
-	    - ap02: api-presto.ap02.treasure-data.com
-	    - ap03: api-presto.ap03.treasure-data.com
+	    - eu01: api-presto.eu01.treasuredata.com
+	    - ap02: api-presto.ap02.treasuredata.com
+	    - ap03: api-presto.ap03.treasuredata.com
 	    - dev: api-development-presto.treasuredata.com
 	- catalog name: td
 	- list of schemas (databases), list of tables can be retrieved queries against information_schema. This need to be instructed in the MCP function definition

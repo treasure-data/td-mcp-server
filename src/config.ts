@@ -1,4 +1,4 @@
-import { Config, TDSite } from './types.js';
+import { Config, TDSite } from './types';
 
 export class ConfigurationError extends Error {
   constructor(message: string) {
