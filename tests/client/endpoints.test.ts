@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest';
 import { getEndpointForSite, getTrinoPort, getCatalog, TD_ENDPOINTS } from '../../src/client/endpoints';
 import { TDSite } from '../../src/types';
 

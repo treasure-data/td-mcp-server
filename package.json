@@ -10,7 +10,9 @@
     "build": "tsc",
     "dev": "tsx src/index.ts",
     "start": "node dist/index.js",
-    "test": "jest",
+    "test": "vitest",
+    "test:watch": "vitest watch",
+    "test:coverage": "vitest run --coverage",
     "lint": "eslint src/**/*.ts",
     "format": "prettier --write src/**/*.ts",
     "typecheck": "tsc --noEmit"
@@ -37,16 +39,15 @@
     "trino-client": "^0.2.7"
   },
   "devDependencies": {
-    "@types/jest": "^29.5.14",
     "@types/node": "^22.15.30",
     "@typescript-eslint/eslint-plugin": "^8.34.0",
     "@typescript-eslint/parser": "^8.34.0",
+    "@vitest/coverage-v8": "^3.2.3",
     "eslint": "^9.28.0",
     "eslint-config-prettier": "^10.1.5",
-    "jest": "^29.7.0",
     "prettier": "^3.5.3",
-    "ts-jest": "^29.3.4",
     "tsx": "^4.19.4",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.3"
   }
 }

@@ -10,9 +10,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm start` - Run compiled code from dist/
 
 ### Testing
-- `npm test` - Run all tests
-- `npm test -- tests/config.test.ts` - Run specific test file
-- `npm test -- --coverage` - Run tests with coverage report
+- `npm test` - Run all tests with Vitest
+- `npm test tests/config.test.ts` - Run specific test file
+- `npm run test:watch` - Run tests in watch mode
+- `npm run test:coverage` - Run tests with coverage report
 
 ### Code Quality
 - `npm run lint` - Check ESLint rules
@@ -75,9 +76,10 @@ The MCP tools use specific information_schema queries:
 
 When implementing new features:
 1. Add tests to match existing patterns in `tests/`
-2. Mock external dependencies (Trino client)
+2. Mock external dependencies (Trino client) using `vi.mock()`
 3. Ensure error cases are covered
-4. Run `npm test -- --coverage` to verify coverage
+4. Run `npm run test:coverage` to verify coverage
+5. Use Vitest's `describe`, `it`, `expect`, `beforeEach`, `vi` imports
 
 ## Future Features
 

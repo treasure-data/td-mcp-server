@@ -1,9 +1,10 @@
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { TDTrinoClient } from '../../src/client/trino';
 import { Config } from '../../src/types';
 import { Trino } from 'trino-client';
 
 // Mock the trino-client module
-jest.mock('trino-client');
+vi.mock('trino-client');
 
 describe('TDTrinoClient', () => {
   const mockConfig: Config = {
@@ -13,14 +14,14 @@ describe('TDTrinoClient', () => {
   };
 
   let mockTrinoInstance: any;
-  let mockQuery: jest.Mock;
+  let mockQuery: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
     // Reset mocks
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Create mock query function
-    mockQuery = jest.fn();
+    mockQuery = vi.fn();
 
     // Create mock Trino instance
     mockTrinoInstance = {
@@ -28,7 +29,7 @@ describe('TDTrinoClient', () => {
     };
 
     // Mock Trino.create to return our mock instance
-    (Trino.create as jest.Mock).mockReturnValue(mockTrinoInstance);
+    vi.mocked(Trino.create).mockReturnValue(mockTrinoInstance);
   });
 
   describe('constructor', () => {
