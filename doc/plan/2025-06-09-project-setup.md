@@ -19,6 +19,18 @@ This document outlines the step-by-step implementation plan for setting up the T
   - Query execution with error handling
   - Utility methods for database operations
   - Comprehensive unit tests with mocked client
+- **Phase 1.4**: ✅ Completed (2025-06-09)
+  - Security module with query validation
+  - SQL query parsing to detect query types
+  - Read-only mode enforcement by default
+  - Audit logging for all database operations
+  - 100% test coverage
+- **Phase 1.5**: ✅ Completed (2025-06-09)
+  - MCP tools implementation
+  - list_databases, list_tables, describe_table tools
+  - query tool with automatic LIMIT injection
+  - execute tool for write operations (when enabled)
+  - Comprehensive tests for all tools
 
 ## Phase 1: Core Implementation
 
@@ -52,7 +64,7 @@ This document outlines the step-by-step implementation plan for setting up the T
 - [x] Create comprehensive test suite with 100% coverage
 
 ### 3. Trino Client Wrapper
-- [ ] Create `src/client/endpoints.ts` with site mappings:
+- [x] Create `src/client/endpoints.ts` with site mappings:
   ```typescript
   const ENDPOINTS = {
     us01: 'https://api-presto.treasuredata.com',
@@ -63,18 +75,18 @@ This document outlines the step-by-step implementation plan for setting up the T
     dev: 'https://api-development-presto.treasuredata.com'
   };
   ```
-- [ ] Create `src/client/trino.ts` wrapper:
+- [x] Create `src/client/trino.ts` wrapper:
   - Configure authentication with TD API key
   - Set up connection pooling
   - Implement query execution with proper error handling
   - Add query timeout configuration
 
 ### 4. Security Module
-- [ ] Create `src/security/query-validator.ts`:
+- [x] Create `src/security/query-validator.ts`:
   - Implement SQL query parsing
   - Detect and block write operations in read-only mode
   - Validate query types (SELECT, SHOW, DESCRIBE)
-- [ ] Create `src/security/audit-logger.ts`:
+- [x] Create `src/security/audit-logger.ts`:
   - Log all queries with timestamps
   - Track operation types and user context
   - Implement log rotation if needed
@@ -82,42 +94,42 @@ This document outlines the step-by-step implementation plan for setting up the T
 ### 5. MCP Tools Implementation
 
 #### 5.1 list_databases Tool
-- [ ] Create `src/tools/list-databases.ts`
-- [ ] Query: `SELECT schema_name FROM td.information_schema.schemata WHERE catalog_name = 'td' ORDER BY schema_name`
-- [ ] Return formatted list of database names
-- [ ] Add error handling for connection failures
+- [x] Create `src/tools/list-databases.ts`
+- [x] Query: `SELECT schema_name FROM td.information_schema.schemata WHERE catalog_name = 'td' ORDER BY schema_name`
+- [x] Return formatted list of database names
+- [x] Add error handling for connection failures
 
 #### 5.2 list_tables Tool
-- [ ] Create `src/tools/list-tables.ts`
-- [ ] Accept database parameter
-- [ ] Query: `SELECT table_name FROM td.information_schema.tables WHERE table_catalog = 'td' AND table_schema = ? ORDER BY table_name`
-- [ ] Validate database exists before querying
+- [x] Create `src/tools/list-tables.ts`
+- [x] Accept database parameter
+- [x] Query: `SELECT table_name FROM td.information_schema.tables WHERE table_catalog = 'td' AND table_schema = ? ORDER BY table_name`
+- [x] Validate database exists before querying
 
 #### 5.3 describe_table Tool
-- [ ] Create `src/tools/describe-table.ts`
-- [ ] Accept database and table parameters
-- [ ] Query: `SELECT column_name, data_type, is_nullable FROM td.information_schema.columns WHERE table_catalog = 'td' AND table_schema = ? AND table_name = ? ORDER BY ordinal_position`
-- [ ] Format response with column details
+- [x] Create `src/tools/describe-table.ts`
+- [x] Accept database and table parameters
+- [x] Query: `SELECT column_name, data_type, is_nullable FROM td.information_schema.columns WHERE table_catalog = 'td' AND table_schema = ? AND table_name = ? ORDER BY ordinal_position`
+- [x] Format response with column details
 
 #### 5.4 query Tool (Read-only)
-- [ ] Create `src/tools/query.ts`
-- [ ] Implement query validation (only SELECT, SHOW, DESCRIBE)
-- [ ] Add automatic LIMIT injection:
+- [x] Create `src/tools/query.ts`
+- [x] Implement query validation (only SELECT, SHOW, DESCRIBE)
+- [x] Add automatic LIMIT injection:
   ```typescript
   function injectLimit(sql: string, limit: number = 40): string {
     // Check if query already has LIMIT
     // If not, append LIMIT clause
   }
   ```
-- [ ] Parse and format query results
-- [ ] Handle large result sets gracefully
+- [x] Parse and format query results
+- [x] Handle large result sets gracefully
 
 #### 5.5 execute Tool (Write operations)
-- [ ] Create `src/tools/execute.ts`
-- [ ] Check if `enable_updates` is true
-- [ ] Support UPDATE, DELETE, INSERT, CREATE, DROP, ALTER
-- [ ] Return affected rows count
-- [ ] Implement transaction support if needed
+- [x] Create `src/tools/execute.ts`
+- [x] Check if `enable_updates` is true
+- [x] Support UPDATE, DELETE, INSERT, CREATE, DROP, ALTER
+- [x] Return affected rows count
+- [x] Implement transaction support if needed
 
 ### 6. MCP Server Setup
 - [ ] Create `src/index.ts` as main entry point
@@ -130,13 +142,14 @@ This document outlines the step-by-step implementation plan for setting up the T
 - [x] Create unit tests for:
   - Configuration validation
   - Query validation
-  - Each MCP tool (pending)
-  - Security features (pending)
+  - Each MCP tool
+  - Security features
 - [x] Create unit tests with mock Trino responses
-- [ ] Create integration tests with real Trino connection:
+- [x] Create integration tests with real Trino connection:
   - Use site: 'dev' for testing
   - Use TD_API_KEY_DEVELOPMENT_AWS environment variable
   - Test actual database operations
+  - Test against sample_datasets (www_access, nasdaq tables)
 - [x] Add CI/CD pipeline configuration with GitHub Actions
 
 ### 8. Documentation
@@ -199,7 +212,9 @@ This document outlines the step-by-step implementation plan for setting up the T
   - Phase 1.1 (Project Initialization): ✅ Completed in 1 day
   - Phase 1.2 (Configuration Module): ✅ Completed in 1 day
   - Phase 1.3 (Trino Client Wrapper): ✅ Completed in 1 day
-  - Phase 1.4-1.10: In progress
+  - Phase 1.4 (Security Module): ✅ Completed in 1 day
+  - Phase 1.5 (MCP Tools): ✅ Completed in 1 day
+  - Phase 1.6-1.10: In progress
 - Phase 2: 1-2 weeks (future)
 
 ## Dependencies and Risks
