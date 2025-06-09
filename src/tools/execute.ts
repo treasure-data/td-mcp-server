@@ -46,23 +46,16 @@ export class ExecuteTool {
     const startTime = Date.now();
     
     try {
-      const result = await this.client.query(sql, database);
+      // Use the execute method for write operations
+      const result = await this.client.execute(sql, database);
       const duration = Date.now() - startTime;
       
       // Extract affected rows if available
-      let affectedRows: number | undefined;
+      const affectedRows = result.affectedRows;
       let message = `${validation.queryType} operation completed successfully`;
       
-      // Different query types may return different result formats
-      if (result.stats && typeof result.stats === 'object') {
-        // Look for row count in stats
-        const stats = result.stats as any;
-        if (stats.processedRows !== undefined) {
-          affectedRows = stats.processedRows;
-          message = `${validation.queryType} operation completed. Affected rows: ${affectedRows}`;
-        } else if (stats.completedSplits !== undefined) {
-          message = `${validation.queryType} operation completed successfully`;
-        }
+      if (affectedRows !== undefined && affectedRows > 0) {
+        message = `${validation.queryType} operation completed. Affected rows: ${affectedRows}`;
       }
       
       // For CREATE/DROP/ALTER operations, we might not have row counts

@@ -31,6 +31,12 @@ This document outlines the step-by-step implementation plan for setting up the T
   - query tool with automatic LIMIT injection
   - execute tool for write operations (when enabled)
   - Comprehensive tests for all tools
+- **Phase 1.6**: ✅ Completed (2025-06-09)
+  - MCP server setup
+  - Main entry point with shebang for npx
+  - Tool registration and request handling
+  - Error handling and graceful shutdown
+  - Separated server logic for testability
 
 ## Phase 1: Core Implementation
 
@@ -132,10 +138,11 @@ This document outlines the step-by-step implementation plan for setting up the T
 - [x] Implement transaction support if needed
 
 ### 6. MCP Server Setup
-- [ ] Create `src/index.ts` as main entry point
-- [ ] Initialize MCP server with all tools
-- [ ] Set up proper error handling and logging
-- [ ] Implement graceful shutdown
+- [x] Create `src/index.ts` as main entry point
+- [x] Initialize MCP server with all tools
+- [x] Set up proper error handling and logging
+- [x] Implement graceful shutdown
+- [x] Separate server logic into `src/server.ts` for testability
 
 ### 7. Testing
 - [x] Set up ~~Jest~~ Vitest testing framework
@@ -172,7 +179,7 @@ This document outlines the step-by-step implementation plan for setting up the T
   }
   ```
   ✅ Configured in `package.json`
-- [ ] Add shebang to entry point
+- [x] Add shebang to entry point
 - [ ] Test npx execution locally
 - [ ] Prepare for npm publication
 
@@ -214,7 +221,8 @@ This document outlines the step-by-step implementation plan for setting up the T
   - Phase 1.3 (Trino Client Wrapper): ✅ Completed in 1 day
   - Phase 1.4 (Security Module): ✅ Completed in 1 day
   - Phase 1.5 (MCP Tools): ✅ Completed in 1 day
-  - Phase 1.6-1.10: In progress
+  - Phase 1.6 (MCP Server Setup): ✅ Completed in 1 day
+  - Phase 1.7-1.10: In progress
 - Phase 2: 1-2 weeks (future)
 
 ## Dependencies and Risks

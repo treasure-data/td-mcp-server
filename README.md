@@ -99,6 +99,10 @@ npm test
 npm run dev
 ```
 
+## Developer Notes
+
+For information on testing this MCP server with GitHub Copilot Chat agent mode, see [DEVELOPER_NOTES.md](DEVELOPER_NOTES.md).
+
 ## License
 
 MIT

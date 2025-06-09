@@ -14,6 +14,7 @@ describe('ExecuteTool', () => {
   beforeEach(() => {
     mockClient = {
       query: vi.fn(),
+      execute: vi.fn(),
     };
     
     mockAuditLogger = {
@@ -48,10 +49,9 @@ describe('ExecuteTool', () => {
     });
     mockQueryValidator.isReadOnly.mockReturnValue(false);
     
-    mockClient.query.mockResolvedValue({
-      data: [],
-      columns: [],
-      stats: { state: 'FINISHED', processedRows: 5 },
+    mockClient.execute.mockResolvedValue({
+      affectedRows: 5,
+      success: true,
     });
     
     const result = await tool.execute('mydb', 'UPDATE users SET active = true WHERE id > 10');
@@ -61,7 +61,7 @@ describe('ExecuteTool', () => {
       message: 'UPDATE operation completed. Affected rows: 5',
     });
     
-    expect(mockClient.query).toHaveBeenCalledWith(
+    expect(mockClient.execute).toHaveBeenCalledWith(
       'UPDATE users SET active = true WHERE id > 10',
       'mydb'
     );
@@ -81,10 +81,9 @@ describe('ExecuteTool', () => {
     });
     mockQueryValidator.isReadOnly.mockReturnValue(false);
     
-    mockClient.query.mockResolvedValue({
-      data: [],
-      columns: [],
-      stats: { state: 'FINISHED', processedRows: 1 },
+    mockClient.execute.mockResolvedValue({
+      affectedRows: 1,
+      success: true,
     });
     
     const result = await tool.execute('mydb', 'INSERT INTO users (name) VALUES ("test")');
@@ -100,10 +99,9 @@ describe('ExecuteTool', () => {
     });
     mockQueryValidator.isReadOnly.mockReturnValue(false);
     
-    mockClient.query.mockResolvedValue({
-      data: [],
-      columns: [],
-      stats: { state: 'FINISHED', processedRows: 10 },
+    mockClient.execute.mockResolvedValue({
+      affectedRows: 10,
+      success: true,
     });
     
     const result = await tool.execute('mydb', 'DELETE FROM users WHERE inactive = true');
@@ -119,15 +117,14 @@ describe('ExecuteTool', () => {
     });
     mockQueryValidator.isReadOnly.mockReturnValue(false);
     
-    mockClient.query.mockResolvedValue({
-      data: [],
-      columns: [],
-      stats: { state: 'FINISHED' },
+    mockClient.execute.mockResolvedValue({
+      affectedRows: 0,
+      success: true,
     });
     
     const result = await tool.execute('mydb', 'CREATE TABLE test (id INT)');
     
-    expect(result.affectedRows).toBeUndefined();
+    expect(result.affectedRows).toBe(0);
     expect(result.message).toBe('CREATE operation completed successfully');
   });
 
@@ -138,10 +135,9 @@ describe('ExecuteTool', () => {
     });
     mockQueryValidator.isReadOnly.mockReturnValue(false);
     
-    mockClient.query.mockResolvedValue({
-      data: [],
-      columns: [],
-      stats: { state: 'FINISHED' },
+    mockClient.execute.mockResolvedValue({
+      affectedRows: 0,
+      success: true,
     });
     
     const result = await tool.execute('mydb', 'DROP TABLE old_table');
@@ -156,10 +152,9 @@ describe('ExecuteTool', () => {
     });
     mockQueryValidator.isReadOnly.mockReturnValue(false);
     
-    mockClient.query.mockResolvedValue({
-      data: [],
-      columns: [],
-      stats: { state: 'FINISHED' },
+    mockClient.execute.mockResolvedValue({
+      affectedRows: 0,
+      success: true,
     });
     
     const result = await tool.execute('mydb', 'ALTER TABLE users ADD COLUMN age INT');
@@ -172,7 +167,7 @@ describe('ExecuteTool', () => {
       toolWithUpdatesDisabled.execute('mydb', 'UPDATE users SET x = 1')
     ).rejects.toThrow('Write operations are disabled. Set enable_updates=true in configuration to allow write operations.');
     
-    expect(mockClient.query).not.toHaveBeenCalled();
+    expect(mockClient.execute).not.toHaveBeenCalled();
   });
 
   it('should reject read-only operations', async () => {
@@ -186,7 +181,7 @@ describe('ExecuteTool', () => {
       tool.execute('mydb', 'SELECT * FROM users')
     ).rejects.toThrow('Use the query tool for read-only operations (SELECT)');
     
-    expect(mockClient.query).not.toHaveBeenCalled();
+    expect(mockClient.execute).not.toHaveBeenCalled();
   });
 
   it('should validate database parameter', async () => {
@@ -210,7 +205,7 @@ describe('ExecuteTool', () => {
       tool.execute('mydb', 'INVALID SQL')
     ).rejects.toThrow('Query validation failed: Invalid SQL syntax');
     
-    expect(mockClient.query).not.toHaveBeenCalled();
+    expect(mockClient.execute).not.toHaveBeenCalled();
   });
 
   it('should handle query execution errors', async () => {
@@ -221,7 +216,7 @@ describe('ExecuteTool', () => {
     mockQueryValidator.isReadOnly.mockReturnValue(false);
     
     const error = new Error('Permission denied');
-    mockClient.query.mockRejectedValue(error);
+    mockClient.execute.mockRejectedValue(error);
     
     await expect(
       tool.execute('mydb', 'UPDATE users SET admin = true')
@@ -243,7 +238,7 @@ describe('ExecuteTool', () => {
     });
     mockQueryValidator.isReadOnly.mockReturnValue(false);
     
-    mockClient.query.mockRejectedValue('String error');
+    mockClient.execute.mockRejectedValue('String error');
     
     await expect(
       tool.execute('mydb', 'UPDATE users SET x = 1')
@@ -257,10 +252,9 @@ describe('ExecuteTool', () => {
     });
     mockQueryValidator.isReadOnly.mockReturnValue(false);
     
-    mockClient.query.mockResolvedValue({
-      data: [],
-      columns: [],
-      // No stats property
+    mockClient.execute.mockResolvedValue({
+      affectedRows: undefined,
+      success: true,
     });
     
     const result = await tool.execute('mydb', 'UPDATE users SET x = 1');

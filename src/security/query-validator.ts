@@ -62,7 +62,7 @@ export class QueryValidator {
       // Check if the WITH clause contains any write operations
       // We need to extract the CTE content properly, handling nested parentheses
       const withMatch = sql.match(/^\s*WITH\s+(\w+)\s+AS\s*\(/i);
-      if (withMatch) {
+      if (withMatch && withMatch[0]) {
         // Find the matching closing parenthesis for the CTE
         let parenCount = 0;
         let startIdx = withMatch[0].length;
@@ -115,15 +115,6 @@ export class QueryValidator {
     return 'UNKNOWN';
   }
 
-  /**
-   * Finds the end position of a WITH clause
-   */
-  private findWithClauseEnd(sql: string): number {
-    // More comprehensive regex to handle WITH clauses
-    // Matches: WITH name AS ( ... ) SELECT
-    const match = sql.match(/WITH\s+\w+\s+AS\s*\([^)]+\)\s*(SELECT\s+)/is);
-    return match ? match.index! + match[0].length - match[1].length : -1;
-  }
 
   /**
    * Checks if a SQL fragment contains write operations
