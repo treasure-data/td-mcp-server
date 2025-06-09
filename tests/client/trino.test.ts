@@ -36,27 +36,24 @@ describe('TDTrinoClient', () => {
     it('should initialize with correct configuration', () => {
       new TDTrinoClient(mockConfig);
 
-      // Client creation is lazy, so create won't be called until first query
-      expect(Trino.create).not.toHaveBeenCalled();
+      // Client is now created immediately in constructor
+      expect(Trino.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          catalog: 'td',
+          schema: 'information_schema', // Default schema
+        })
+      );
     });
 
-    it('should create client with correct endpoint when query is made', async () => {
+    it('should create client with correct endpoint', () => {
       const jpConfig = { ...mockConfig, site: 'jp01' as const };
-      const client = new TDTrinoClient(jpConfig);
-      
-      mockQuery.mockResolvedValue({
-        [Symbol.asyncIterator]: async function* () {
-          yield { columns: [], data: [] };
-        },
-      });
-      
-      await client.query('SELECT 1', 'test_db');
+      new TDTrinoClient(jpConfig);
 
       expect(Trino.create).toHaveBeenCalledWith(
         expect.objectContaining({
           server: 'https://api-presto.treasuredata.co.jp:443',
           catalog: 'td',
-          schema: 'test_db',
+          schema: 'information_schema', // Default schema since no database in config
           auth: expect.any(Object),
         })
       );
@@ -104,7 +101,7 @@ describe('TDTrinoClient', () => {
       });
     });
 
-    it('should use database when provided', async () => {
+    it('should execute query with database parameter', async () => {
       const client = new TDTrinoClient(mockConfig);
 
       mockQuery.mockResolvedValue({
@@ -115,13 +112,7 @@ describe('TDTrinoClient', () => {
 
       await client.query('SELECT 1', 'mydb');
 
-      // Should create a client with mydb schema
-      expect(Trino.create).toHaveBeenCalledWith(
-        expect.objectContaining({
-          schema: 'mydb',
-        })
-      );
-      
+      // The database parameter is ignored - query executes in default schema context
       expect(mockQuery).toHaveBeenCalledWith({
         query: 'SELECT 1',
         user: 'test-api-key-12345',

@@ -120,7 +120,7 @@ describe.skipIf(!isIntegrationTest)('TDTrinoClient Integration Tests', () => {
 
     it('should query www_access table with limit', async () => {
       const result = await client.query(
-        'SELECT time, method, path, code FROM www_access LIMIT 5',
+        'SELECT time, method, path, code FROM sample_datasets.www_access LIMIT 5',
         'sample_datasets'
       );
       
@@ -145,7 +145,7 @@ describe.skipIf(!isIntegrationTest)('TDTrinoClient Integration Tests', () => {
 
     it('should query nasdaq table with aggregation', async () => {
       const result = await client.query(
-        'SELECT symbol, AVG(close) as avg_close FROM nasdaq GROUP BY symbol ORDER BY avg_close DESC LIMIT 10',
+        'SELECT symbol, AVG(close) as avg_close FROM sample_datasets.nasdaq GROUP BY symbol ORDER BY avg_close DESC LIMIT 10',
         'sample_datasets'
       );
       
@@ -167,7 +167,7 @@ describe.skipIf(!isIntegrationTest)('TDTrinoClient Integration Tests', () => {
 
     it('should handle query with no results', async () => {
       const result = await client.query(
-        "SELECT * FROM nasdaq WHERE symbol = 'NON_EXISTENT_SYMBOL_12345'",
+        "SELECT * FROM sample_datasets.nasdaq WHERE symbol = 'NON_EXISTENT_SYMBOL_12345'",
         'sample_datasets'
       );
       

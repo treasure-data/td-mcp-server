@@ -9,52 +9,43 @@ import { getEndpointForSite, getTrinoPort, getCatalog } from './endpoints';
 export class TDTrinoClient {
   private config: Config;
   private catalog: string;
-  private clients: Map<string, Trino> = new Map();
+  private client: Trino;
+  private defaultDatabase: string;
 
   constructor(config: Config) {
     this.config = config;
     this.catalog = getCatalog();
-  }
-
-  private getClient(database?: string): Trino {
-    // TD requires a database to be specified
-    if (!database) {
-      throw new Error('Database must be specified for Treasure Data queries');
-    }
-    // Cache clients per database
-    if (!this.clients.has(database)) {
-      const endpoint = getEndpointForSite(this.config.site);
-      const url = new URL(endpoint);
-
-      // Initialize Trino client with TD-specific configuration
-      const client = Trino.create({
-        server: `${url.protocol}//${url.hostname}:${getTrinoPort()}`,
-        catalog: this.catalog,
-        schema: database, // In TD, schema = database
-        // TD uses API key as username in BasicAuth
-        auth: new BasicAuth(this.config.td_api_key),
-        ssl: {
-          rejectUnauthorized: true,
-        },
-      });
-      
-      this.clients.set(database, client);
-    }
+    this.defaultDatabase = config.database || 'information_schema';
     
-    return this.clients.get(database)!;
+    // Initialize single Trino client with default database
+    const endpoint = getEndpointForSite(this.config.site);
+    const url = new URL(endpoint);
+
+    this.client = Trino.create({
+      server: `${url.protocol}//${url.hostname}:${getTrinoPort()}`,
+      catalog: this.catalog,
+      schema: this.defaultDatabase, // Set default schema
+      // TD uses API key as username in BasicAuth
+      auth: new BasicAuth(this.config.td_api_key),
+      ssl: {
+        rejectUnauthorized: true,
+      },
+    });
   }
 
   /**
    * Executes a SQL query and returns the results
    * @param sql - SQL query to execute
-   * @param database - Database to query (required for TD)
+   * @param database - Database to query (ignored - uses client's configured database)
    * @returns Query results with columns and data
-   * @throws {Error} If database is not specified or query fails
+   * @throws {Error} If query fails
    */
   async query(sql: string, database?: string): Promise<QueryResult> {
     try {
-      // Get client for the specific database
-      const client = this.getClient(database);
+      // Note: The database parameter is ignored. The query will execute
+      // in the context of the database configured in the Trino client.
+      // If the user wants to query a different database, they should use
+      // fully qualified table names (e.g., database.table)
       
       // Build query object with TD API key as user
       const queryObj: TrinoQuery = {
@@ -64,7 +55,7 @@ export class TDTrinoClient {
       };
 
       // Execute the query
-      const iterator = await client.query(queryObj);
+      const iterator = await this.client.query(queryObj);
       
       // Collect results
       const rows: Array<Record<string, unknown>> = [];
@@ -106,14 +97,14 @@ export class TDTrinoClient {
   /**
    * Executes a SQL statement (for write operations)
    * @param sql - SQL statement to execute
-   * @param database - Database to execute against (required for TD)
+   * @param database - Database to execute against (ignored - uses client's configured database)
    * @returns Execution result with affected rows count
-   * @throws {Error} If database is not specified or execution fails
+   * @throws {Error} If execution fails
    */
   async execute(sql: string, database?: string): Promise<{ affectedRows: number; success: boolean }> {
     try {
-      // Get client for the specific database
-      const client = this.getClient(database);
+      // Note: The database parameter is ignored. The statement will execute
+      // in the context of the database configured in the Trino client.
       
       // Build query object with TD API key as user
       const queryObj: TrinoQuery = {
@@ -123,7 +114,7 @@ export class TDTrinoClient {
       };
 
       // Execute the statement
-      const iterator = await client.query(queryObj);
+      const iterator = await this.client.query(queryObj);
       
       let affectedRows = 0;
       let success = false;
@@ -209,7 +200,8 @@ export class TDTrinoClient {
   }
 
   destroy(): void {
-    // Clean up all client connections
-    this.clients.clear();
+    // Clean up client connection
+    // Note: The trino-client library doesn't expose a destroy method,
+    // but the connection will be cleaned up when the process exits
   }
 }
