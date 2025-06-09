@@ -1,12 +1,12 @@
 # Developer Notes
 
-## Testing with GitHub Copilot Chat Agent Mode
+## Testing with VS Code MCP Servers
 
-This MCP server can be tested with GitHub Copilot Chat's agent mode. Here's how to set it up and test it:
+This MCP server can be tested with VS Code's MCP support. Here's how to set it up and test it:
 
 ### Prerequisites
 
-1. Ensure you have GitHub Copilot Chat installed in VS Code
+1. Ensure you have VS Code with MCP support
 2. Build the MCP server:
    ```bash
    npm run build
@@ -18,14 +18,17 @@ This MCP server can be tested with GitHub Copilot Chat's agent mode. Here's how 
 
    ```json
    {
-     "github.copilot.chat.agentExtensions": {
-       "td": {
-         "command": "node",
-         "args": ["/path/to/td-mcp-server/dist/index.js"],
-         "env": {
-           "TD_API_KEY": "your-td-api-key-here",
-           "TD_SITE": "dev",  // or us01, jp01, eu01, ap02, ap03
-           "TD_DATABASE": "sample_datasets"  // optional
+     "mcp": {
+       "servers": {
+         "treasureData": {
+           "type": "stdio",
+           "command": "node",
+           "args": ["/path/to/td-mcp-server/dist/index.js"],
+           "env": {
+             "TD_API_KEY": "your-td-api-key-here",
+             "TD_SITE": "dev",  // or us01, jp01, eu01, ap02, ap03
+             "TD_DATABASE": "sample_datasets"  // optional
+           }
          }
        }
      }
@@ -34,43 +37,67 @@ This MCP server can be tested with GitHub Copilot Chat's agent mode. Here's how 
 
    Replace `/path/to/td-mcp-server` with the actual path to this project.
 
-2. Alternatively, for development testing, you can use the TypeScript source directly:
+   For the published package, you can use npx directly:
 
    ```json
    {
-     "github.copilot.chat.agentExtensions": {
-       "td": {
-         "command": "npx",
-         "args": ["tsx", "/path/to/td-mcp-server/src/index.ts"],
-         "env": {
-           "TD_API_KEY": "your-td-api-key-here",
-           "TD_SITE": "dev",
-           "TD_DATABASE": "sample_datasets"  // optional
+     "mcp": {
+       "servers": {
+         "treasureData": {
+           "type": "stdio",
+           "command": "npx",
+           "args": ["@treasuredata/mcp-server"],
+           "env": {
+             "TD_API_KEY": "your-td-api-key-here",
+             "TD_SITE": "us01",  // or jp01, eu01, ap02, ap03
+             "TD_DATABASE": "sample_datasets"  // optional
+           }
          }
        }
      }
    }
    ```
 
-### Testing the Agent
+2. Alternatively, for development testing, you can use the TypeScript source directly:
 
-1. Open GitHub Copilot Chat in VS Code
-2. Use the `@td` agent to interact with Treasure Data:
+   ```json
+   {
+     "mcp": {
+       "servers": {
+         "treasureData": {
+           "type": "stdio",
+           "command": "npx",
+           "args": ["tsx", "/path/to/td-mcp-server/src/index.ts"],
+           "env": {
+             "TD_API_KEY": "your-td-api-key-here",
+             "TD_SITE": "dev",
+             "TD_DATABASE": "sample_datasets"  // optional
+           }
+         }
+       }
+     }
+   }
+   ```
+
+### Testing the MCP Server
+
+1. Open VS Code
+2. Use the MCP server to interact with Treasure Data:
 
    ```
-   @td list all databases
+   list all databases
    ```
 
    ```
-   @td show tables in sample_datasets
+   show tables in sample_datasets
    ```
 
    ```
-   @td describe the www_access table in sample_datasets
+   describe the www_access table in sample_datasets
    ```
 
    ```
-   @td query sample_datasets: SELECT COUNT(*) FROM www_access
+   query sample_datasets: SELECT COUNT(*) FROM www_access
    ```
 
 ### Available Commands
@@ -78,21 +105,21 @@ This MCP server can be tested with GitHub Copilot Chat's agent mode. Here's how 
 The MCP server exposes these tools that can be invoked through natural language:
 
 1. **list_databases** - Lists all available databases
-   - Example: "@td show me all databases"
+   - Example: "show me all databases"
 
 2. **list_tables** - Lists tables in a specific database
-   - Example: "@td what tables are in sample_datasets?"
+   - Example: "what tables are in sample_datasets?"
 
 3. **describe_table** - Shows column information for a table
-   - Example: "@td describe the schema of nasdaq table in sample_datasets"
+   - Example: "describe the schema of nasdaq table in sample_datasets"
 
 4. **query** - Executes read-only SQL queries (SELECT, SHOW, DESCRIBE)
-   - Example: "@td run this query in sample_datasets: SELECT symbol, COUNT(*) as count FROM nasdaq GROUP BY symbol ORDER BY count DESC LIMIT 10"
+   - Example: "run this query in sample_datasets: SELECT symbol, COUNT(*) as count FROM nasdaq GROUP BY symbol ORDER BY count DESC LIMIT 10"
    - Note: Queries are automatically limited to 40 rows by default
 
 5. **execute** - Executes write operations (UPDATE, DELETE, INSERT, etc.)
    - Only available when `TD_ENABLE_UPDATES=true` is set
-   - Example: "@td execute in mydb: INSERT INTO logs VALUES (...)"
+   - Example: "execute in mydb: INSERT INTO logs VALUES (...)"
 
 ### Debugging
 
@@ -105,7 +132,7 @@ The MCP server exposes these tools that can be invoked through natural language:
    }
    ```
 
-2. Check VS Code's Output panel and select "GitHub Copilot Chat" to see logs
+2. Check VS Code's Output panel to see logs
 
 3. Common issues:
    - **Authentication errors**: Verify your TD_API_KEY is correct
