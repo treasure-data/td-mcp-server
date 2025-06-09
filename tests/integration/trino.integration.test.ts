@@ -49,33 +49,34 @@ describe.skipIf(!isIntegrationTest)('TDTrinoClient Integration Tests', () => {
       
       expect(Array.isArray(databases)).toBe(true);
       expect(databases.length).toBeGreaterThan(0);
-      // information_schema should always exist
+      // Sample dataset should exist in dev environment
+      expect(databases).toContain('sample_datasets');
       expect(databases).toContain('information_schema');
     });
 
-    it('should list tables in information_schema', async () => {
-      const tables = await client.listTables('information_schema');
+    it('should list tables in sample_datasets', async () => {
+      const tables = await client.listTables('sample_datasets');
       
       expect(Array.isArray(tables)).toBe(true);
       expect(tables.length).toBeGreaterThan(0);
-      // These tables should always exist in information_schema
-      expect(tables).toContain('columns');
-      expect(tables).toContain('tables');
-      expect(tables).toContain('schemata');
+      // These tables should exist in sample_datasets
+      expect(tables).toContain('www_access');
+      expect(tables).toContain('nasdaq');
     });
 
-    it('should describe table schema', async () => {
-      const schema = await client.describeTable('information_schema', 'columns');
+    it('should describe www_access table schema', async () => {
+      const schema = await client.describeTable('sample_datasets', 'www_access');
       
       expect(Array.isArray(schema)).toBe(true);
       expect(schema.length).toBeGreaterThan(0);
       
-      // Verify schema structure
+      // Verify known columns in www_access table
       const columnNames = schema.map(col => col.name);
-      expect(columnNames).toContain('table_catalog');
-      expect(columnNames).toContain('table_schema');
-      expect(columnNames).toContain('table_name');
-      expect(columnNames).toContain('column_name');
+      expect(columnNames).toContain('time');
+      expect(columnNames).toContain('method');
+      expect(columnNames).toContain('path');
+      expect(columnNames).toContain('code');
+      expect(columnNames).toContain('size');
       
       // Verify column properties
       schema.forEach(col => {
@@ -84,6 +85,22 @@ describe.skipIf(!isIntegrationTest)('TDTrinoClient Integration Tests', () => {
         expect(col).toHaveProperty('nullable');
         expect(typeof col.nullable).toBe('boolean');
       });
+    });
+
+    it('should describe nasdaq table schema', async () => {
+      const schema = await client.describeTable('sample_datasets', 'nasdaq');
+      
+      expect(Array.isArray(schema)).toBe(true);
+      expect(schema.length).toBeGreaterThan(0);
+      
+      // Verify known columns in nasdaq table
+      const columnNames = schema.map(col => col.name);
+      expect(columnNames).toContain('symbol');
+      expect(columnNames).toContain('open');
+      expect(columnNames).toContain('close');
+      expect(columnNames).toContain('high');
+      expect(columnNames).toContain('low');
+      expect(columnNames).toContain('volume');
     });
   });
 
@@ -100,22 +117,57 @@ describe.skipIf(!isIntegrationTest)('TDTrinoClient Integration Tests', () => {
       expect(result.rowCount).toBe(1);
     });
 
-    it('should execute query with schema context', async () => {
+    it('should query www_access table with limit', async () => {
       const result = await client.query(
-        'SELECT COUNT(*) as table_count FROM tables',
-        'information_schema'
+        'SELECT time, method, path, code FROM www_access LIMIT 5',
+        'sample_datasets'
       );
       
-      expect(result.columns).toHaveLength(1);
-      expect(result.columns[0].name).toBe('table_count');
-      expect(result.data).toHaveLength(1);
-      expect(result.data[0].table_count).toBeGreaterThan(0);
+      expect(result.columns).toHaveLength(4);
+      expect(result.columns[0].name).toBe('time');
+      expect(result.columns[1].name).toBe('method');
+      expect(result.columns[2].name).toBe('path');
+      expect(result.columns[3].name).toBe('code');
+      
+      expect(result.data.length).toBeLessThanOrEqual(5);
+      expect(result.rowCount).toBeLessThanOrEqual(5);
+      
+      // Verify data structure
+      if (result.data.length > 0) {
+        const firstRow = result.data[0];
+        expect(firstRow).toHaveProperty('time');
+        expect(firstRow).toHaveProperty('method');
+        expect(firstRow).toHaveProperty('path');
+        expect(firstRow).toHaveProperty('code');
+      }
+    });
+
+    it('should query nasdaq table with aggregation', async () => {
+      const result = await client.query(
+        'SELECT symbol, AVG(close) as avg_close FROM nasdaq GROUP BY symbol ORDER BY avg_close DESC LIMIT 10',
+        'sample_datasets'
+      );
+      
+      expect(result.columns).toHaveLength(2);
+      expect(result.columns[0].name).toBe('symbol');
+      expect(result.columns[1].name).toBe('avg_close');
+      
+      expect(result.data.length).toBeLessThanOrEqual(10);
+      
+      // Verify data is properly ordered
+      if (result.data.length > 1) {
+        for (let i = 1; i < result.data.length; i++) {
+          const prevAvg = result.data[i - 1].avg_close as number;
+          const currAvg = result.data[i].avg_close as number;
+          expect(prevAvg).toBeGreaterThanOrEqual(currAvg);
+        }
+      }
     });
 
     it('should handle query with no results', async () => {
       const result = await client.query(
-        "SELECT * FROM schemata WHERE schema_name = 'non_existent_schema_12345'",
-        'information_schema'
+        "SELECT * FROM nasdaq WHERE symbol = 'NON_EXISTENT_SYMBOL_12345'",
+        'sample_datasets'
       );
       
       expect(result.columns.length).toBeGreaterThan(0);

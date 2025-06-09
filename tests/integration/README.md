@@ -24,9 +24,9 @@ npm run test:integration
 The integration tests cover:
 
 - **Connection validation**: Testing successful and failed connections
-- **Database operations**: Listing databases and tables
-- **Schema inspection**: Describing table structures
-- **Query execution**: Running various SELECT queries
+- **Database operations**: Listing databases and tables (uses `sample_datasets` database)
+- **Schema inspection**: Describing table structures for `www_access` and `nasdaq` tables
+- **Query execution**: Running various SELECT queries against sample data
 - **Error handling**: Ensuring errors are handled gracefully
 
 ## Important Notes
