@@ -20,7 +20,7 @@ This MCP server can be tested with VS Code's MCP support. Here's how to set it u
    {
      "mcp": {
        "servers": {
-         "treasureData": {
+         "td": {
            "type": "stdio",
            "command": "node",
            "args": ["/path/to/td-mcp-server/dist/index.js"],
@@ -43,7 +43,7 @@ This MCP server can be tested with VS Code's MCP support. Here's how to set it u
    {
      "mcp": {
        "servers": {
-         "treasureData": {
+         "td": {
            "type": "stdio",
            "command": "npx",
            "args": ["@treasuredata/mcp-server"],
@@ -64,7 +64,7 @@ This MCP server can be tested with VS Code's MCP support. Here's how to set it u
    {
      "mcp": {
        "servers": {
-         "treasureData": {
+         "td": {
            "type": "stdio",
            "command": "npx",
            "args": ["tsx", "/path/to/td-mcp-server/src/index.ts"],
@@ -82,22 +82,22 @@ This MCP server can be tested with VS Code's MCP support. Here's how to set it u
 ### Testing the MCP Server
 
 1. Open VS Code
-2. Use the MCP server to interact with Treasure Data:
+2. Use the `@td` prefix to interact with Treasure Data via the MCP server:
 
    ```
-   list all databases
-   ```
-
-   ```
-   show tables in sample_datasets
+   @td list all databases
    ```
 
    ```
-   describe the www_access table in sample_datasets
+   @td show tables in sample_datasets
    ```
 
    ```
-   query sample_datasets: SELECT COUNT(*) FROM www_access
+   @td describe the www_access table in sample_datasets
+   ```
+
+   ```
+   @td query sample_datasets: SELECT COUNT(*) FROM www_access
    ```
 
 ### Available Commands
@@ -105,21 +105,21 @@ This MCP server can be tested with VS Code's MCP support. Here's how to set it u
 The MCP server exposes these tools that can be invoked through natural language:
 
 1. **list_databases** - Lists all available databases
-   - Example: "show me all databases"
+   - Example: "@td show me all databases"
 
 2. **list_tables** - Lists tables in a specific database
-   - Example: "what tables are in sample_datasets?"
+   - Example: "@td what tables are in sample_datasets?"
 
 3. **describe_table** - Shows column information for a table
-   - Example: "describe the schema of nasdaq table in sample_datasets"
+   - Example: "@td describe the schema of nasdaq table in sample_datasets"
 
 4. **query** - Executes read-only SQL queries (SELECT, SHOW, DESCRIBE)
-   - Example: "run this query in sample_datasets: SELECT symbol, COUNT(*) as count FROM nasdaq GROUP BY symbol ORDER BY count DESC LIMIT 10"
+   - Example: "@td run this query in sample_datasets: SELECT symbol, COUNT(*) as count FROM nasdaq GROUP BY symbol ORDER BY count DESC LIMIT 10"
    - Note: Queries are automatically limited to 40 rows by default
 
 5. **execute** - Executes write operations (UPDATE, DELETE, INSERT, etc.)
    - Only available when `TD_ENABLE_UPDATES=true` is set
-   - Example: "execute in mydb: INSERT INTO logs VALUES (...)"
+   - Example: "@td execute in mydb: INSERT INTO logs VALUES (...)"
 
 ### Debugging
 
