@@ -48,7 +48,7 @@ Add to your MCP client configuration (e.g., Claude Desktop):
 ### Configuration Options
 
 - `TD_API_KEY` (required): Your Treasure Data API key
-- `TD_SITE` (optional): Region endpoint - `us01` (default), `jp01`, `eu01`, `ap02`, `ap03`, `dev`
+- `TD_SITE` (optional): Region endpoint - `us01` (default), `jp01`, `eu01`, `ap02`, `ap03`
 - `TD_ENABLE_UPDATES` (optional): Enable write operations - `false` (default), `true`
 - `TD_DATABASE` (optional): Default database for queries (e.g., `sample_datasets`)
 
