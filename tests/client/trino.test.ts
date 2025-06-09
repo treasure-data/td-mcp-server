@@ -36,22 +36,28 @@ describe('TDTrinoClient', () => {
     it('should initialize with correct configuration', () => {
       new TDTrinoClient(mockConfig);
 
-      expect(Trino.create).toHaveBeenCalledWith({
-        server: 'https://api-presto.treasuredata.com:443',
-        catalog: 'td',
-        schema: 'default',
-        auth: expect.any(Object),
-        ssl: { rejectUnauthorized: true },
-      });
+      // Client creation is lazy, so create won't be called until first query
+      expect(Trino.create).not.toHaveBeenCalled();
     });
 
-    it('should use correct endpoint for different sites', () => {
+    it('should create client with correct endpoint when query is made', async () => {
       const jpConfig = { ...mockConfig, site: 'jp01' as const };
-      new TDTrinoClient(jpConfig);
+      const client = new TDTrinoClient(jpConfig);
+      
+      mockQuery.mockResolvedValue({
+        [Symbol.asyncIterator]: async function* () {
+          yield { columns: [], data: [] };
+        },
+      });
+      
+      await client.query('SELECT 1');
 
       expect(Trino.create).toHaveBeenCalledWith(
         expect.objectContaining({
           server: 'https://api-presto.treasuredata.co.jp:443',
+          catalog: 'td',
+          schema: 'default',
+          auth: expect.any(Object),
         })
       );
     });
@@ -98,7 +104,7 @@ describe('TDTrinoClient', () => {
       });
     });
 
-    it('should use schema when provided', async () => {
+    it('should use database when provided', async () => {
       const client = new TDTrinoClient(mockConfig);
 
       mockQuery.mockResolvedValue({
@@ -109,10 +115,15 @@ describe('TDTrinoClient', () => {
 
       await client.query('SELECT 1', 'mydb');
 
+      // Should create a client with mydb schema
+      expect(Trino.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          schema: 'mydb',
+        })
+      );
+      
       expect(mockQuery).toHaveBeenCalledWith({
         query: 'SELECT 1',
-        catalog: 'td',
-        schema: 'mydb',
         user: 'test-api-key-12345',
       });
     });

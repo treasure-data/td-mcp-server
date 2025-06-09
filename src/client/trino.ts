@@ -3,43 +3,53 @@ import { Config, QueryResult } from '../types';
 import { getEndpointForSite, getTrinoPort, getCatalog } from './endpoints';
 
 export class TDTrinoClient {
-  private client: Trino;
   private config: Config;
   private catalog: string;
+  private clients: Map<string, Trino> = new Map();
 
   constructor(config: Config) {
     this.config = config;
     this.catalog = getCatalog();
-
-    const endpoint = getEndpointForSite(config.site);
-    const url = new URL(endpoint);
-
-    // Initialize Trino client with TD-specific configuration
-    this.client = Trino.create({
-      server: `${url.protocol}//${url.hostname}:${getTrinoPort()}`,
-      catalog: this.catalog,
-      schema: 'default',
-      // No auth in connection, will use per-query auth
-      auth: new BasicAuth('', ''),
-      ssl: {
-        rejectUnauthorized: true,
-      },
-    });
   }
 
-  async query(sql: string, schema?: string): Promise<QueryResult> {
+  private getClient(database: string = 'default'): Trino {
+    // Cache clients per database
+    if (!this.clients.has(database)) {
+      const endpoint = getEndpointForSite(this.config.site);
+      const url = new URL(endpoint);
+
+      // Initialize Trino client with TD-specific configuration
+      const client = Trino.create({
+        server: `${url.protocol}//${url.hostname}:${getTrinoPort()}`,
+        catalog: this.catalog,
+        schema: database, // In TD, schema = database
+        // TD uses API key as username in BasicAuth
+        auth: new BasicAuth(this.config.td_api_key),
+        ssl: {
+          rejectUnauthorized: true,
+        },
+      });
+      
+      this.clients.set(database, client);
+    }
+    
+    return this.clients.get(database)!;
+  }
+
+  async query(sql: string, database?: string): Promise<QueryResult> {
     try {
+      // Get client for the specific database
+      const client = this.getClient(database);
+      
       // Build query object with TD API key as user
       const queryObj: TrinoQuery = {
         query: sql,
-        catalog: this.catalog,
-        schema: schema || 'default',
         // TD uses API key as the user in X-Trino-User header
         user: this.config.td_api_key,
       };
 
       // Execute the query
-      const iterator = await this.client.query(queryObj);
+      const iterator = await client.query(queryObj);
       
       // Collect results
       const rows: Array<Record<string, unknown>> = [];
@@ -78,19 +88,20 @@ export class TDTrinoClient {
     }
   }
 
-  async execute(sql: string, schema?: string): Promise<{ affectedRows: number; success: boolean }> {
+  async execute(sql: string, database?: string): Promise<{ affectedRows: number; success: boolean }> {
     try {
+      // Get client for the specific database
+      const client = this.getClient(database);
+      
       // Build query object with TD API key as user
       const queryObj: TrinoQuery = {
         query: sql,
-        catalog: this.catalog,
-        schema: schema || 'default',
         // TD uses API key as the user in X-Trino-User header
         user: this.config.td_api_key,
       };
 
       // Execute the statement
-      const iterator = await this.client.query(queryObj);
+      const iterator = await client.query(queryObj);
       
       let affectedRows = 0;
       let success = false;
@@ -123,15 +134,20 @@ export class TDTrinoClient {
   }
 
   async listDatabases(): Promise<string[]> {
+    // Query information_schema to get all databases
+    // Use information_schema database for this query
     const result = await this.query(
-      `SELECT schema_name FROM ${this.catalog}.information_schema.schemata WHERE catalog_name = '${this.catalog}' ORDER BY schema_name`
+      `SELECT schema_name FROM ${this.catalog}.information_schema.schemata WHERE catalog_name = '${this.catalog}' ORDER BY schema_name`,
+      'information_schema'
     );
     return result.data.map((row) => row.schema_name as string);
   }
 
   async listTables(database: string): Promise<string[]> {
+    // Query information_schema to get tables in a specific database
     const result = await this.query(
-      `SELECT table_name FROM ${this.catalog}.information_schema.tables WHERE table_catalog = '${this.catalog}' AND table_schema = '${database}' ORDER BY table_name`
+      `SELECT table_name FROM ${this.catalog}.information_schema.tables WHERE table_catalog = '${this.catalog}' AND table_schema = '${database}' ORDER BY table_name`,
+      'information_schema'
     );
     return result.data.map((row) => row.table_name as string);
   }
@@ -140,8 +156,10 @@ export class TDTrinoClient {
     database: string,
     table: string
   ): Promise<Array<{ name: string; type: string; nullable: boolean }>> {
+    // Query information_schema to get column information
     const result = await this.query(
-      `SELECT column_name, data_type, is_nullable FROM ${this.catalog}.information_schema.columns WHERE table_catalog = '${this.catalog}' AND table_schema = '${database}' AND table_name = '${table}' ORDER BY ordinal_position`
+      `SELECT column_name, data_type, is_nullable FROM ${this.catalog}.information_schema.columns WHERE table_catalog = '${this.catalog}' AND table_schema = '${database}' AND table_name = '${table}' ORDER BY ordinal_position`,
+      'information_schema'
     );
     return result.data.map((row) => ({
       name: row.column_name as string,
@@ -160,7 +178,7 @@ export class TDTrinoClient {
   }
 
   destroy(): void {
-    // Clean up any resources if needed
-    // The trino-client doesn't have explicit cleanup, but we include this for future use
+    // Clean up all client connections
+    this.clients.clear();
   }
 }
