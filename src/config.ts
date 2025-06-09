@@ -1,5 +1,8 @@
 import { Config, TDSite } from './types';
 
+/**
+ * Error thrown when configuration validation fails
+ */
 export class ConfigurationError extends Error {
   constructor(message: string) {
     super(message);
@@ -9,6 +12,11 @@ export class ConfigurationError extends Error {
 
 const VALID_SITES: readonly TDSite[] = ['us01', 'jp01', 'eu01', 'ap02', 'ap03', 'dev'];
 
+/**
+ * Loads and validates configuration from environment variables
+ * @returns Validated configuration object
+ * @throws {ConfigurationError} If configuration is invalid or missing required values
+ */
 export function loadConfig(): Config {
   const config: Config = {
     td_api_key: process.env.TD_API_KEY || '',
@@ -23,6 +31,11 @@ export function loadConfig(): Config {
   return config;
 }
 
+/**
+ * Validates the configuration object
+ * @param config - Configuration to validate
+ * @throws {ConfigurationError} If configuration is invalid
+ */
 export function validateConfig(config: Config): void {
   // Validate API key
   if (!config.td_api_key) {
@@ -50,6 +63,12 @@ export function validateConfig(config: Config): void {
   }
 }
 
+/**
+ * Gets configuration from arguments with environment variable fallback
+ * @param args - Optional configuration arguments
+ * @returns Validated configuration object
+ * @throws {ConfigurationError} If configuration is invalid
+ */
 export function getConfigFromArgs(args?: Record<string, unknown>): Config {
   // Support both environment variables and direct args
   const config: Config = {
@@ -69,6 +88,11 @@ export function getConfigFromArgs(args?: Record<string, unknown>): Config {
   return config;
 }
 
+/**
+ * Masks an API key for safe display in logs
+ * @param apiKey - The API key to mask
+ * @returns Masked API key showing only first 4 and last 4 characters
+ */
 export function maskApiKey(apiKey: string): string {
   if (apiKey.length <= 8) {
     return '***';
@@ -76,6 +100,11 @@ export function maskApiKey(apiKey: string): string {
   return `${apiKey.substring(0, 4)}...${apiKey.substring(apiKey.length - 4)}`;
 }
 
+/**
+ * Gets a human-readable summary of the configuration
+ * @param config - Configuration object
+ * @returns Formatted configuration summary with masked sensitive data
+ */
 export function getConfigSummary(config: Config): string {
   return `TD MCP Server Configuration:
   - Site: ${config.site}

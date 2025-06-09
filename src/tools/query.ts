@@ -9,6 +9,9 @@ export interface QueryResult {
   truncated: boolean;
 }
 
+/**
+ * MCP tool for executing read-only SQL queries
+ */
 export class QueryTool {
   constructor(
     private readonly client: TDTrinoClient,
@@ -16,6 +19,14 @@ export class QueryTool {
     private readonly queryValidator: QueryValidator
   ) {}
 
+  /**
+   * Executes a read-only SQL query
+   * @param database - Database to query
+   * @param sql - SQL query to execute (SELECT, SHOW, DESCRIBE only)
+   * @param limit - Maximum number of rows to return (default: 40, max: 10000)
+   * @returns Query results with columns, rows, and metadata
+   * @throws {Error} If parameters are invalid or query fails
+   */
   async execute(
     database: string,
     sql: string,

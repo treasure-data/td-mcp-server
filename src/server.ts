@@ -16,6 +16,10 @@ import { DescribeTableTool } from './tools/describe-table';
 import { QueryTool } from './tools/query';
 import { ExecuteTool } from './tools/execute';
 
+/**
+ * Treasure Data MCP Server implementation
+ * Provides tools for querying and managing Treasure Data through the Model Context Protocol
+ */
 export class TDMcpServer {
   private server: Server;
   private trinoClient: TDTrinoClient | null = null;
@@ -301,6 +305,10 @@ export class TDMcpServer {
     }
   }
 
+  /**
+   * Starts the MCP server and begins listening for requests
+   * @throws {Error} If server fails to start
+   */
   async run(): Promise<void> {
     this.setupErrorHandling();
     const transport = new StdioServerTransport();

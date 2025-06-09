@@ -5,12 +5,20 @@ export interface ListDatabasesResult {
   databases: string[];
 }
 
+/**
+ * MCP tool for listing all databases in Treasure Data
+ */
 export class ListDatabasesTool {
   constructor(
     private readonly client: TDTrinoClient,
     private readonly auditLogger: AuditLogger
   ) {}
 
+  /**
+   * Lists all databases accessible to the user
+   * @returns Object containing array of database names
+   * @throws {Error} If the query fails
+   */
   async execute(): Promise<ListDatabasesResult> {
     const query = `
       SELECT schema_name 

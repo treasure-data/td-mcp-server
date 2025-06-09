@@ -2,6 +2,10 @@ import { Trino, BasicAuth, Query as TrinoQuery } from 'trino-client';
 import { Config, QueryResult } from '../types';
 import { getEndpointForSite, getTrinoPort, getCatalog } from './endpoints';
 
+/**
+ * Trino client wrapper for Treasure Data
+ * Handles authentication, query execution, and connection management
+ */
 export class TDTrinoClient {
   private config: Config;
   private catalog: string;
@@ -40,6 +44,13 @@ export class TDTrinoClient {
     return this.clients.get(database)!;
   }
 
+  /**
+   * Executes a SQL query and returns the results
+   * @param sql - SQL query to execute
+   * @param database - Database to query (required for TD)
+   * @returns Query results with columns and data
+   * @throws {Error} If database is not specified or query fails
+   */
   async query(sql: string, database?: string): Promise<QueryResult> {
     try {
       // Get client for the specific database
@@ -92,6 +103,13 @@ export class TDTrinoClient {
     }
   }
 
+  /**
+   * Executes a SQL statement (for write operations)
+   * @param sql - SQL statement to execute
+   * @param database - Database to execute against (required for TD)
+   * @returns Execution result with affected rows count
+   * @throws {Error} If database is not specified or execution fails
+   */
   async execute(sql: string, database?: string): Promise<{ affectedRows: number; success: boolean }> {
     try {
       // Get client for the specific database
@@ -137,6 +155,10 @@ export class TDTrinoClient {
     }
   }
 
+  /**
+   * Lists all databases accessible to the user
+   * @returns Array of database names
+   */
   async listDatabases(): Promise<string[]> {
     // Query information_schema to get all databases
     // Use information_schema database for this query
@@ -147,6 +169,11 @@ export class TDTrinoClient {
     return result.data.map((row) => row.schema_name as string);
   }
 
+  /**
+   * Lists all tables in a database
+   * @param database - Database name
+   * @returns Array of table names
+   */
   async listTables(database: string): Promise<string[]> {
     // Query information_schema to get tables in a specific database
     const result = await this.query(

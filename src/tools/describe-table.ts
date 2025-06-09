@@ -11,12 +11,22 @@ export interface DescribeTableResult {
   columns: ColumnInfo[];
 }
 
+/**
+ * MCP tool for describing table schema
+ */
 export class DescribeTableTool {
   constructor(
     private readonly client: TDTrinoClient,
     private readonly auditLogger: AuditLogger
   ) {}
 
+  /**
+   * Gets column information for a specific table
+   * @param database - Database name
+   * @param table - Table name
+   * @returns Object containing array of column information
+   * @throws {Error} If parameters are invalid or query fails
+   */
   async execute(database: string, table: string): Promise<DescribeTableResult> {
     if (!database || typeof database !== 'string') {
       throw new Error('Database parameter is required');

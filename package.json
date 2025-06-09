@@ -7,8 +7,7 @@
     "td-mcp-server": "./dist/index.js"
   },
   "scripts": {
-    "build": "tsc && chmod +x dist/index.js",
-    "clean": "rm -rf dist",
+    "build": "tsc",
     "dev": "tsx src/index.ts",
     "start": "node dist/index.js",
     "test": "vitest",
@@ -18,8 +17,7 @@
     "test:unit": "vitest run --exclude tests/integration",
     "lint": "eslint src/**/*.ts",
     "format": "prettier --write src/**/*.ts",
-    "typecheck": "tsc --noEmit",
-    "prepublishOnly": "npm run clean && npm run build && npm test"
+    "typecheck": "tsc --noEmit"
   },
   "keywords": [
     "mcp",

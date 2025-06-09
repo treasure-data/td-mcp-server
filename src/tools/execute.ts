@@ -7,6 +7,9 @@ export interface ExecuteResult {
   message: string;
 }
 
+/**
+ * MCP tool for executing write operations (UPDATE, DELETE, INSERT, etc.)
+ */
 export class ExecuteTool {
   constructor(
     private readonly client: TDTrinoClient,
@@ -15,6 +18,13 @@ export class ExecuteTool {
     private readonly enableUpdates: boolean
   ) {}
 
+  /**
+   * Executes a write operation SQL statement
+   * @param database - Database to execute against
+   * @param sql - SQL statement to execute
+   * @returns Execution result with affected rows and status message
+   * @throws {Error} If write operations are disabled, parameters are invalid, or execution fails
+   */
   async execute(
     database: string,
     sql: string

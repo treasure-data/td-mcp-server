@@ -1,0 +1,31 @@
+{
+  "mcpServers": {
+    "td-us": {
+      "command": "npx",
+      "args": ["@treasuredata/mcp-server"],
+      "env": {
+        "TD_API_KEY": "your_us_api_key",
+        "TD_SITE": "us01",
+        "TD_ENABLE_UPDATES": "false"
+      }
+    },
+    "td-jp": {
+      "command": "npx",
+      "args": ["@treasuredata/mcp-server"],
+      "env": {
+        "TD_API_KEY": "your_jp_api_key",
+        "TD_SITE": "jp01",
+        "TD_ENABLE_UPDATES": "false"
+      }
+    },
+    "td-eu": {
+      "command": "npx",
+      "args": ["@treasuredata/mcp-server"],
+      "env": {
+        "TD_API_KEY": "your_eu_api_key",
+        "TD_SITE": "eu01",
+        "TD_ENABLE_UPDATES": "false"
+      }
+    }
+  }
+}

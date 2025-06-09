@@ -27,6 +27,9 @@ const READ_ONLY_TYPES: Set<QueryType> = new Set(['SELECT', 'SHOW', 'DESCRIBE']);
 // Write query types
 const WRITE_TYPES: Set<QueryType> = new Set(['UPDATE', 'DELETE', 'INSERT', 'CREATE', 'DROP', 'ALTER', 'MERGE']);
 
+/**
+ * Validates SQL queries for security and permission constraints
+ */
 export class QueryValidator {
   private readonly enableUpdates: boolean;
 
@@ -36,6 +39,8 @@ export class QueryValidator {
 
   /**
    * Validates a SQL query based on the current security settings
+   * @param sql - SQL query to validate
+   * @returns Validation result with query type and any errors
    */
   validate(sql: string): ValidationResult {
     if (!sql || typeof sql !== 'string') {
@@ -130,6 +135,8 @@ export class QueryValidator {
 
   /**
    * Checks if a query type is read-only
+   * @param queryType - Type of query to check
+   * @returns true if the query type is read-only
    */
   isReadOnly(queryType: QueryType): boolean {
     return READ_ONLY_TYPES.has(queryType);
@@ -137,6 +144,8 @@ export class QueryValidator {
 
   /**
    * Checks if a query type is a write operation
+   * @param queryType - Type of query to check
+   * @returns true if the query type is a write operation
    */
   isWriteOperation(queryType: QueryType): boolean {
     return WRITE_TYPES.has(queryType);

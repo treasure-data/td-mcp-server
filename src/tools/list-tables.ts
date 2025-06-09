@@ -5,12 +5,21 @@ export interface ListTablesResult {
   tables: string[];
 }
 
+/**
+ * MCP tool for listing tables in a specific database
+ */
 export class ListTablesTool {
   constructor(
     private readonly client: TDTrinoClient,
     private readonly auditLogger: AuditLogger
   ) {}
 
+  /**
+   * Lists all tables in the specified database
+   * @param database - Database name to list tables from
+   * @returns Object containing array of table names
+   * @throws {Error} If database parameter is invalid or query fails
+   */
   async execute(database: string): Promise<ListTablesResult> {
     if (!database || typeof database !== 'string') {
       throw new Error('Database parameter is required');

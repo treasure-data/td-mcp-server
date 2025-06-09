@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "treasuredata": {
+      "command": "npx",
+      "args": ["@treasuredata/mcp-server"],
+      "env": {
+        "TD_API_KEY": "your_td_api_key_here",
+        "TD_SITE": "us01",
+        "TD_ENABLE_UPDATES": "false"
+      }
+    }
+  }
+}

@@ -17,6 +17,9 @@ export interface AuditLoggerOptions {
   maxQueryLength?: number;
 }
 
+/**
+ * Logs and tracks all database operations for security auditing
+ */
 export class AuditLogger {
   private readonly options: Required<AuditLoggerOptions>;
   private logs: QueryAuditEntry[] = [];
@@ -31,6 +34,7 @@ export class AuditLogger {
 
   /**
    * Logs a query execution
+   * @param entry - Audit entry without timestamp (added automatically)
    */
   logQuery(entry: Omit<QueryAuditEntry, 'timestamp'>): void {
     if (!this.options.enabled) {
@@ -52,7 +56,12 @@ export class AuditLogger {
   }
 
   /**
-   * Logs a successful query
+   * Logs a successful query execution
+   * @param queryType - Type of query executed
+   * @param query - SQL query text
+   * @param database - Database name (optional)
+   * @param duration - Execution duration in milliseconds (optional)
+   * @param rowCount - Number of rows returned/affected (optional)
    */
   logSuccess(
     queryType: QueryType,
@@ -72,7 +81,12 @@ export class AuditLogger {
   }
 
   /**
-   * Logs a failed query
+   * Logs a failed query execution
+   * @param queryType - Type of query attempted
+   * @param query - SQL query text
+   * @param error - Error message
+   * @param database - Database name (optional)
+   * @param duration - Execution duration in milliseconds (optional)
    */
   logFailure(
     queryType: QueryType,
@@ -93,6 +107,7 @@ export class AuditLogger {
 
   /**
    * Gets all audit logs
+   * @returns Read-only array of all audit entries
    */
   getLogs(): ReadonlyArray<QueryAuditEntry> {
     return [...this.logs];
@@ -100,6 +115,8 @@ export class AuditLogger {
 
   /**
    * Gets logs filtered by criteria
+   * @param filter - Filter criteria object
+   * @returns Filtered array of audit entries
    */
   getFilteredLogs(filter: {
     startTime?: Date;
@@ -119,7 +136,7 @@ export class AuditLogger {
   }
 
   /**
-   * Clears all logs
+   * Clears all logs from memory
    */
   clearLogs(): void {
     this.logs = [];
@@ -127,6 +144,7 @@ export class AuditLogger {
 
   /**
    * Gets audit statistics
+   * @returns Statistics object with query counts and performance metrics
    */
   getStats(): {
     totalQueries: number;
