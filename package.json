@@ -13,6 +13,8 @@
     "test": "vitest",
     "test:watch": "vitest watch",
     "test:coverage": "vitest run --coverage",
+    "test:integration": "vitest run tests/integration",
+    "test:unit": "vitest run --exclude tests/integration",
     "lint": "eslint src/**/*.ts",
     "format": "prettier --write src/**/*.ts",
     "typecheck": "tsc --noEmit"

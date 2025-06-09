@@ -14,8 +14,11 @@ export default defineConfig({
         '**/*.d.ts',
         '**/index.ts',
         'vitest.config.ts',
+        'tests/integration/**',
       ],
     },
+    // Increase timeout for integration tests
+    testTimeout: 30000,
   },
   resolve: {
     extensions: ['.ts', '.js'],

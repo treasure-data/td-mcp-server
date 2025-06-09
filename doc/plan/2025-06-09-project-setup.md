@@ -5,7 +5,7 @@ This document outlines the step-by-step implementation plan for setting up the T
 
 ## Progress Summary
 - **Phase 1.1**: ✅ Completed (2025-06-09)
-  - Project initialization with TypeScript, ESLint, Prettier, and Jest
+  - Project initialization with TypeScript, ESLint, Prettier, and ~~Jest~~ Vitest
   - Created project structure and configuration files
   - Installed all core and development dependencies
 - **Phase 1.2**: ✅ Completed (2025-06-09)
@@ -13,6 +13,12 @@ This document outlines the step-by-step implementation plan for setting up the T
   - Environment variable and args support
   - Security features (API key masking)
   - 100% test coverage
+- **Phase 1.3**: ✅ Completed (2025-06-09)
+  - Trino client wrapper with TD authentication
+  - Site-specific endpoint configuration
+  - Query execution with error handling
+  - Utility methods for database operations
+  - Comprehensive unit tests with mocked client
 
 ## Phase 1: Core Implementation
 
@@ -120,14 +126,18 @@ This document outlines the step-by-step implementation plan for setting up the T
 - [ ] Implement graceful shutdown
 
 ### 7. Testing
-- [ ] Set up Jest testing framework
-- [ ] Create unit tests for:
+- [x] Set up ~~Jest~~ Vitest testing framework
+- [x] Create unit tests for:
   - Configuration validation
   - Query validation
-  - Each MCP tool
-  - Security features
-- [ ] Create integration tests with mock Trino responses
-- [ ] Add CI/CD pipeline configuration with GitHub Actions
+  - Each MCP tool (pending)
+  - Security features (pending)
+- [x] Create unit tests with mock Trino responses
+- [ ] Create integration tests with real Trino connection:
+  - Use site: 'dev' for testing
+  - Use TD_API_KEY_DEVELOPMENT_AWS environment variable
+  - Test actual database operations
+- [x] Add CI/CD pipeline configuration with GitHub Actions
 
 ### 8. Documentation
 - [x] Create comprehensive README.md:
@@ -188,7 +198,8 @@ This document outlines the step-by-step implementation plan for setting up the T
 - Phase 1: 2-3 weeks
   - Phase 1.1 (Project Initialization): ✅ Completed in 1 day
   - Phase 1.2 (Configuration Module): ✅ Completed in 1 day
-  - Phase 1.3-1.10: In progress
+  - Phase 1.3 (Trino Client Wrapper): ✅ Completed in 1 day
+  - Phase 1.4-1.10: In progress
 - Phase 2: 1-2 weeks (future)
 
 ## Dependencies and Risks

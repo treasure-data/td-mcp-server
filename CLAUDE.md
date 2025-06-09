@@ -14,6 +14,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm test tests/config.test.ts` - Run specific test file
 - `npm run test:watch` - Run tests in watch mode
 - `npm run test:coverage` - Run tests with coverage report
+- `npm run test:unit` - Run only unit tests (excludes integration)
+- `npm run test:integration` - Run integration tests (requires TD_API_KEY_DEVELOPMENT_AWS)
 
 ### Code Quality
 - `npm run lint` - Check ESLint rules
@@ -48,6 +50,7 @@ This is an MCP (Model Context Protocol) server that exposes Treasure Data functi
 - TD API key goes in the X-Trino-User header (trino-client sets this via `user` property)
 - No password needed for Trino connection
 - Catalog name is always 'td'
+- For integration tests, use TD_API_KEY_DEVELOPMENT_AWS with site: 'dev'
 
 ### Information Schema Queries
 The MCP tools use specific information_schema queries:
