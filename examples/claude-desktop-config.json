@@ -6,7 +6,8 @@
       "env": {
         "TD_API_KEY": "your_td_api_key_here",
         "TD_SITE": "us01",
-        "TD_ENABLE_UPDATES": "false"
+        "TD_ENABLE_UPDATES": "false",
+        "TD_DEFAULT_DATABASE": "sample_datasets"
       }
     }
   }

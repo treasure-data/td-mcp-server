@@ -22,6 +22,7 @@ export function loadConfig(): Config {
     td_api_key: process.env.TD_API_KEY || '',
     site: (process.env.TD_SITE as TDSite) || 'us01',
     enable_updates: process.env.TD_ENABLE_UPDATES === 'true',
+    default_database: process.env.TD_DEFAULT_DATABASE,
     llm_api_base: process.env.TD_LLM_API_BASE,
     default_project_name: process.env.TD_DEFAULT_PROJECT_NAME,
     default_agent_id: process.env.TD_DEFAULT_AGENT_ID,
@@ -78,6 +79,7 @@ export function getConfigFromArgs(args?: Record<string, unknown>): Config {
       args?.enable_updates === true ||
       args?.enable_updates === 'true' ||
       process.env.TD_ENABLE_UPDATES === 'true',
+    default_database: (args?.default_database as string) || process.env.TD_DEFAULT_DATABASE,
     llm_api_base: (args?.llm_api_base as string) || process.env.TD_LLM_API_BASE,
     default_project_name:
       (args?.default_project_name as string) || process.env.TD_DEFAULT_PROJECT_NAME,
@@ -110,5 +112,6 @@ export function getConfigSummary(config: Config): string {
   - Site: ${config.site}
   - API Key: ${maskApiKey(config.td_api_key)}
   - Updates Enabled: ${config.enable_updates || false}
+  - Default Database: ${config.default_database || 'none'}
   - LLM API Base: ${config.llm_api_base || 'default'}`;
 }

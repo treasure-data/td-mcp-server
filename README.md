@@ -49,6 +49,7 @@ Add to your MCP client configuration (e.g., Claude Desktop):
 - `TD_API_KEY` (required): Your Treasure Data API key
 - `TD_SITE` (optional): Region endpoint - `us01` (default), `jp01`, `eu01`, `ap02`, `ap03`, `dev`
 - `TD_ENABLE_UPDATES` (optional): Enable write operations - `false` (default), `true`
+- `TD_DEFAULT_DATABASE` (optional): Default database for queries (e.g., `sample_datasets`)
 
 ## Available Tools
 
@@ -79,6 +80,14 @@ List all tables in a specific database.
 }
 ```
 
+**With default database configured:**
+```json
+{
+  "name": "list_tables",
+  "arguments": {}
+}
+```
+
 ### 3. describe_table
 Get schema information for a specific table.
 
@@ -92,6 +101,16 @@ Get schema information for a specific table.
   "name": "describe_table",
   "arguments": {
     "database": "sample_datasets",
+    "table": "www_access"
+  }
+}
+```
+
+**With default database configured:**
+```json
+{
+  "name": "describe_table",
+  "arguments": {
     "table": "www_access"
   }
 }
@@ -111,6 +130,17 @@ Execute read-only SQL queries (SELECT, SHOW, DESCRIBE).
   "name": "query",
   "arguments": {
     "database": "sample_datasets",
+    "sql": "SELECT method, COUNT(*) as count FROM www_access GROUP BY method",
+    "limit": 10
+  }
+}
+```
+
+**With default database configured:**
+```json
+{
+  "name": "query",
+  "arguments": {
     "sql": "SELECT method, COUNT(*) as count FROM www_access GROUP BY method",
     "limit": 10
   }

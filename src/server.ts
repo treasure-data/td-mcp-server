@@ -79,10 +79,10 @@ export class TDMcpServer {
             properties: {
               database: {
                 type: 'string',
-                description: 'The database name',
+                description: `The database name (optional if default_database is configured)`,
               },
             },
-            required: ['database'],
+            required: [],
           },
         },
         {
@@ -93,14 +93,14 @@ export class TDMcpServer {
             properties: {
               database: {
                 type: 'string',
-                description: 'The database name',
+                description: 'The database name (optional if default_database is configured)',
               },
               table: {
                 type: 'string',
                 description: 'The table name',
               },
             },
-            required: ['database', 'table'],
+            required: ['table'],
           },
         },
         {
@@ -111,7 +111,7 @@ export class TDMcpServer {
             properties: {
               database: {
                 type: 'string',
-                description: 'The database to query',
+                description: 'The database to query (optional if default_database is configured)',
               },
               sql: {
                 type: 'string',
@@ -124,7 +124,7 @@ export class TDMcpServer {
                 maximum: 10000,
               },
             },
-            required: ['database', 'sql'],
+            required: ['sql'],
           },
         },
         {
@@ -135,14 +135,14 @@ export class TDMcpServer {
             properties: {
               database: {
                 type: 'string',
-                description: 'The database to execute against',
+                description: 'The database to execute against (optional if default_database is configured)',
               },
               sql: {
                 type: 'string',
                 description: 'The SQL statement to execute',
               },
             },
-            required: ['database', 'sql'],
+            required: ['sql'],
           },
         },
       ],
@@ -170,14 +170,15 @@ export class TDMcpServer {
           }
 
           case 'list_tables': {
-            if (!args || typeof args.database !== 'string') {
+            const database = args?.database || this.config.default_database;
+            if (!database || typeof database !== 'string') {
               throw new McpError(
                 ErrorCode.InvalidParams,
-                'Database parameter is required'
+                'Database parameter is required (no default_database configured)'
               );
             }
             const tool = new ListTablesTool(client, this.auditLogger);
-            const result = await tool.execute(args.database);
+            const result = await tool.execute(database);
             return {
               content: [
                 {
@@ -189,14 +190,21 @@ export class TDMcpServer {
           }
 
           case 'describe_table': {
-            if (!args || typeof args.database !== 'string' || typeof args.table !== 'string') {
+            const database = args?.database || this.config.default_database;
+            if (!database || typeof database !== 'string') {
               throw new McpError(
                 ErrorCode.InvalidParams,
-                'Database and table parameters are required'
+                'Database parameter is required (no default_database configured)'
+              );
+            }
+            if (!args || typeof args.table !== 'string') {
+              throw new McpError(
+                ErrorCode.InvalidParams,
+                'Table parameter is required'
               );
             }
             const tool = new DescribeTableTool(client, this.auditLogger);
-            const result = await tool.execute(args.database, args.table);
+            const result = await tool.execute(database, args.table);
             return {
               content: [
                 {
@@ -208,15 +216,22 @@ export class TDMcpServer {
           }
 
           case 'query': {
-            if (!args || typeof args.database !== 'string' || typeof args.sql !== 'string') {
+            const database = args?.database || this.config.default_database;
+            if (!database || typeof database !== 'string') {
               throw new McpError(
                 ErrorCode.InvalidParams,
-                'Database and sql parameters are required'
+                'Database parameter is required (no default_database configured)'
+              );
+            }
+            if (!args || typeof args.sql !== 'string') {
+              throw new McpError(
+                ErrorCode.InvalidParams,
+                'SQL parameter is required'
               );
             }
             const limit = typeof args.limit === 'number' ? args.limit : 40;
             const tool = new QueryTool(client, this.auditLogger, this.queryValidator);
-            const result = await tool.execute(args.database, args.sql, limit);
+            const result = await tool.execute(database, args.sql, limit);
             return {
               content: [
                 {
@@ -228,10 +243,17 @@ export class TDMcpServer {
           }
 
           case 'execute': {
-            if (!args || typeof args.database !== 'string' || typeof args.sql !== 'string') {
+            const database = args?.database || this.config.default_database;
+            if (!database || typeof database !== 'string') {
               throw new McpError(
                 ErrorCode.InvalidParams,
-                'Database and sql parameters are required'
+                'Database parameter is required (no default_database configured)'
+              );
+            }
+            if (!args || typeof args.sql !== 'string') {
+              throw new McpError(
+                ErrorCode.InvalidParams,
+                'SQL parameter is required'
               );
             }
             const tool = new ExecuteTool(
@@ -240,7 +262,7 @@ export class TDMcpServer {
               this.queryValidator,
               this.config.enable_updates || false
             );
-            const result = await tool.execute(args.database, args.sql);
+            const result = await tool.execute(database, args.sql);
             return {
               content: [
                 {
