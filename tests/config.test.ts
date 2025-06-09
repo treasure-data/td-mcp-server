@@ -26,14 +26,14 @@ describe('Configuration', () => {
       process.env.TD_API_KEY = 'test-api-key-12345';
       process.env.TD_SITE = 'jp01';
       process.env.TD_ENABLE_UPDATES = 'true';
-      process.env.TD_DEFAULT_DATABASE = 'my_database';
+      process.env.TD_DATABASE = 'my_database';
 
       const config = loadConfig();
 
       expect(config.td_api_key).toBe('test-api-key-12345');
       expect(config.site).toBe('jp01');
       expect(config.enable_updates).toBe(true);
-      expect(config.default_database).toBe('my_database');
+      expect(config.database).toBe('my_database');
     });
 
     it('should use default values when env vars not set', () => {
@@ -43,7 +43,7 @@ describe('Configuration', () => {
 
       expect(config.site).toBe('us01');
       expect(config.enable_updates).toBe(false);
-      expect(config.default_database).toBeUndefined();
+      expect(config.database).toBeUndefined();
       expect(config.llm_api_base).toBeUndefined();
     });
 
@@ -149,7 +149,7 @@ describe('Configuration', () => {
         td_api_key: 'test-api-key-12345',
         site: 'jp01',
         enable_updates: true,
-        default_database: 'my_db',
+        database: 'my_db',
         llm_api_base: 'https://llm.example.com',
       };
 

@@ -79,7 +79,7 @@ export class TDMcpServer {
             properties: {
               database: {
                 type: 'string',
-                description: `The database name (optional if default_database is configured)`,
+                description: `The database name (optional if TD_DATABASE is configured)`,
               },
             },
             required: [],
@@ -93,7 +93,7 @@ export class TDMcpServer {
             properties: {
               database: {
                 type: 'string',
-                description: 'The database name (optional if default_database is configured)',
+                description: 'The database name (optional if TD_DATABASE is configured)',
               },
               table: {
                 type: 'string',
@@ -111,7 +111,7 @@ export class TDMcpServer {
             properties: {
               database: {
                 type: 'string',
-                description: 'The database to query (optional if default_database is configured)',
+                description: 'The database to query (optional if TD_DATABASE is configured)',
               },
               sql: {
                 type: 'string',
@@ -135,7 +135,7 @@ export class TDMcpServer {
             properties: {
               database: {
                 type: 'string',
-                description: 'The database to execute against (optional if default_database is configured)',
+                description: 'The database to execute against (optional if TD_DATABASE is configured)',
               },
               sql: {
                 type: 'string',
@@ -170,13 +170,7 @@ export class TDMcpServer {
           }
 
           case 'list_tables': {
-            const database = args?.database || this.config.default_database;
-            if (!database || typeof database !== 'string') {
-              throw new McpError(
-                ErrorCode.InvalidParams,
-                'Database parameter is required (no default_database configured)'
-              );
-            }
+            const database = (args?.database as string | undefined) || this.config.database || 'information_schema';
             const tool = new ListTablesTool(client, this.auditLogger);
             const result = await tool.execute(database);
             return {
@@ -190,13 +184,7 @@ export class TDMcpServer {
           }
 
           case 'describe_table': {
-            const database = args?.database || this.config.default_database;
-            if (!database || typeof database !== 'string') {
-              throw new McpError(
-                ErrorCode.InvalidParams,
-                'Database parameter is required (no default_database configured)'
-              );
-            }
+            const database = (args?.database as string | undefined) || this.config.database || 'information_schema';
             if (!args || typeof args.table !== 'string') {
               throw new McpError(
                 ErrorCode.InvalidParams,
@@ -216,13 +204,7 @@ export class TDMcpServer {
           }
 
           case 'query': {
-            const database = args?.database || this.config.default_database;
-            if (!database || typeof database !== 'string') {
-              throw new McpError(
-                ErrorCode.InvalidParams,
-                'Database parameter is required (no default_database configured)'
-              );
-            }
+            const database = (args?.database as string | undefined) || this.config.database || 'information_schema';
             if (!args || typeof args.sql !== 'string') {
               throw new McpError(
                 ErrorCode.InvalidParams,
@@ -243,13 +225,7 @@ export class TDMcpServer {
           }
 
           case 'execute': {
-            const database = args?.database || this.config.default_database;
-            if (!database || typeof database !== 'string') {
-              throw new McpError(
-                ErrorCode.InvalidParams,
-                'Database parameter is required (no default_database configured)'
-              );
-            }
+            const database = (args?.database as string | undefined) || this.config.database || 'information_schema';
             if (!args || typeof args.sql !== 'string') {
               throw new McpError(
                 ErrorCode.InvalidParams,

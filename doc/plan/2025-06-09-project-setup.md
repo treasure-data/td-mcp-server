@@ -48,6 +48,11 @@ This document outlines the step-by-step implementation plan for setting up the T
   - Example configurations for various use cases
   - Enhanced README with usage examples
   - Developer documentation
+- **Phase 1.9**: ✅ Completed (2025-06-09)
+  - Added default database support via TD_DATABASE environment variable
+  - Renamed TD_DEFAULT_DATABASE to TD_DATABASE for consistency
+  - Implemented automatic fallback to 'information_schema' when no database is specified
+  - Updated all tools to support optional database parameter with fallback logic
 
 ## Phase 1: Core Implementation
 
@@ -70,6 +75,7 @@ This document outlines the step-by-step implementation plan for setting up the T
     td_api_key: string;
     site: 'us01' | 'jp01' | 'eu01' | 'ap02' | 'ap03' | 'dev';
     enable_updates?: boolean;
+    database?: string;
     llm_api_base?: string;
     default_project_name?: string;
     default_agent_id?: string;

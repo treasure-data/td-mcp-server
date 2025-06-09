@@ -25,7 +25,7 @@ This MCP server can be tested with GitHub Copilot Chat's agent mode. Here's how 
          "env": {
            "TD_API_KEY": "your-td-api-key-here",
            "TD_SITE": "dev",  // or us01, jp01, eu01, ap02, ap03
-           "TD_DEFAULT_DATABASE": "sample_datasets"  // optional
+           "TD_DATABASE": "sample_datasets"  // optional
          }
        }
      }
@@ -45,7 +45,7 @@ This MCP server can be tested with GitHub Copilot Chat's agent mode. Here's how 
          "env": {
            "TD_API_KEY": "your-td-api-key-here",
            "TD_SITE": "dev",
-           "TD_DEFAULT_DATABASE": "sample_datasets"  // optional
+           "TD_DATABASE": "sample_datasets"  // optional
          }
        }
      }

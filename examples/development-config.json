@@ -7,7 +7,7 @@
         "TD_API_KEY": "your_development_api_key",
         "TD_SITE": "dev",
         "TD_ENABLE_UPDATES": "false",
-        "TD_DEFAULT_DATABASE": "sample_datasets",
+        "TD_DATABASE": "sample_datasets",
         "TD_MCP_LOG_TO_CONSOLE": "true"
       }
     }
