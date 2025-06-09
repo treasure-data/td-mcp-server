@@ -105,7 +105,7 @@ export class TDMcpServer {
         },
         {
           name: 'query',
-          description: 'Execute a read-only SQL query (SELECT, SHOW, DESCRIBE)',
+          description: 'Execute a read-only SQL query (SELECT, SHOW, DESCRIBE). For better performance on large tables, use td_interval(time, \'-30d/now\') to limit the time range.',
           inputSchema: {
             type: 'object',
             properties: {
@@ -115,7 +115,7 @@ export class TDMcpServer {
               },
               sql: {
                 type: 'string',
-                description: 'The SQL query to execute',
+                description: 'The SQL query to execute. For tables with time column, consider using td_interval(time, \'-30d/now\') in WHERE clause to improve performance by limiting the search to recent data (e.g., WHERE td_interval(time, \'-30d/now\')).',
               },
               limit: {
                 type: 'number',
