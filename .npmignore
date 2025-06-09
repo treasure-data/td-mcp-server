@@ -1,0 +1,37 @@
+# Source files
+src/
+tests/
+
+# Development files
+.github/
+.vscode/
+coverage/
+*.log
+*.tgz
+
+# Config files
+.eslintrc*
+.prettierrc*
+vitest.config.ts
+tsconfig.json
+eslint.config.js
+
+# Documentation source
+design/
+doc/
+examples/
+DEVELOPER_NOTES.md
+
+# Environment files
+.env
+.env.*
+
+# IDE files
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Test data
+*.test.ts
+*.spec.ts

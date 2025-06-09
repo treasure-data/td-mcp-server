@@ -33,6 +33,13 @@
     "type": "git",
     "url": "https://github.com/treasure-data/td-mcp-server.git"
   },
+  "bugs": {
+    "url": "https://github.com/treasure-data/td-mcp-server/issues"
+  },
+  "homepage": "https://github.com/treasure-data/td-mcp-server#readme",
+  "publishConfig": {
+    "access": "public"
+  },
   "engines": {
     "node": ">=18.0.0"
   },
