@@ -12,7 +12,11 @@ export class TDTrinoClient {
     this.catalog = getCatalog();
   }
 
-  private getClient(database: string = 'default'): Trino {
+  private getClient(database?: string): Trino {
+    // TD requires a database to be specified
+    if (!database) {
+      throw new Error('Database must be specified for Treasure Data queries');
+    }
     // Cache clients per database
     if (!this.clients.has(database)) {
       const endpoint = getEndpointForSite(this.config.site);
@@ -125,8 +129,8 @@ export class TDTrinoClient {
 
   async testConnection(): Promise<boolean> {
     try {
-      // Simple query to test connection
-      await this.query('SELECT 1');
+      // Simple query to test connection using information_schema
+      await this.query('SELECT 1', 'information_schema');
       return true;
     } catch {
       return false;

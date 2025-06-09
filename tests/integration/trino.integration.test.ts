@@ -106,7 +106,8 @@ describe.skipIf(!isIntegrationTest)('TDTrinoClient Integration Tests', () => {
 
   describe('Query Execution', () => {
     it('should execute simple SELECT query', async () => {
-      const result = await client.query('SELECT 1 as test_col, 2 as another_col');
+      // Use a specific database for the query
+      const result = await client.query('SELECT 1 as test_col, 2 as another_col', 'sample_datasets');
       
       expect(result.columns).toHaveLength(2);
       expect(result.columns[0]).toEqual({ name: 'test_col', type: 'integer' });
@@ -177,7 +178,7 @@ describe.skipIf(!isIntegrationTest)('TDTrinoClient Integration Tests', () => {
 
     it('should handle query errors gracefully', async () => {
       await expect(
-        client.query('SELECT * FROM non_existent_table')
+        client.query('SELECT * FROM non_existent_table', 'sample_datasets')
       ).rejects.toThrow('Trino query failed');
     });
 

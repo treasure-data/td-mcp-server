@@ -50,13 +50,13 @@ describe('TDTrinoClient', () => {
         },
       });
       
-      await client.query('SELECT 1');
+      await client.query('SELECT 1', 'test_db');
 
       expect(Trino.create).toHaveBeenCalledWith(
         expect.objectContaining({
           server: 'https://api-presto.treasuredata.co.jp:443',
           catalog: 'td',
-          schema: 'default',
+          schema: 'test_db',
           auth: expect.any(Object),
         })
       );
@@ -89,7 +89,7 @@ describe('TDTrinoClient', () => {
         },
       });
 
-      const result = await client.query('SELECT * FROM users');
+      const result = await client.query('SELECT * FROM users', 'test_db');
 
       expect(result).toEqual({
         columns: [
@@ -133,7 +133,7 @@ describe('TDTrinoClient', () => {
 
       mockQuery.mockRejectedValue(new Error('Query failed: syntax error'));
 
-      await expect(client.query('INVALID SQL')).rejects.toThrow('Trino query failed: Query failed: syntax error');
+      await expect(client.query('INVALID SQL', 'test_db')).rejects.toThrow('Trino query failed: Query failed: syntax error');
     });
 
     it('should mask API key in error messages', async () => {
@@ -141,7 +141,7 @@ describe('TDTrinoClient', () => {
 
       mockQuery.mockRejectedValue(new Error(`Auth failed for user test-api-key-12345`));
 
-      await expect(client.query('SELECT 1')).rejects.toThrow('Trino query failed: Auth failed for user ***');
+      await expect(client.query('SELECT 1', 'test_db')).rejects.toThrow('Trino query failed: Auth failed for user ***');
     });
   });
 
@@ -158,7 +158,7 @@ describe('TDTrinoClient', () => {
         },
       });
 
-      const result = await client.execute('UPDATE users SET active = true');
+      const result = await client.execute('UPDATE users SET active = true', 'test_db');
 
       expect(result).toEqual({
         affectedRows: 5,
