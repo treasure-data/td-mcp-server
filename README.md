@@ -37,7 +37,8 @@ Add to your MCP client configuration (e.g., Claude Desktop):
       "env": {
         "TD_API_KEY": "your_api_key",
         "TD_SITE": "us01",
-        "TD_ENABLE_UPDATES": "false"
+        "TD_ENABLE_UPDATES": "false",
+        "TD_DATABASE": "sample_datasets"
       }
     }
   }
