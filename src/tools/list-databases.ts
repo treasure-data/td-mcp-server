@@ -35,7 +35,7 @@ export class ListDatabasesTool {
       const duration = Date.now() - startTime;
       
       // Extract database names from results
-      const databases = result.data.map((row: any) => row.schema_name as string);
+      const databases = result.data.map((row: Record<string, unknown>) => row.schema_name as string);
       
       this.auditLogger.logSuccess(
         'SELECT',

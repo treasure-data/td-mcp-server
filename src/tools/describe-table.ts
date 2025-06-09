@@ -71,7 +71,7 @@ export class DescribeTableTool {
       const duration = Date.now() - startTime;
       
       // Format column information
-      const columns: ColumnInfo[] = result.data.map((row: any) => ({
+      const columns: ColumnInfo[] = result.data.map((row: Record<string, unknown>) => ({
         column_name: row.column_name as string,
         data_type: row.data_type as string,
         is_nullable: row.is_nullable === 'YES',

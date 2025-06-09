@@ -4,7 +4,7 @@ import { QueryValidator } from '../security/query-validator';
 
 export interface QueryResult {
   columns: Array<{ name: string; type: string }>;
-  rows: any[][];
+  rows: unknown[][];
   rowCount: number;
   truncated: boolean;
 }
@@ -59,7 +59,7 @@ export class QueryTool {
       const duration = Date.now() - startTime;
       
       // Convert result to array format for MCP
-      const rows = result.data.map((row: any) => {
+      const rows = result.data.map((row: Record<string, unknown>) => {
         return result.columns.map(col => row[col.name]);
       });
       

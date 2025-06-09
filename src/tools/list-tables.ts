@@ -55,7 +55,7 @@ export class ListTablesTool {
       const duration = Date.now() - startTime;
       
       // Extract table names from results
-      const tables = result.data.map((row: any) => row.table_name as string);
+      const tables = result.data.map((row: Record<string, unknown>) => row.table_name as string);
       
       this.auditLogger.logSuccess(
         'SELECT',
