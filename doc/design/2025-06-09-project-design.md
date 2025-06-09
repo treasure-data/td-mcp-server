@@ -15,6 +15,7 @@
 - Trino (Presto) API Client https://github.com/trinodb/trino-js-client
 - TypeScript MCP server SDK https://github.com/modelcontextprotocol/typescript-sdk
 - npx
+- GitHub Actions for CI/CD
 - Use Claude Code for development
 
 ## Details

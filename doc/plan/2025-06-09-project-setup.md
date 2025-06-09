@@ -121,7 +121,7 @@ This document outlines the step-by-step implementation plan for setting up the T
   - Each MCP tool
   - Security features
 - [ ] Create integration tests with mock Trino responses
-- [ ] Add CI/CD pipeline configuration
+- [ ] Add CI/CD pipeline configuration with GitHub Actions
 
 ### 8. Documentation
 - [x] Create comprehensive README.md:
