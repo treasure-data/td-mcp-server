@@ -115,7 +115,7 @@ export class TDMcpServer {
               },
               sql: {
                 type: 'string',
-                description: 'The SQL query to execute. For tables with time column, consider using td_interval(time, \'-30d/now\') in WHERE clause to improve performance by limiting the search to recent data (e.g., WHERE td_interval(time, \'-30d/now\')).',
+                description: 'The SQL query to execute. For tables with time column, consider using td_interval() in WHERE clause to improve performance. Examples: td_interval(time, \'-30d/now\') for last 30 days, td_interval(time, \'-7d/now\') for last 7 days, td_interval(time, \'-1d\') for yesterday, td_interval(time, \'-1h/now\') for last hour, td_interval(time, \'2024-01-01/2024-01-31\') for specific date range.',
               },
               limit: {
                 type: 'number',
