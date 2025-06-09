@@ -125,12 +125,12 @@ Execute read-only SQL queries (SELECT, SHOW, DESCRIBE).
 - `sql` (string, required): SQL query to execute
 - `limit` (number, optional): Max rows (default: 40, max: 10000)
 
-**Performance Tip:** For tables with a `time` column, use `td_interval()` to limit the time range:
+**Performance Tip:** For tables with a `time` column, use `td_interval()` or `td_time_range()` to limit the time range:
 - `td_interval(time, '-30d/now')` - Last 30 days
 - `td_interval(time, '-7d/now')` - Last 7 days  
 - `td_interval(time, '-1d')` - Yesterday only
 - `td_interval(time, '-1h/now')` - Last hour
-- `td_interval(time, '2024-01-01/2024-01-31')` - Specific date range
+- `td_time_range(time, '2024-01-01', '2024-01-31')` - Specific date range
 
 **Example:**
 ```json
