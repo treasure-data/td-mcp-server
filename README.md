@@ -77,7 +77,7 @@ List all databases in your Treasure Data account.
 List all tables in a specific database.
 
 **Parameters:**
-- `database` (string, required): Database name
+- `database` (string, optional): Database name. If omitted, uses the current database context (TD_DATABASE or last used database)
 
 **Example:**
 ```json
@@ -101,7 +101,7 @@ List all tables in a specific database.
 Get schema information for a specific table.
 
 **Parameters:**
-- `database` (string, required): Database name
+- `database` (string, optional): Database name. If omitted, uses the current database context (TD_DATABASE or last used database)
 - `table` (string, required): Table name
 
 **Example:**
