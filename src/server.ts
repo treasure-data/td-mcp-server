@@ -109,10 +109,6 @@ export class TDMcpServer {
           inputSchema: {
             type: 'object',
             properties: {
-              database: {
-                type: 'string',
-                description: 'The database to query (optional if TD_DATABASE is configured)',
-              },
               sql: {
                 type: 'string',
                 description: 'The SQL query to execute. For tables with time column, consider using td_interval() or td_time_range() in WHERE clause to improve performance. Examples: td_interval(time, \'-30d/now\') for last 30 days, td_interval(time, \'-7d/now\') for last 7 days, td_interval(time, \'-1d\') for yesterday, td_interval(time, \'-1h/now\') for last hour, td_time_range(time, \'2024-01-01\', \'2024-01-31\') for specific date range.',
@@ -133,10 +129,6 @@ export class TDMcpServer {
           inputSchema: {
             type: 'object',
             properties: {
-              database: {
-                type: 'string',
-                description: 'The database to execute against (optional if TD_DATABASE is configured)',
-              },
               sql: {
                 type: 'string',
                 description: 'The SQL statement to execute',
@@ -204,7 +196,6 @@ export class TDMcpServer {
           }
 
           case 'query': {
-            const database = (args?.database as string | undefined) || this.config.database || 'information_schema';
             if (!args || typeof args.sql !== 'string') {
               throw new McpError(
                 ErrorCode.InvalidParams,
@@ -213,7 +204,7 @@ export class TDMcpServer {
             }
             const limit = typeof args.limit === 'number' ? args.limit : 40;
             const tool = new QueryTool(client, this.auditLogger, this.queryValidator);
-            const result = await tool.execute(database, args.sql, limit);
+            const result = await tool.execute(args.sql, limit);
             return {
               content: [
                 {
@@ -225,7 +216,6 @@ export class TDMcpServer {
           }
 
           case 'execute': {
-            const database = (args?.database as string | undefined) || this.config.database || 'information_schema';
             if (!args || typeof args.sql !== 'string') {
               throw new McpError(
                 ErrorCode.InvalidParams,
@@ -238,7 +228,7 @@ export class TDMcpServer {
               this.queryValidator,
               this.config.enable_updates || false
             );
-            const result = await tool.execute(database, args.sql);
+            const result = await tool.execute(args.sql);
             return {
               content: [
                 {

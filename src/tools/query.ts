@@ -21,21 +21,15 @@ export class QueryTool {
 
   /**
    * Executes a read-only SQL query
-   * @param database - Database to query
    * @param sql - SQL query to execute (SELECT, SHOW, DESCRIBE only)
    * @param limit - Maximum number of rows to return (default: 40, max: 10000)
    * @returns Query results with columns, rows, and metadata
    * @throws {Error} If parameters are invalid or query fails
    */
   async execute(
-    database: string,
     sql: string,
     limit: number = 40
   ): Promise<QueryResult> {
-    if (!database || typeof database !== 'string') {
-      throw new Error('Database parameter is required');
-    }
-    
     if (!sql || typeof sql !== 'string') {
       throw new Error('SQL parameter is required');
     }
@@ -55,7 +49,7 @@ export class QueryTool {
     const startTime = Date.now();
     
     try {
-      const result = await this.client.query(processedSql, database);
+      const result = await this.client.query(processedSql);
       const duration = Date.now() - startTime;
       
       // Convert result to array format for MCP
@@ -69,7 +63,7 @@ export class QueryTool {
       this.auditLogger.logSuccess(
         validation.queryType,
         processedSql,
-        database,
+        this.client.database,
         duration,
         rows.length
       );
@@ -88,7 +82,7 @@ export class QueryTool {
         validation.queryType,
         processedSql,
         errorMessage,
-        database,
+        this.client.database,
         duration
       );
       

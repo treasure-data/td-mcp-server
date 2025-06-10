@@ -48,12 +48,10 @@ describe('ListTablesTool', () => {
     expect(result.tables).toEqual(['users', 'orders', 'products']);
     expect(mockClient.query).toHaveBeenCalledTimes(2);
     expect(mockClient.query).toHaveBeenNthCalledWith(1,
-      expect.stringContaining('schema_name = \'mydb\''),
-      'information_schema'
+      expect.stringContaining('schema_name = \'mydb\'')
     );
     expect(mockClient.query).toHaveBeenNthCalledWith(2,
-      expect.stringContaining('table_schema = \'mydb\''),
-      'information_schema'
+      expect.stringContaining('table_schema = \'mydb\'')
     );
     expect(mockAuditLogger.logSuccess).toHaveBeenCalledWith(
       'SELECT',

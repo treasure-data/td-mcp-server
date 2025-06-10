@@ -107,7 +107,7 @@ describe.skipIf(!isIntegrationTest)('TDTrinoClient Integration Tests', () => {
   describe('Query Execution', () => {
     it('should execute simple SELECT query', async () => {
       // Use a specific database for the query
-      const result = await client.query('SELECT 1 as test_col, 2 as another_col', 'sample_datasets');
+      const result = await client.query('SELECT 1 as test_col, 2 as another_col');
       
       expect(result.columns).toHaveLength(2);
       expect(result.columns[0]).toEqual({ name: 'test_col', type: 'integer' });
@@ -120,8 +120,7 @@ describe.skipIf(!isIntegrationTest)('TDTrinoClient Integration Tests', () => {
 
     it('should query www_access table with limit', async () => {
       const result = await client.query(
-        'SELECT time, method, path, code FROM www_access LIMIT 5',
-        'sample_datasets'
+        'SELECT time, method, path, code FROM sample_datasets.www_access LIMIT 5'
       );
       
       expect(result.columns).toHaveLength(4);
@@ -145,8 +144,7 @@ describe.skipIf(!isIntegrationTest)('TDTrinoClient Integration Tests', () => {
 
     it('should query nasdaq table with aggregation', async () => {
       const result = await client.query(
-        'SELECT symbol, AVG(close) as avg_close FROM nasdaq GROUP BY symbol ORDER BY avg_close DESC LIMIT 10',
-        'sample_datasets'
+        'SELECT symbol, AVG(close) as avg_close FROM sample_datasets.nasdaq GROUP BY symbol ORDER BY avg_close DESC LIMIT 10'
       );
       
       expect(result.columns).toHaveLength(2);
@@ -167,8 +165,7 @@ describe.skipIf(!isIntegrationTest)('TDTrinoClient Integration Tests', () => {
 
     it('should handle query with no results', async () => {
       const result = await client.query(
-        "SELECT * FROM nasdaq WHERE symbol = 'NON_EXISTENT_SYMBOL_12345'",
-        'sample_datasets'
+        "SELECT * FROM sample_datasets.nasdaq WHERE symbol = 'NON_EXISTENT_SYMBOL_12345'"
       );
       
       expect(result.columns.length).toBeGreaterThan(0);
@@ -180,14 +177,13 @@ describe.skipIf(!isIntegrationTest)('TDTrinoClient Integration Tests', () => {
       // Note: Trino might return empty results rather than throwing errors for non-existent tables
       // This behavior can vary by environment configuration
       await expect(
-        client.query('SELECT * FROM non_existent_table', 'sample_datasets')
+        client.query('SELECT * FROM non_existent_table')
       ).rejects.toThrow('Trino query failed');
     });
 
     it('should execute query with LIMIT', async () => {
       const result = await client.query(
-        'SELECT * FROM tables LIMIT 5',
-        'information_schema'
+        'SELECT * FROM information_schema.tables LIMIT 5'
       );
       
       expect(result.data.length).toBeLessThanOrEqual(5);

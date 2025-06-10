@@ -13,6 +13,7 @@ describe('QueryTool', () => {
   beforeEach(() => {
     mockClient = {
       query: vi.fn(),
+      database: 'test_db',
     };
     
     mockAuditLogger = {
@@ -50,7 +51,7 @@ describe('QueryTool', () => {
       stats: { state: 'FINISHED' },
     });
     
-    const result = await tool.execute('mydb', 'SELECT * FROM users');
+    const result = await tool.execute('SELECT * FROM users');
     
     expect(result).toEqual({
       columns: [
@@ -67,8 +68,7 @@ describe('QueryTool', () => {
     });
     
     expect(mockClient.query).toHaveBeenCalledWith(
-      'SELECT * FROM users LIMIT 40',
-      'mydb'
+      'SELECT * FROM users LIMIT 40'
     );
     expect(mockAuditLogger.logSuccess).toHaveBeenCalled();
   });
@@ -85,11 +85,10 @@ describe('QueryTool', () => {
       stats: { state: 'FINISHED' },
     });
     
-    await tool.execute('mydb', 'SELECT * FROM users', 100);
+    await tool.execute('SELECT * FROM users', 100);
     
     expect(mockClient.query).toHaveBeenCalledWith(
-      'SELECT * FROM users LIMIT 100',
-      'mydb'
+      'SELECT * FROM users LIMIT 100'
     );
   });
 
@@ -105,11 +104,10 @@ describe('QueryTool', () => {
       stats: { state: 'FINISHED' },
     });
     
-    await tool.execute('mydb', 'SELECT * FROM users LIMIT 10');
+    await tool.execute('SELECT * FROM users LIMIT 10');
     
     expect(mockClient.query).toHaveBeenCalledWith(
-      'SELECT * FROM users LIMIT 10',
-      'mydb'
+      'SELECT * FROM users LIMIT 10'
     );
   });
 
@@ -125,11 +123,10 @@ describe('QueryTool', () => {
       stats: { state: 'FINISHED' },
     });
     
-    await tool.execute('mydb', 'SELECT * FROM users;');
+    await tool.execute('SELECT * FROM users;');
     
     expect(mockClient.query).toHaveBeenCalledWith(
-      'SELECT * FROM users LIMIT 40',
-      'mydb'
+      'SELECT * FROM users LIMIT 40'
     );
   });
 
@@ -148,7 +145,7 @@ describe('QueryTool', () => {
       stats: { state: 'FINISHED' },
     });
     
-    const result = await tool.execute('mydb', 'SELECT * FROM large_table', 40);
+    const result = await tool.execute('SELECT * FROM large_table', 40);
     
     expect(result.truncated).toBe(true);
     expect(result.rowCount).toBe(40);
@@ -169,24 +166,21 @@ describe('QueryTool', () => {
       stats: { state: 'FINISHED' },
     });
     
-    const result = await tool.execute('mydb', 'SELECT * FROM large_table LIMIT 10');
+    const result = await tool.execute('SELECT * FROM large_table LIMIT 10');
     
     expect(result.truncated).toBe(false);
   });
 
-  it('should validate database parameter', async () => {
-    await expect(tool.execute('', 'SELECT 1')).rejects.toThrow('Database parameter is required');
-    await expect(tool.execute(null as any, 'SELECT 1')).rejects.toThrow('Database parameter is required');
-  });
+  // Database parameter validation test removed - no longer applicable
 
   it('should validate SQL parameter', async () => {
-    await expect(tool.execute('mydb', '')).rejects.toThrow('SQL parameter is required');
-    await expect(tool.execute('mydb', null as any)).rejects.toThrow('SQL parameter is required');
+    await expect(tool.execute('')).rejects.toThrow('SQL parameter is required');
+    await expect(tool.execute(null as any)).rejects.toThrow('SQL parameter is required');
   });
 
   it('should validate limit parameter', async () => {
-    await expect(tool.execute('mydb', 'SELECT 1', 0)).rejects.toThrow('Limit must be between 1 and 10000');
-    await expect(tool.execute('mydb', 'SELECT 1', 10001)).rejects.toThrow('Limit must be between 1 and 10000');
+    await expect(tool.execute('SELECT 1', 0)).rejects.toThrow('Limit must be between 1 and 10000');
+    await expect(tool.execute('SELECT 1', 10001)).rejects.toThrow('Limit must be between 1 and 10000');
   });
 
   it('should reject invalid queries', async () => {
@@ -196,7 +190,7 @@ describe('QueryTool', () => {
       error: 'UPDATE operations are not allowed',
     });
     
-    await expect(tool.execute('mydb', 'UPDATE users SET x = 1')).rejects.toThrow(
+    await expect(tool.execute('UPDATE users SET x = 1')).rejects.toThrow(
       'Query validation failed: UPDATE operations are not allowed'
     );
     
@@ -212,7 +206,7 @@ describe('QueryTool', () => {
     const error = new Error('Syntax error');
     mockClient.query.mockRejectedValue(error);
     
-    await expect(tool.execute('mydb', 'SELECT * FROM users')).rejects.toThrow(
+    await expect(tool.execute('SELECT * FROM users')).rejects.toThrow(
       'Query execution failed: Syntax error'
     );
     
@@ -220,7 +214,7 @@ describe('QueryTool', () => {
       'SELECT',
       'SELECT * FROM users LIMIT 40',
       'Syntax error',
-      'mydb',
+      'test_db',
       expect.any(Number)
     );
   });
@@ -237,13 +231,13 @@ describe('QueryTool', () => {
       stats: { state: 'FINISHED' },
     });
     
-    const result = await tool.execute('mydb', 'SHOW TABLES');
+    const result = await tool.execute('SHOW TABLES');
     
     expect(result.rows).toEqual([['users'], ['orders']]);
     expect(mockAuditLogger.logSuccess).toHaveBeenCalledWith(
       'SHOW',
       expect.any(String),
-      'mydb',
+      'test_db',
       expect.any(Number),
       2
     );
@@ -268,7 +262,7 @@ describe('QueryTool', () => {
       stats: { state: 'FINISHED' },
     });
     
-    const result = await tool.execute('mydb', 'DESCRIBE users');
+    const result = await tool.execute('DESCRIBE users');
     
     expect(result.rows).toEqual([
       ['id', 'bigint', 'NO'],

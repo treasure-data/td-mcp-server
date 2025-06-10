@@ -60,14 +60,14 @@ export class DescribeTableTool {
           AND table_name = '${table}'
       `.trim();
       
-      const tableExists = await this.client.query(tableCheckQuery, 'information_schema');
+      const tableExists = await this.client.query(tableCheckQuery);
       
       if (tableExists.data.length === 0) {
         throw new Error(`Table '${database}.${table}' does not exist`);
       }
       
       // Execute the main query
-      const result = await this.client.query(query, 'information_schema');
+      const result = await this.client.query(query);
       const duration = Date.now() - startTime;
       
       // Format column information

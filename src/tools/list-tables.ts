@@ -44,14 +44,14 @@ export class ListTablesTool {
           AND schema_name = '${database}'
       `.trim();
       
-      const dbExists = await this.client.query(dbCheckQuery, 'information_schema');
+      const dbExists = await this.client.query(dbCheckQuery);
       
       if (dbExists.data.length === 0) {
         throw new Error(`Database '${database}' does not exist`);
       }
       
       // Execute the main query
-      const result = await this.client.query(query, 'information_schema');
+      const result = await this.client.query(query);
       const duration = Date.now() - startTime;
       
       // Extract table names from results

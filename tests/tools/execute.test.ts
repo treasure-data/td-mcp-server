@@ -15,6 +15,7 @@ describe('ExecuteTool', () => {
     mockClient = {
       query: vi.fn(),
       execute: vi.fn(),
+      database: 'test_db',
     };
     
     mockAuditLogger = {
@@ -54,7 +55,7 @@ describe('ExecuteTool', () => {
       success: true,
     });
     
-    const result = await tool.execute('mydb', 'UPDATE users SET active = true WHERE id > 10');
+    const result = await tool.execute('UPDATE users SET active = true WHERE id > 10');
     
     expect(result).toEqual({
       affectedRows: 5,
@@ -62,13 +63,12 @@ describe('ExecuteTool', () => {
     });
     
     expect(mockClient.execute).toHaveBeenCalledWith(
-      'UPDATE users SET active = true WHERE id > 10',
-      'mydb'
+      'UPDATE users SET active = true WHERE id > 10'
     );
     expect(mockAuditLogger.logSuccess).toHaveBeenCalledWith(
       'UPDATE',
       expect.any(String),
-      'mydb',
+      'test_db',
       expect.any(Number),
       5
     );
@@ -86,7 +86,7 @@ describe('ExecuteTool', () => {
       success: true,
     });
     
-    const result = await tool.execute('mydb', 'INSERT INTO users (name) VALUES ("test")');
+    const result = await tool.execute('INSERT INTO users (name) VALUES ("test")');
     
     expect(result.affectedRows).toBe(1);
     expect(result.message).toContain('INSERT operation completed');
@@ -104,7 +104,7 @@ describe('ExecuteTool', () => {
       success: true,
     });
     
-    const result = await tool.execute('mydb', 'DELETE FROM users WHERE inactive = true');
+    const result = await tool.execute('DELETE FROM users WHERE inactive = true');
     
     expect(result.affectedRows).toBe(10);
     expect(result.message).toBe('DELETE operation completed. Affected rows: 10');
@@ -122,7 +122,7 @@ describe('ExecuteTool', () => {
       success: true,
     });
     
-    const result = await tool.execute('mydb', 'CREATE TABLE test (id INT)');
+    const result = await tool.execute('CREATE TABLE test (id INT)');
     
     expect(result.affectedRows).toBe(0);
     expect(result.message).toBe('CREATE operation completed successfully');
@@ -140,7 +140,7 @@ describe('ExecuteTool', () => {
       success: true,
     });
     
-    const result = await tool.execute('mydb', 'DROP TABLE old_table');
+    const result = await tool.execute('DROP TABLE old_table');
     
     expect(result.message).toBe('DROP operation completed successfully');
   });
@@ -157,14 +157,14 @@ describe('ExecuteTool', () => {
       success: true,
     });
     
-    const result = await tool.execute('mydb', 'ALTER TABLE users ADD COLUMN age INT');
+    const result = await tool.execute('ALTER TABLE users ADD COLUMN age INT');
     
     expect(result.message).toBe('ALTER operation completed successfully');
   });
 
   it('should throw error when updates are disabled', async () => {
     await expect(
-      toolWithUpdatesDisabled.execute('mydb', 'UPDATE users SET x = 1')
+      toolWithUpdatesDisabled.execute('UPDATE users SET x = 1')
     ).rejects.toThrow('Write operations are disabled. Set enable_updates=true in configuration to allow write operations.');
     
     expect(mockClient.execute).not.toHaveBeenCalled();
@@ -178,20 +178,19 @@ describe('ExecuteTool', () => {
     mockQueryValidator.isReadOnly.mockReturnValue(true);
     
     await expect(
-      tool.execute('mydb', 'SELECT * FROM users')
+      tool.execute('SELECT * FROM users')
     ).rejects.toThrow('Use the query tool for read-only operations (SELECT)');
     
     expect(mockClient.execute).not.toHaveBeenCalled();
   });
 
   it('should validate database parameter', async () => {
-    await expect(tool.execute('', 'UPDATE users SET x = 1')).rejects.toThrow('Database parameter is required');
-    await expect(tool.execute(null as any, 'UPDATE users SET x = 1')).rejects.toThrow('Database parameter is required');
+    // Database parameter validation test removed - no longer applicable
   });
 
   it('should validate SQL parameter', async () => {
-    await expect(tool.execute('mydb', '')).rejects.toThrow('SQL parameter is required');
-    await expect(tool.execute('mydb', null as any)).rejects.toThrow('SQL parameter is required');
+    await expect(tool.execute('')).rejects.toThrow('SQL parameter is required');
+    await expect(tool.execute(null as any)).rejects.toThrow('SQL parameter is required');
   });
 
   it('should reject invalid queries', async () => {
@@ -202,7 +201,7 @@ describe('ExecuteTool', () => {
     });
     
     await expect(
-      tool.execute('mydb', 'INVALID SQL')
+      tool.execute('INVALID SQL')
     ).rejects.toThrow('Query validation failed: Invalid SQL syntax');
     
     expect(mockClient.execute).not.toHaveBeenCalled();
@@ -219,14 +218,14 @@ describe('ExecuteTool', () => {
     mockClient.execute.mockRejectedValue(error);
     
     await expect(
-      tool.execute('mydb', 'UPDATE users SET admin = true')
+      tool.execute('UPDATE users SET admin = true')
     ).rejects.toThrow('Execute operation failed: Permission denied');
     
     expect(mockAuditLogger.logFailure).toHaveBeenCalledWith(
       'UPDATE',
       'UPDATE users SET admin = true',
       'Permission denied',
-      'mydb',
+      'test_db',
       expect.any(Number)
     );
   });
@@ -241,7 +240,7 @@ describe('ExecuteTool', () => {
     mockClient.execute.mockRejectedValue('String error');
     
     await expect(
-      tool.execute('mydb', 'UPDATE users SET x = 1')
+      tool.execute('UPDATE users SET x = 1')
     ).rejects.toThrow('Execute operation failed: Unknown error');
   });
 
@@ -257,7 +256,7 @@ describe('ExecuteTool', () => {
       success: true,
     });
     
-    const result = await tool.execute('mydb', 'UPDATE users SET x = 1');
+    const result = await tool.execute('UPDATE users SET x = 1');
     
     expect(result.affectedRows).toBeUndefined();
     expect(result.message).toBe('UPDATE operation completed successfully');

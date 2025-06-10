@@ -36,27 +36,24 @@ describe('TDTrinoClient', () => {
     it('should initialize with correct configuration', () => {
       new TDTrinoClient(mockConfig);
 
-      // Client creation is lazy, so create won't be called until first query
-      expect(Trino.create).not.toHaveBeenCalled();
+      // Client is now created immediately in constructor
+      expect(Trino.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          catalog: 'td',
+          schema: 'information_schema', // Default schema
+        })
+      );
     });
 
-    it('should create client with correct endpoint when query is made', async () => {
+    it('should create client with correct endpoint', () => {
       const jpConfig = { ...mockConfig, site: 'jp01' as const };
-      const client = new TDTrinoClient(jpConfig);
-      
-      mockQuery.mockResolvedValue({
-        [Symbol.asyncIterator]: async function* () {
-          yield { columns: [], data: [] };
-        },
-      });
-      
-      await client.query('SELECT 1', 'test_db');
+      new TDTrinoClient(jpConfig);
 
       expect(Trino.create).toHaveBeenCalledWith(
         expect.objectContaining({
           server: 'https://api-presto.treasuredata.co.jp:443',
           catalog: 'td',
-          schema: 'test_db',
+          schema: 'information_schema', // Default schema since no database in config
           auth: expect.any(Object),
         })
       );
@@ -89,7 +86,7 @@ describe('TDTrinoClient', () => {
         },
       });
 
-      const result = await client.query('SELECT * FROM users', 'test_db');
+      const result = await client.query('SELECT * FROM users');
 
       expect(result).toEqual({
         columns: [
@@ -104,7 +101,7 @@ describe('TDTrinoClient', () => {
       });
     });
 
-    it('should use database when provided', async () => {
+    it('should execute query with database parameter', async () => {
       const client = new TDTrinoClient(mockConfig);
 
       mockQuery.mockResolvedValue({
@@ -113,15 +110,9 @@ describe('TDTrinoClient', () => {
         },
       });
 
-      await client.query('SELECT 1', 'mydb');
+      await client.query('SELECT 1');
 
-      // Should create a client with mydb schema
-      expect(Trino.create).toHaveBeenCalledWith(
-        expect.objectContaining({
-          schema: 'mydb',
-        })
-      );
-      
+      // The database parameter is ignored - query executes in default schema context
       expect(mockQuery).toHaveBeenCalledWith({
         query: 'SELECT 1',
         user: 'test-api-key-12345',
@@ -133,7 +124,7 @@ describe('TDTrinoClient', () => {
 
       mockQuery.mockRejectedValue(new Error('Query failed: syntax error'));
 
-      await expect(client.query('INVALID SQL', 'test_db')).rejects.toThrow('Trino query failed: Query failed: syntax error');
+      await expect(client.query('INVALID SQL')).rejects.toThrow('Trino query failed: Query failed: syntax error');
     });
 
     it('should mask API key in error messages', async () => {
@@ -141,7 +132,7 @@ describe('TDTrinoClient', () => {
 
       mockQuery.mockRejectedValue(new Error(`Auth failed for user test-api-key-12345`));
 
-      await expect(client.query('SELECT 1', 'test_db')).rejects.toThrow('Trino query failed: Auth failed for user ***');
+      await expect(client.query('SELECT 1')).rejects.toThrow('Trino query failed: Auth failed for user ***');
     });
   });
 
@@ -158,7 +149,7 @@ describe('TDTrinoClient', () => {
         },
       });
 
-      const result = await client.execute('UPDATE users SET active = true', 'test_db');
+      const result = await client.execute('UPDATE users SET active = true');
 
       expect(result).toEqual({
         affectedRows: 5,

@@ -30,8 +30,8 @@ export class ListDatabasesTool {
     const startTime = Date.now();
     
     try {
-      // Execute query in the information_schema context
-      const result = await this.client.query(query, 'information_schema');
+      // Execute query
+      const result = await this.client.query(query);
       const duration = Date.now() - startTime;
       
       // Extract database names from results
