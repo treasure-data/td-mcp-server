@@ -20,19 +20,13 @@ export class ExecuteTool {
 
   /**
    * Executes a write operation SQL statement
-   * @param database - Database to execute against
    * @param sql - SQL statement to execute
    * @returns Execution result with affected rows and status message
    * @throws {Error} If write operations are disabled, parameters are invalid, or execution fails
    */
   async execute(
-    database: string,
     sql: string
   ): Promise<ExecuteResult> {
-    if (!database || typeof database !== 'string') {
-      throw new Error('Database parameter is required');
-    }
-    
     if (!sql || typeof sql !== 'string') {
       throw new Error('SQL parameter is required');
     }
@@ -76,7 +70,7 @@ export class ExecuteTool {
       this.auditLogger.logSuccess(
         validation.queryType,
         sql,
-        database,
+        this.client.database,
         duration,
         affectedRows
       );
@@ -93,7 +87,7 @@ export class ExecuteTool {
         validation.queryType,
         sql,
         errorMessage,
-        database,
+        this.client.database,
         duration
       );
       

@@ -190,4 +190,11 @@ export class TDTrinoClient {
     // Note: The trino-client library doesn't expose a destroy method,
     // but the connection will be cleaned up when the process exits
   }
+
+  /**
+   * Gets the current database/schema name
+   */
+  get database(): string {
+    return this.defaultDatabase;
+  }
 }
