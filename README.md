@@ -357,7 +357,7 @@ For information on testing this MCP server with GitHub Copilot Chat agent mode, 
 
 ## License
 
-MIT
+Apache License 2.0
 
 ## Contributing
 
