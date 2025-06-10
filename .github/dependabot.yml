@@ -29,3 +29,14 @@ updates:
     versioning-strategy: "increase"
     labels:
       - "dependencies"
+  
+  # Enable version updates for GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "10:00"
+    labels:
+      - "dependencies"
+      - "github-actions"
