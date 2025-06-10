@@ -6,6 +6,11 @@ import { Trino } from 'trino-client';
 // Mock the trino-client module
 vi.mock('trino-client');
 
+// Mock package.json to provide a version
+vi.mock('../../../package.json', () => ({
+  version: '0.1.0',
+}));
+
 describe('TDTrinoClient', () => {
   const mockConfig: Config = {
     td_api_key: 'test-api-key-12345',
@@ -55,6 +60,18 @@ describe('TDTrinoClient', () => {
           catalog: 'td',
           schema: 'information_schema', // Default schema since no database in config
           auth: expect.any(Object),
+        })
+      );
+    });
+
+    it('should include User-Agent header with version', () => {
+      new TDTrinoClient(mockConfig);
+
+      expect(Trino.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          extraHeaders: {
+            'User-Agent': expect.stringMatching(/^td-mcp-server\/\d+\.\d+\.\d+$/),
+          },
         })
       );
     });

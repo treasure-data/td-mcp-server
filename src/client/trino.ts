@@ -1,6 +1,7 @@
 import { Trino, BasicAuth, Query as TrinoQuery } from 'trino-client';
 import { Config, QueryResult } from '../types';
 import { getEndpointForSite, getTrinoPort, getCatalog } from './endpoints';
+import { version } from '../../package.json';
 
 /**
  * Trino client wrapper for Treasure Data
@@ -29,6 +30,9 @@ export class TDTrinoClient {
       auth: new BasicAuth(this.config.td_api_key),
       ssl: {
         rejectUnauthorized: true,
+      },
+      extraHeaders: {
+        'User-Agent': `td-mcp-server/${version}`,
       },
     });
   }
