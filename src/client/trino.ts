@@ -59,10 +59,10 @@ export class TDTrinoClient {
       for await (const result of iterator) {
         // Check for query errors first
         if (result.error) {
-          const error = new Error(
-            `${result.error.message} (${result.error.errorName}: ${result.error.errorCode})`
-          );
-          throw error;
+          const errorMessage = result.id 
+            ? `[${result.error.errorName}] ${result.error.message} (${result.id})`
+            : `[${result.error.errorName}] ${result.error.message}`;
+          throw new Error(errorMessage);
         }
 
         if (!columnsSet && result.columns) {
@@ -120,10 +120,10 @@ export class TDTrinoClient {
       for await (const result of iterator) {
         // Check for query errors first
         if (result.error) {
-          const error = new Error(
-            `${result.error.message} (${result.error.errorName}: ${result.error.errorCode})`
-          );
-          throw error;
+          const errorMessage = result.id 
+            ? `[${result.error.errorName}] ${result.error.message} (${result.id})`
+            : `[${result.error.errorName}] ${result.error.message}`;
+          throw new Error(errorMessage);
         }
 
         if (result.stats) {

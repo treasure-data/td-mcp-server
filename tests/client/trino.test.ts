@@ -134,6 +134,7 @@ describe('TDTrinoClient', () => {
       mockQuery.mockResolvedValue({
         [Symbol.asyncIterator]: async function* () {
           yield {
+            id: 'query-12345',
             error: {
               message: 'line 1:8: mismatched input \'INVALID\'. Expecting: \'(\'',
               errorCode: 1,
@@ -151,7 +152,35 @@ describe('TDTrinoClient', () => {
       });
 
       await expect(client.query('SELECT INVALID SQL')).rejects.toThrow(
-        'line 1:8: mismatched input \'INVALID\'. Expecting: \'(\' (SYNTAX_ERROR: 1)'
+        '[SYNTAX_ERROR] line 1:8: mismatched input \'INVALID\'. Expecting: \'(\' (query-12345)'
+      );
+    });
+
+    it('should handle QueryResult error without query ID', async () => {
+      const client = new TDTrinoClient(mockConfig);
+
+      // Mock async iterator that returns a result with error but no ID
+      mockQuery.mockResolvedValue({
+        [Symbol.asyncIterator]: async function* () {
+          yield {
+            error: {
+              message: 'Connection timeout',
+              errorCode: 999,
+              errorName: 'CONNECTION_ERROR',
+              errorType: 'INTERNAL_ERROR',
+              failureInfo: {
+                type: 'java.net.SocketTimeoutException',
+                message: 'Connection timeout',
+                suppressed: [],
+                stack: [],
+              },
+            },
+          };
+        },
+      });
+
+      await expect(client.query('SELECT 1')).rejects.toThrow(
+        '[CONNECTION_ERROR] Connection timeout'
       );
     });
 
@@ -191,6 +220,7 @@ describe('TDTrinoClient', () => {
       mockQuery.mockResolvedValue({
         [Symbol.asyncIterator]: async function* () {
           yield {
+            id: 'query-67890',
             error: {
               message: 'Table users does not exist',
               errorCode: 42,
@@ -208,7 +238,7 @@ describe('TDTrinoClient', () => {
       });
 
       await expect(client.execute('UPDATE users SET active = true')).rejects.toThrow(
-        'Table users does not exist (TABLE_NOT_FOUND: 42)'
+        '[TABLE_NOT_FOUND] Table users does not exist (query-67890)'
       );
     });
   });
