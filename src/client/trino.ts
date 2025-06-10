@@ -57,6 +57,14 @@ export class TDTrinoClient {
       let columnsSet = false;
 
       for await (const result of iterator) {
+        // Check for query errors first
+        if (result.error) {
+          const errorMessage = result.id 
+            ? `[${result.error.errorName}] ${result.error.message} (${result.id})`
+            : `[${result.error.errorName}] ${result.error.message}`;
+          throw new Error(errorMessage);
+        }
+
         if (!columnsSet && result.columns) {
           columns.push(
             ...result.columns.map((col) => ({
@@ -110,6 +118,14 @@ export class TDTrinoClient {
       let success = false;
 
       for await (const result of iterator) {
+        // Check for query errors first
+        if (result.error) {
+          const errorMessage = result.id 
+            ? `[${result.error.errorName}] ${result.error.message} (${result.id})`
+            : `[${result.error.errorName}] ${result.error.message}`;
+          throw new Error(errorMessage);
+        }
+
         if (result.stats) {
           // Try to get affected rows from stats
           affectedRows = result.stats.processedRows || 0;
@@ -180,9 +196,9 @@ export class TDTrinoClient {
     if (error instanceof Error) {
       // Don't expose API key in error messages
       const message = error.message.replace(this.config.td_api_key, '***');
-      return new Error(`Trino query failed: ${message}`);
+      return new Error(message);
     }
-    return new Error('Trino query failed: Unknown error');
+    return new Error('Unknown error');
   }
 
   destroy(): void {

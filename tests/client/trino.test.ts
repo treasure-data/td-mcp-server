@@ -124,7 +124,64 @@ describe('TDTrinoClient', () => {
 
       mockQuery.mockRejectedValue(new Error('Query failed: syntax error'));
 
-      await expect(client.query('INVALID SQL')).rejects.toThrow('Trino query failed: Query failed: syntax error');
+      await expect(client.query('INVALID SQL')).rejects.toThrow('Query failed: syntax error');
+    });
+
+    it('should handle QueryResult error field for syntax errors', async () => {
+      const client = new TDTrinoClient(mockConfig);
+
+      // Mock async iterator that returns a result with error
+      mockQuery.mockResolvedValue({
+        [Symbol.asyncIterator]: async function* () {
+          yield {
+            id: 'query-12345',
+            error: {
+              message: 'line 1:8: mismatched input \'INVALID\'. Expecting: \'(\'',
+              errorCode: 1,
+              errorName: 'SYNTAX_ERROR',
+              errorType: 'USER_ERROR',
+              failureInfo: {
+                type: 'com.facebook.presto.sql.parser.ParsingException',
+                message: 'line 1:8: mismatched input \'INVALID\'',
+                suppressed: [],
+                stack: [],
+              },
+            },
+          };
+        },
+      });
+
+      await expect(client.query('SELECT INVALID SQL')).rejects.toThrow(
+        '[SYNTAX_ERROR] line 1:8: mismatched input \'INVALID\'. Expecting: \'(\' (query-12345)'
+      );
+    });
+
+    it('should handle QueryResult error without query ID', async () => {
+      const client = new TDTrinoClient(mockConfig);
+
+      // Mock async iterator that returns a result with error but no ID
+      mockQuery.mockResolvedValue({
+        [Symbol.asyncIterator]: async function* () {
+          yield {
+            error: {
+              message: 'Connection timeout',
+              errorCode: 999,
+              errorName: 'CONNECTION_ERROR',
+              errorType: 'INTERNAL_ERROR',
+              failureInfo: {
+                type: 'java.net.SocketTimeoutException',
+                message: 'Connection timeout',
+                suppressed: [],
+                stack: [],
+              },
+            },
+          };
+        },
+      });
+
+      await expect(client.query('SELECT 1')).rejects.toThrow(
+        '[CONNECTION_ERROR] Connection timeout'
+      );
     });
 
     it('should mask API key in error messages', async () => {
@@ -132,7 +189,7 @@ describe('TDTrinoClient', () => {
 
       mockQuery.mockRejectedValue(new Error(`Auth failed for user test-api-key-12345`));
 
-      await expect(client.query('SELECT 1')).rejects.toThrow('Trino query failed: Auth failed for user ***');
+      await expect(client.query('SELECT 1')).rejects.toThrow('Auth failed for user ***');
     });
   });
 
@@ -155,6 +212,34 @@ describe('TDTrinoClient', () => {
         affectedRows: 5,
         success: true,
       });
+    });
+
+    it('should handle QueryResult error field in execute', async () => {
+      const client = new TDTrinoClient(mockConfig);
+
+      mockQuery.mockResolvedValue({
+        [Symbol.asyncIterator]: async function* () {
+          yield {
+            id: 'query-67890',
+            error: {
+              message: 'Table users does not exist',
+              errorCode: 42,
+              errorName: 'TABLE_NOT_FOUND',
+              errorType: 'USER_ERROR',
+              failureInfo: {
+                type: 'com.facebook.presto.sql.analyzer.SemanticException',
+                message: 'Table users does not exist',
+                suppressed: [],
+                stack: [],
+              },
+            },
+          };
+        },
+      });
+
+      await expect(client.execute('UPDATE users SET active = true')).rejects.toThrow(
+        '[TABLE_NOT_FOUND] Table users does not exist (query-67890)'
+      );
     });
   });
 
