@@ -84,6 +84,9 @@ When implementing new features:
 4. Run `npm run test:coverage` to verify coverage
 5. Use Vitest's `describe`, `it`, `expect`, `beforeEach`, `vi` imports
 
+## Git Workflow
+- For merging pr, use squash commits for maintaining release notes in the pr title 
+
 ## Future Features
 
 Phase 2 will add chat functionality using TD LLM API:

@@ -70,20 +70,29 @@ describe('AuditLogger', () => {
   describe('Console logging', () => {
     it('should log to console when enabled', () => {
       logger = new AuditLogger({ logToConsole: true });
-      logger.logSuccess('SELECT', 'SELECT 1', 'mydb', 100, 1);
+      logger.logSuccess('SELECT', 'SELECT * FROM users WHERE id = 1', 'mydb', 100, 1);
       
-      expect(consoleLogSpy).toHaveBeenCalled();
-      const logMessage = consoleLogSpy.mock.calls[0][0] as string;
-      expect(logMessage).toContain('✓ SELECT [mydb] (100ms) -> 1 rows');
+      expect(consoleLogSpy).toHaveBeenCalledTimes(2); // Status line + SQL line
+      const statusMessage = consoleLogSpy.mock.calls[0][0] as string;
+      const sqlMessage = consoleLogSpy.mock.calls[1][0] as string;
+      
+      expect(statusMessage).toContain('✓ SELECT [mydb] (100ms) -> 1 rows');
+      expect(sqlMessage).toContain('SQL: SELECT * FROM users WHERE id = 1');
     });
 
     it('should log errors to console', () => {
       logger = new AuditLogger({ logToConsole: true });
-      logger.logFailure('UPDATE', 'UPDATE x', 'Permission denied');
+      logger.logFailure('UPDATE', 'UPDATE users SET admin = true', 'Permission denied');
       
-      expect(consoleLogSpy).toHaveBeenCalled();
+      expect(consoleLogSpy).toHaveBeenCalledTimes(2); // Status line + SQL line
       expect(consoleErrorSpy).toHaveBeenCalled();
+      
+      const statusMessage = consoleLogSpy.mock.calls[0][0] as string;
+      const sqlMessage = consoleLogSpy.mock.calls[1][0] as string;
       const errorMessage = consoleErrorSpy.mock.calls[0][0] as string;
+      
+      expect(statusMessage).toContain('✗ UPDATE');
+      expect(sqlMessage).toContain('SQL: UPDATE users SET admin = true');
       expect(errorMessage).toContain('Permission denied');
     });
 
@@ -92,6 +101,20 @@ describe('AuditLogger', () => {
       logger.logSuccess('SELECT', 'SELECT 1');
       
       expect(consoleLogSpy).not.toHaveBeenCalled();
+    });
+    
+    it('should truncate long SQL queries in console', () => {
+      logger = new AuditLogger({ logToConsole: true, maxQueryLength: 50 });
+      const longQuery = 'SELECT ' + 'a,'.repeat(100) + ' b FROM very_long_table_name WHERE conditions = true';
+      logger.logSuccess('SELECT', longQuery, 'mydb');
+      
+      expect(consoleLogSpy).toHaveBeenCalledTimes(2);
+      const sqlMessage = consoleLogSpy.mock.calls[1][0] as string;
+      
+      expect(sqlMessage).toContain('  SQL: ');
+      expect(sqlMessage).toContain('...');
+      // Verify it's truncated to approximately maxQueryLength + some overhead
+      expect(sqlMessage.length).toBeLessThan(70);
     });
   });
 

@@ -207,6 +207,9 @@ export class AuditLogger {
       `[${entry.timestamp.toISOString()}] ${status} ${entry.queryType} ${database}${duration}${rowCount}`
     );
     
+    // Log the SQL query
+    console.log(`  SQL: ${entry.query}`);
+    
     if (!entry.success && entry.error) {
       console.error(`  Error: ${entry.error}`);
     }

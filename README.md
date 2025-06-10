@@ -38,7 +38,8 @@ Add to your MCP client configuration (e.g., Claude Desktop):
         "TD_API_KEY": "your_api_key",
         "TD_SITE": "us01",
         "TD_ENABLE_UPDATES": "false",
-        "TD_DATABASE": "sample_datasets"
+        "TD_DATABASE": "sample_datasets",
+        "TD_MCP_LOG_TO_CONSOLE": "true"
       }
     }
   }
@@ -51,6 +52,7 @@ Add to your MCP client configuration (e.g., Claude Desktop):
 - `TD_SITE` (optional): Region endpoint - `us01` (default), `jp01`, `eu01`, `ap02`, `ap03`
 - `TD_ENABLE_UPDATES` (optional): Enable write operations - `false` (default), `true`
 - `TD_DATABASE` (optional): Default database for queries (e.g., `sample_datasets`)
+- `TD_MCP_LOG_TO_CONSOLE` (optional): Log SQL queries to console - `false` (default), `true`
 
 ## Available Tools
 
