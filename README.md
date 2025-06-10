@@ -121,7 +121,6 @@ Get schema information for a specific table.
 Execute read-only SQL queries (SELECT, SHOW, DESCRIBE).
 
 **Parameters:**
-- `database` (string, required): Database to query
 - `sql` (string, required): SQL query to execute
 - `limit` (number, optional): Max rows (default: 40, max: 10000)
 
@@ -137,7 +136,6 @@ Execute read-only SQL queries (SELECT, SHOW, DESCRIBE).
 {
   "name": "query",
   "arguments": {
-    "database": "sample_datasets",
     "sql": "SELECT method, COUNT(*) as count FROM www_access GROUP BY method",
     "limit": 10
   }
@@ -149,19 +147,7 @@ Execute read-only SQL queries (SELECT, SHOW, DESCRIBE).
 {
   "name": "query",
   "arguments": {
-    "database": "sample_datasets",
     "sql": "SELECT method, COUNT(*) as count FROM www_access WHERE td_interval(time, '-7d/now') GROUP BY method",
-    "limit": 10
-  }
-}
-```
-
-**With default database configured:**
-```json
-{
-  "name": "query",
-  "arguments": {
-    "sql": "SELECT method, COUNT(*) as count FROM www_access GROUP BY method",
     "limit": 10
   }
 }
@@ -171,7 +157,6 @@ Execute read-only SQL queries (SELECT, SHOW, DESCRIBE).
 Execute write operations (UPDATE, INSERT, DELETE, etc.) - requires `TD_ENABLE_UPDATES=true`.
 
 **Parameters:**
-- `database` (string, required): Database to execute against
 - `sql` (string, required): SQL statement to execute
 
 **Example:**
@@ -179,11 +164,28 @@ Execute write operations (UPDATE, INSERT, DELETE, etc.) - requires `TD_ENABLE_UP
 {
   "name": "execute",
   "arguments": {
-    "database": "my_database",
     "sql": "INSERT INTO events (timestamp, event_type) VALUES (NOW(), 'test')"
   }
 }
 ```
+
+### 6. use_database
+Switch the current database context for subsequent queries.
+
+**Parameters:**
+- `database` (string, required): Database to switch to
+
+**Example:**
+```json
+{
+  "name": "use_database",
+  "arguments": {
+    "database": "production_logs"
+  }
+}
+```
+
+After switching, all queries will use the new database by default unless explicitly specified.
 
 ## Security
 
@@ -191,6 +193,50 @@ Execute write operations (UPDATE, INSERT, DELETE, etc.) - requires `TD_ENABLE_UP
 - **Query validation**: All queries are validated before execution
 - **Audit logging**: All operations are logged for security monitoring
 - **Row limiting**: Automatic LIMIT injection for SELECT queries to prevent large responses
+
+## Basic Prompt for Using td-mcp-server
+
+When interacting with an AI assistant that has td-mcp-server configured, you can use prompts like these to effectively work with your Treasure Data:
+
+### Initial Setup Prompt
+```
+You have access to Treasure Data through the td-mcp-server. You can:
+- List databases and tables
+- Describe table schemas
+- Execute SQL queries on the data
+- Switch between databases using use_database
+
+Start by listing available databases to understand what data is available.
+```
+
+### Common Task Prompts
+
+**Data Exploration:**
+```
+Please help me explore the data in Treasure Data:
+1. First, list all available databases
+2. For the database "sample_datasets", show me all tables
+3. Describe the schema of the "www_access" table
+4. Show me a sample of 5 rows from this table
+```
+
+**Data Analysis:**
+```
+Analyze the web access logs in the www_access table:
+1. What are the top 10 most accessed URLs?
+2. Show the distribution of HTTP methods used
+3. Find the busiest hours of the day (use td_interval for recent data)
+4. Identify any potential anomalies or interesting patterns
+```
+
+**Time-based Queries:**
+```
+For the www_access table, analyze the last 7 days of data:
+- Use td_interval(time, '-7d/now') in your WHERE clause
+- Show daily traffic trends
+- Compare weekday vs weekend patterns
+- Identify peak usage times
+```
 
 ## Usage Examples
 
@@ -224,6 +270,52 @@ SELECT COUNT(*) as total_records FROM www_access
 [Executes query and returns results]
 
 The www_access table contains 5,000 total records.
+
+### Working with Multiple Databases
+
+**User:** "I need to work with the production_logs database instead of sample_datasets"
+
+**Assistant:** I'll switch to the production_logs database for you.
+
+[Uses use_database tool]
+
+Now switched to production_logs database. All subsequent queries will use this database by default unless you specify otherwise.
+
+### Complex Analysis Example
+
+**User:** "Can you analyze user behavior patterns in our access logs for the past month?"
+
+**Assistant:** I'll analyze the user behavior patterns from your access logs. Let me break this down into several queries:
+
+1. First, let me check the table structure:
+[Describes table to understand available columns]
+
+2. Now I'll analyze the overall traffic pattern for the past month:
+```sql
+SELECT 
+  DATE(time) as date,
+  COUNT(*) as daily_requests,
+  COUNT(DISTINCT host) as unique_visitors
+FROM www_access 
+WHERE td_interval(time, '-30d/now')
+GROUP BY DATE(time)
+ORDER BY date
+```
+
+3. Let me identify the most popular pages:
+```sql
+SELECT 
+  path,
+  COUNT(*) as visits,
+  COUNT(DISTINCT host) as unique_visitors
+FROM www_access
+WHERE td_interval(time, '-30d/now')
+GROUP BY path
+ORDER BY visits DESC
+LIMIT 20
+```
+
+[Continues with analysis and insights...]
 
 ## Development
 
