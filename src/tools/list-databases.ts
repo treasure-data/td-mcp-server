@@ -28,15 +28,17 @@ export class ListDatabasesTool {
     `.trim();
 
     const startTime = Date.now();
-    
+
     try {
       // Execute query
       const result = await this.client.query(query);
       const duration = Date.now() - startTime;
-      
+
       // Extract database names from results
-      const databases = result.data.map((row: Record<string, unknown>) => row.schema_name as string);
-      
+      const databases = result.data.map(
+        (row: Record<string, unknown>) => row.schema_name as string
+      );
+
       this.auditLogger.logSuccess(
         'SELECT',
         query,
@@ -44,20 +46,14 @@ export class ListDatabasesTool {
         duration,
         databases.length
       );
-      
+
       return { databases };
     } catch (error) {
       const duration = Date.now() - startTime;
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      
-      this.auditLogger.logFailure(
-        'SELECT',
-        query,
-        errorMessage,
-        'information_schema',
-        duration
-      );
-      
+
+      this.auditLogger.logFailure('SELECT', query, errorMessage, 'information_schema', duration);
+
       throw new Error(`Failed to list databases: ${errorMessage}`);
     }
   }

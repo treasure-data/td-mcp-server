@@ -202,11 +202,11 @@ export class AuditLogger {
     const duration = entry.duration !== undefined ? ` (${entry.duration}ms)` : '';
     const database = entry.database ? `[${entry.database}]` : '';
     const rowCount = entry.rowCount !== undefined ? ` -> ${entry.rowCount} rows` : '';
-    
+
     console.log(
       `[${entry.timestamp.toISOString()}] ${status} ${entry.queryType} ${database}${duration}${rowCount}`
     );
-    
+
     if (!entry.success && entry.error) {
       console.error(`  Error: ${entry.error}`);
     }

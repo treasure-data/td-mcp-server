@@ -24,16 +24,16 @@ export class ExecuteTool {
    * @returns Execution result with affected rows and status message
    * @throws {Error} If write operations are disabled, parameters are invalid, or execution fails
    */
-  async execute(
-    sql: string
-  ): Promise<ExecuteResult> {
+  async execute(sql: string): Promise<ExecuteResult> {
     if (!sql || typeof sql !== 'string') {
       throw new Error('SQL parameter is required');
     }
 
     // Check if updates are enabled
     if (!this.enableUpdates) {
-      throw new Error('Write operations are disabled. Set enable_updates=true in configuration to allow write operations.');
+      throw new Error(
+        'Write operations are disabled. Set enable_updates=true in configuration to allow write operations.'
+      );
     }
 
     // Validate query
@@ -48,25 +48,25 @@ export class ExecuteTool {
     }
 
     const startTime = Date.now();
-    
+
     try {
       // Use the execute method for write operations
       const result = await this.client.execute(sql);
       const duration = Date.now() - startTime;
-      
+
       // Extract affected rows if available
       const affectedRows = result.affectedRows;
       let message = `${validation.queryType} operation completed successfully`;
-      
+
       if (affectedRows !== undefined && affectedRows > 0) {
         message = `${validation.queryType} operation completed. Affected rows: ${affectedRows}`;
       }
-      
+
       // For CREATE/DROP/ALTER operations, we might not have row counts
       if (['CREATE', 'DROP', 'ALTER'].includes(validation.queryType)) {
         message = `${validation.queryType} operation completed successfully`;
       }
-      
+
       this.auditLogger.logSuccess(
         validation.queryType,
         sql,
@@ -74,7 +74,7 @@ export class ExecuteTool {
         duration,
         affectedRows
       );
-      
+
       return {
         affectedRows,
         message,
@@ -82,7 +82,7 @@ export class ExecuteTool {
     } catch (error) {
       const duration = Date.now() - startTime;
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      
+
       this.auditLogger.logFailure(
         validation.queryType,
         sql,
@@ -90,7 +90,7 @@ export class ExecuteTool {
         this.client.database,
         duration
       );
-      
+
       throw new Error(`Execute operation failed: ${errorMessage}`);
     }
   }

@@ -1,4 +1,15 @@
-export type QueryType = 'SELECT' | 'SHOW' | 'DESCRIBE' | 'UPDATE' | 'DELETE' | 'INSERT' | 'CREATE' | 'DROP' | 'ALTER' | 'MERGE' | 'UNKNOWN';
+export type QueryType =
+  | 'SELECT'
+  | 'SHOW'
+  | 'DESCRIBE'
+  | 'UPDATE'
+  | 'DELETE'
+  | 'INSERT'
+  | 'CREATE'
+  | 'DROP'
+  | 'ALTER'
+  | 'MERGE'
+  | 'UNKNOWN';
 
 export interface ValidationResult {
   isValid: boolean;
@@ -25,7 +36,15 @@ const QUERY_PATTERNS: Record<QueryType, RegExp> = {
 const READ_ONLY_TYPES: Set<QueryType> = new Set(['SELECT', 'SHOW', 'DESCRIBE']);
 
 // Write query types
-const WRITE_TYPES: Set<QueryType> = new Set(['UPDATE', 'DELETE', 'INSERT', 'CREATE', 'DROP', 'ALTER', 'MERGE']);
+const WRITE_TYPES: Set<QueryType> = new Set([
+  'UPDATE',
+  'DELETE',
+  'INSERT',
+  'CREATE',
+  'DROP',
+  'ALTER',
+  'MERGE',
+]);
 
 /**
  * Validates SQL queries for security and permission constraints
@@ -72,7 +91,7 @@ export class QueryValidator {
         let parenCount = 0;
         let startIdx = withMatch[0].length;
         let endIdx = startIdx;
-        
+
         for (let i = startIdx; i < sql.length; i++) {
           if (sql[i] === '(') parenCount++;
           else if (sql[i] === ')') {
@@ -83,7 +102,7 @@ export class QueryValidator {
             parenCount--;
           }
         }
-        
+
         if (endIdx > startIdx) {
           const cteContent = sql.substring(startIdx, endIdx);
           if (this.containsWriteOperations(cteContent)) {
@@ -110,16 +129,15 @@ export class QueryValidator {
     // Remove single-line comments
     const sqlWithoutComments = sql.replace(/--.*$/gm, '');
     const trimmedSql = sqlWithoutComments.trim();
-    
+
     for (const [type, pattern] of Object.entries(QUERY_PATTERNS)) {
       if (type !== 'UNKNOWN' && pattern.test(trimmedSql)) {
         return type as QueryType;
       }
     }
-    
+
     return 'UNKNOWN';
   }
-
 
   /**
    * Checks if a SQL fragment contains write operations
