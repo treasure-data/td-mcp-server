@@ -123,18 +123,9 @@ The MCP server exposes these tools that can be invoked through natural language:
 
 ### Debugging
 
-1. Enable console logging to see what's happening:
-   ```json
-   "env": {
-     "TD_API_KEY": "your-td-api-key-here",
-     "TD_SITE": "dev",
-     "TD_MCP_LOG_TO_CONSOLE": "true"
-   }
-   ```
+1. Check VS Code's Output panel to see logs
 
-2. Check VS Code's Output panel to see logs
-
-3. Common issues:
+2. Common issues:
    - **Authentication errors**: Verify your TD_API_KEY is correct
    - **Connection errors**: Check your TD_SITE setting
    - **Permission errors**: Ensure your API key has access to the requested databases
