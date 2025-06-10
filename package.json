@@ -28,7 +28,7 @@
     "ai"
   ],
   "author": "Treasure Data",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/treasure-data/td-mcp-server.git"
