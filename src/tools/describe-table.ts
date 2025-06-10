@@ -31,7 +31,7 @@ export class DescribeTableTool {
     if (!database || typeof database !== 'string') {
       throw new Error('Database parameter is required');
     }
-    
+
     if (!table || typeof table !== 'string') {
       throw new Error('Table parameter is required');
     }
@@ -49,7 +49,7 @@ export class DescribeTableTool {
     `.trim();
 
     const startTime = Date.now();
-    
+
     try {
       // First verify the table exists
       const tableCheckQuery = `
@@ -59,45 +59,33 @@ export class DescribeTableTool {
           AND table_schema = '${database}'
           AND table_name = '${table}'
       `.trim();
-      
+
       const tableExists = await this.client.query(tableCheckQuery);
-      
+
       if (tableExists.data.length === 0) {
         throw new Error(`Table '${database}.${table}' does not exist`);
       }
-      
+
       // Execute the main query
       const result = await this.client.query(query);
       const duration = Date.now() - startTime;
-      
+
       // Format column information
       const columns: ColumnInfo[] = result.data.map((row: Record<string, unknown>) => ({
         column_name: row.column_name as string,
         data_type: row.data_type as string,
         is_nullable: row.is_nullable === 'YES',
       }));
-      
-      this.auditLogger.logSuccess(
-        'SELECT',
-        query,
-        database,
-        duration,
-        columns.length
-      );
-      
+
+      this.auditLogger.logSuccess('SELECT', query, database, duration, columns.length);
+
       return { columns };
     } catch (error) {
       const duration = Date.now() - startTime;
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      
-      this.auditLogger.logFailure(
-        'SELECT',
-        query,
-        errorMessage,
-        database,
-        duration
-      );
-      
+
+      this.auditLogger.logFailure('SELECT', query, errorMessage, database, duration);
+
       throw new Error(`Failed to describe table: ${errorMessage}`);
     }
   }

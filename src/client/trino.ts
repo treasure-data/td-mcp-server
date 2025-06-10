@@ -16,7 +16,7 @@ export class TDTrinoClient {
     this.config = config;
     this.catalog = getCatalog();
     this.defaultDatabase = config.database || 'information_schema';
-    
+
     // Initialize single Trino client with default database
     const endpoint = getEndpointForSite(this.config.site);
     const url = new URL(endpoint);
@@ -50,7 +50,7 @@ export class TDTrinoClient {
 
       // Execute the query
       const iterator = await this.client.query(queryObj);
-      
+
       // Collect results
       const rows: Array<Record<string, unknown>> = [];
       const columns: Array<{ name: string; type: string }> = [];
@@ -59,7 +59,7 @@ export class TDTrinoClient {
       for await (const result of iterator) {
         // Check for query errors first
         if (result.error) {
-          const errorMessage = result.id 
+          const errorMessage = result.id
             ? `[${result.error.errorName}] ${result.error.message} (${result.id})`
             : `[${result.error.errorName}] ${result.error.message}`;
           throw new Error(errorMessage);
@@ -113,14 +113,14 @@ export class TDTrinoClient {
 
       // Execute the statement
       const iterator = await this.client.query(queryObj);
-      
+
       let affectedRows = 0;
       let success = false;
 
       for await (const result of iterator) {
         // Check for query errors first
         if (result.error) {
-          const errorMessage = result.id 
+          const errorMessage = result.id
             ? `[${result.error.errorName}] ${result.error.message} (${result.id})`
             : `[${result.error.errorName}] ${result.error.message}`;
           throw new Error(errorMessage);

@@ -34,7 +34,7 @@ export class ListTablesTool {
     `.trim();
 
     const startTime = Date.now();
-    
+
     try {
       // First verify the database exists
       const dbCheckQuery = `
@@ -43,41 +43,29 @@ export class ListTablesTool {
         WHERE catalog_name = 'td' 
           AND schema_name = '${database}'
       `.trim();
-      
+
       const dbExists = await this.client.query(dbCheckQuery);
-      
+
       if (dbExists.data.length === 0) {
         throw new Error(`Database '${database}' does not exist`);
       }
-      
+
       // Execute the main query
       const result = await this.client.query(query);
       const duration = Date.now() - startTime;
-      
+
       // Extract table names from results
       const tables = result.data.map((row: Record<string, unknown>) => row.table_name as string);
-      
-      this.auditLogger.logSuccess(
-        'SELECT',
-        query,
-        database,
-        duration,
-        tables.length
-      );
-      
+
+      this.auditLogger.logSuccess('SELECT', query, database, duration, tables.length);
+
       return { tables };
     } catch (error) {
       const duration = Date.now() - startTime;
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      
-      this.auditLogger.logFailure(
-        'SELECT',
-        query,
-        errorMessage,
-        database,
-        duration
-      );
-      
+
+      this.auditLogger.logFailure('SELECT', query, errorMessage, database, duration);
+
       throw new Error(`Failed to list tables: ${errorMessage}`);
     }
   }

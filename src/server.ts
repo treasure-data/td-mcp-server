@@ -23,6 +23,7 @@ import { ExecuteTool } from './tools/execute';
 export class TDMcpServer {
   private server: Server;
   private trinoClient: TDTrinoClient | null = null;
+  private currentDatabase: string;
   private queryValidator: QueryValidator;
   private auditLogger: AuditLogger;
   private config: ReturnType<typeof loadConfig>;
@@ -43,6 +44,9 @@ export class TDMcpServer {
     // Load configuration
     this.config = loadConfig();
     
+    // Initialize current database
+    this.currentDatabase = this.config.database || 'information_schema';
+    
     // Initialize security components
     this.queryValidator = new QueryValidator(this.config.enable_updates);
     this.auditLogger = new AuditLogger({ 
@@ -54,7 +58,72 @@ export class TDMcpServer {
 
   private async ensureClient(): Promise<TDTrinoClient> {
     if (!this.trinoClient) {
-      this.trinoClient = new TDTrinoClient(this.config);
+      this.trinoClient = new TDTrinoClient({
+        ...this.config,
+        database: this.currentDatabase
+      });
+    }
+    return this.trinoClient;
+  }
+
+  /**
+   * Switch to a different database context
+   * @param database The database to switch to
+   */
+  async switchDatabase(database: string): Promise<void> {
+    // Create a temporary client to validate the database exists
+    const tempClient = new TDTrinoClient({
+      ...this.config,
+      database: this.currentDatabase // Use current database for validation
+    });
+
+    try {
+      // Validate database exists
+      const databases = await tempClient.listDatabases();
+      if (!databases.includes(database)) {
+        throw new Error(`Database '${database}' does not exist`);
+      }
+
+      // Create new client with new database
+      const newClient = new TDTrinoClient({
+        ...this.config,
+        database: database
+      });
+
+      // Test connection with new client
+      const connected = await newClient.testConnection();
+      if (!connected) {
+        throw new Error(`Failed to connect with database '${database}'`);
+      }
+
+      // Replace the client and update current database
+      const oldClient = this.trinoClient;
+      this.trinoClient = newClient;
+      this.currentDatabase = database;
+
+      // Clean up old client
+      if (oldClient) {
+        oldClient.destroy();
+      }
+    } finally {
+      // Always clean up temp client
+      tempClient.destroy();
+    }
+  }
+
+  /**
+   * Get the current database context
+   */
+  getCurrentDatabase(): string {
+    return this.currentDatabase;
+  }
+
+  /**
+   * Get the Trino client instance
+   */
+  getClient(): TDTrinoClient {
+    if (!this.trinoClient) {
+      throw new Error('Client not initialized');
     }
     return this.trinoClient;
   }
@@ -137,6 +206,20 @@ export class TDMcpServer {
             required: ['sql'],
           },
         },
+        {
+          name: 'use_database',
+          description: 'Switch the current database context for subsequent queries',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              database: {
+                type: 'string',
+                description: 'The database to switch to',
+              },
+            },
+            required: ['database'],
+          },
+        },
       ],
     }));
 
@@ -162,7 +245,7 @@ export class TDMcpServer {
           }
 
           case 'list_tables': {
-            const database = (args?.database as string | undefined) || this.config.database || 'information_schema';
+            const database = (args?.database as string | undefined) || this.currentDatabase;
             const tool = new ListTablesTool(client, this.auditLogger);
             const result = await tool.execute(database);
             return {
@@ -176,7 +259,7 @@ export class TDMcpServer {
           }
 
           case 'describe_table': {
-            const database = (args?.database as string | undefined) || this.config.database || 'information_schema';
+            const database = (args?.database as string | undefined) || this.currentDatabase;
             if (!args || typeof args.table !== 'string') {
               throw new McpError(
                 ErrorCode.InvalidParams,
@@ -237,6 +320,40 @@ export class TDMcpServer {
                 },
               ],
             };
+          }
+
+          case 'use_database': {
+            if (!args || typeof args.database !== 'string') {
+              throw new McpError(
+                ErrorCode.InvalidParams,
+                'Database parameter is required'
+              );
+            }
+            
+            const previousDatabase = this.currentDatabase;
+            try {
+              await this.switchDatabase(args.database);
+              
+              // Note: Audit logging for use_database could be added here
+              // if AuditLogger is extended to support non-query operations
+              
+              return {
+                content: [
+                  {
+                    type: 'text',
+                    text: JSON.stringify({
+                      success: true,
+                      message: `Switched database from '${previousDatabase}' to '${args.database}'`,
+                      previousDatabase,
+                      currentDatabase: args.database,
+                    }, null, 2),
+                  },
+                ],
+              };
+            } catch (error) {
+              // Note: Audit logging for failures could be added here
+              throw error;
+            }
           }
 
           default:

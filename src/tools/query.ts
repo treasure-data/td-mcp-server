@@ -26,14 +26,11 @@ export class QueryTool {
    * @returns Query results with columns, rows, and metadata
    * @throws {Error} If parameters are invalid or query fails
    */
-  async execute(
-    sql: string,
-    limit: number = 40
-  ): Promise<QueryResult> {
+  async execute(sql: string, limit: number = 40): Promise<QueryResult> {
     if (!sql || typeof sql !== 'string') {
       throw new Error('SQL parameter is required');
     }
-    
+
     if (limit < 1 || limit > 10000) {
       throw new Error('Limit must be between 1 and 10000');
     }
@@ -47,19 +44,19 @@ export class QueryTool {
     // Inject LIMIT if not present
     const processedSql = this.injectLimit(sql, limit);
     const startTime = Date.now();
-    
+
     try {
       const result = await this.client.query(processedSql);
       const duration = Date.now() - startTime;
-      
+
       // Convert result to array format for MCP
       const rows = result.data.map((row: Record<string, unknown>) => {
-        return result.columns.map(col => row[col.name]);
+        return result.columns.map((col) => row[col.name]);
       });
-      
+
       // Check if we hit the limit (might indicate truncation)
       const truncated = rows.length === limit && !this.hasExplicitLimit(sql);
-      
+
       this.auditLogger.logSuccess(
         validation.queryType,
         processedSql,
@@ -67,7 +64,7 @@ export class QueryTool {
         duration,
         rows.length
       );
-      
+
       return {
         columns: result.columns,
         rows,
@@ -77,7 +74,7 @@ export class QueryTool {
     } catch (error) {
       const duration = Date.now() - startTime;
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      
+
       this.auditLogger.logFailure(
         validation.queryType,
         processedSql,
@@ -85,7 +82,7 @@ export class QueryTool {
         this.client.database,
         duration
       );
-      
+
       throw new Error(`Query execution failed: ${errorMessage}`);
     }
   }
@@ -101,7 +98,7 @@ export class QueryTool {
 
     // Remove trailing semicolon if present
     const trimmedSql = sql.trim().replace(/;+$/, '');
-    
+
     // Add LIMIT clause
     return `${trimmedSql} LIMIT ${limit}`;
   }
