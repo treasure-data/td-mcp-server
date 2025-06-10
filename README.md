@@ -2,6 +2,14 @@
 
 MCP (Model Context Protocol) server for Treasure Data, enabling AI assistants to query and interact with Treasure Data through a secure, controlled interface.
 
+## 🚀 Public Preview
+
+This MCP server is currently in a public preview. We're excited for you to try it out and welcome your feedback to help us improve the service.
+
+**Please note:** During this preview period, use of the server is free. However, we plan to introduce a usage-based pricing model in the future, which will be based on the number of queries issued. We will provide ample notice and detailed pricing information before any charges are implemented.
+
+Your feedback during this phase is invaluable and will help us shape the future of this tool. Thank you for being an early adopter!
+
 ## Features
 
 - 🔍 Query databases, tables, and schemas through information_schema
