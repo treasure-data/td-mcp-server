@@ -1,0 +1,34 @@
+# Dependabot configuration file
+# https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+
+version: 2
+updates:
+  # Enable version updates for npm
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "10:00"
+    open-pull-requests-limit: 10
+    groups:
+      # Group all development dependencies together
+      dev-dependencies:
+        patterns:
+          - "*"
+        dependency-type: "development"
+      # Group all production dependencies together
+      production-dependencies:
+        patterns:
+          - "*"
+        dependency-type: "production"
+    # Allow both direct and indirect (transitive) dependency updates
+    allow:
+      - dependency-type: "all"
+    # Automatically include security updates
+    versioning-strategy: "increase"
+    labels:
+      - "dependencies"
+      - "javascript"
+    reviewers:
+      - "xerial"
