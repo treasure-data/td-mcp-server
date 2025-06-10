@@ -5,6 +5,7 @@ tests/
 # Development files
 .github/
 .vscode/
+.claude/
 coverage/
 *.log
 *.tgz
