@@ -127,6 +127,34 @@ describe('TDTrinoClient', () => {
       await expect(client.query('INVALID SQL')).rejects.toThrow('Trino query failed: Query failed: syntax error');
     });
 
+    it('should handle QueryResult error field for syntax errors', async () => {
+      const client = new TDTrinoClient(mockConfig);
+
+      // Mock async iterator that returns a result with error
+      mockQuery.mockResolvedValue({
+        [Symbol.asyncIterator]: async function* () {
+          yield {
+            error: {
+              message: 'line 1:8: mismatched input \'INVALID\'. Expecting: \'(\'',
+              errorCode: 1,
+              errorName: 'SYNTAX_ERROR',
+              errorType: 'USER_ERROR',
+              failureInfo: {
+                type: 'com.facebook.presto.sql.parser.ParsingException',
+                message: 'line 1:8: mismatched input \'INVALID\'',
+                suppressed: [],
+                stack: [],
+              },
+            },
+          };
+        },
+      });
+
+      await expect(client.query('SELECT INVALID SQL')).rejects.toThrow(
+        'Query failed: line 1:8: mismatched input \'INVALID\'. Expecting: \'(\' (SYNTAX_ERROR: 1)'
+      );
+    });
+
     it('should mask API key in error messages', async () => {
       const client = new TDTrinoClient(mockConfig);
 
@@ -155,6 +183,33 @@ describe('TDTrinoClient', () => {
         affectedRows: 5,
         success: true,
       });
+    });
+
+    it('should handle QueryResult error field in execute', async () => {
+      const client = new TDTrinoClient(mockConfig);
+
+      mockQuery.mockResolvedValue({
+        [Symbol.asyncIterator]: async function* () {
+          yield {
+            error: {
+              message: 'Table users does not exist',
+              errorCode: 42,
+              errorName: 'TABLE_NOT_FOUND',
+              errorType: 'USER_ERROR',
+              failureInfo: {
+                type: 'com.facebook.presto.sql.analyzer.SemanticException',
+                message: 'Table users does not exist',
+                suppressed: [],
+                stack: [],
+              },
+            },
+          };
+        },
+      });
+
+      await expect(client.execute('UPDATE users SET active = true')).rejects.toThrow(
+        'Query failed: Table users does not exist (TABLE_NOT_FOUND: 42)'
+      );
     });
   });
 

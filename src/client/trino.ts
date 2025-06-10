@@ -57,6 +57,14 @@ export class TDTrinoClient {
       let columnsSet = false;
 
       for await (const result of iterator) {
+        // Check for query errors first
+        if (result.error) {
+          const error = new Error(
+            `Query failed: ${result.error.message} (${result.error.errorName}: ${result.error.errorCode})`
+          );
+          throw error;
+        }
+
         if (!columnsSet && result.columns) {
           columns.push(
             ...result.columns.map((col) => ({
@@ -110,6 +118,14 @@ export class TDTrinoClient {
       let success = false;
 
       for await (const result of iterator) {
+        // Check for query errors first
+        if (result.error) {
+          const error = new Error(
+            `Query failed: ${result.error.message} (${result.error.errorName}: ${result.error.errorCode})`
+          );
+          throw error;
+        }
+
         if (result.stats) {
           // Try to get affected rows from stats
           affectedRows = result.stats.processedRows || 0;
