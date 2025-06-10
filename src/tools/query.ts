@@ -55,7 +55,7 @@ export class QueryTool {
     const startTime = Date.now();
     
     try {
-      const result = await this.client.query(processedSql, database);
+      const result = await this.client.query(processedSql);
       const duration = Date.now() - startTime;
       
       // Convert result to array format for MCP

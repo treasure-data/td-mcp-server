@@ -62,8 +62,7 @@ describe('ExecuteTool', () => {
     });
     
     expect(mockClient.execute).toHaveBeenCalledWith(
-      'UPDATE users SET active = true WHERE id > 10',
-      'mydb'
+      'UPDATE users SET active = true WHERE id > 10'
     );
     expect(mockAuditLogger.logSuccess).toHaveBeenCalledWith(
       'UPDATE',

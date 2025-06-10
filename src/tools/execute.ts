@@ -57,7 +57,7 @@ export class ExecuteTool {
     
     try {
       // Use the execute method for write operations
-      const result = await this.client.execute(sql, database);
+      const result = await this.client.execute(sql);
       const duration = Date.now() - startTime;
       
       // Extract affected rows if available

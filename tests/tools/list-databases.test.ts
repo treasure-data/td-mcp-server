@@ -41,8 +41,7 @@ describe('ListDatabasesTool', () => {
     
     expect(result.databases).toEqual(['database1', 'database2', 'sample_datasets']);
     expect(mockClient.query).toHaveBeenCalledWith(
-      expect.stringContaining('SELECT schema_name'),
-      'information_schema'
+      expect.stringContaining('SELECT schema_name')
     );
     expect(mockAuditLogger.logSuccess).toHaveBeenCalledWith(
       'SELECT',

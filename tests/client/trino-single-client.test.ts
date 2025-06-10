@@ -41,7 +41,7 @@ describe('TDTrinoClient - Single Client Fix', () => {
       },
     });
     
-    await client.query('SELECT * FROM accounts', 'leo_dbt');
+    await client.query('SELECT * FROM accounts');
     
     // The query should be executed as-is, without modification
     expect(mockTrinoQuery).toHaveBeenCalledWith({

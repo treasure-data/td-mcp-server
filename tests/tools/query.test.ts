@@ -67,8 +67,7 @@ describe('QueryTool', () => {
     });
     
     expect(mockClient.query).toHaveBeenCalledWith(
-      'SELECT * FROM users LIMIT 40',
-      'mydb'
+      'SELECT * FROM users LIMIT 40'
     );
     expect(mockAuditLogger.logSuccess).toHaveBeenCalled();
   });
@@ -88,8 +87,7 @@ describe('QueryTool', () => {
     await tool.execute('mydb', 'SELECT * FROM users', 100);
     
     expect(mockClient.query).toHaveBeenCalledWith(
-      'SELECT * FROM users LIMIT 100',
-      'mydb'
+      'SELECT * FROM users LIMIT 100'
     );
   });
 
@@ -108,8 +106,7 @@ describe('QueryTool', () => {
     await tool.execute('mydb', 'SELECT * FROM users LIMIT 10');
     
     expect(mockClient.query).toHaveBeenCalledWith(
-      'SELECT * FROM users LIMIT 10',
-      'mydb'
+      'SELECT * FROM users LIMIT 10'
     );
   });
 
@@ -128,8 +125,7 @@ describe('QueryTool', () => {
     await tool.execute('mydb', 'SELECT * FROM users;');
     
     expect(mockClient.query).toHaveBeenCalledWith(
-      'SELECT * FROM users LIMIT 40',
-      'mydb'
+      'SELECT * FROM users LIMIT 40'
     );
   });
 
