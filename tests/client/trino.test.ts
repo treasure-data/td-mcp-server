@@ -124,7 +124,7 @@ describe('TDTrinoClient', () => {
 
       mockQuery.mockRejectedValue(new Error('Query failed: syntax error'));
 
-      await expect(client.query('INVALID SQL')).rejects.toThrow('Trino query failed: Query failed: syntax error');
+      await expect(client.query('INVALID SQL')).rejects.toThrow('Query failed: syntax error');
     });
 
     it('should handle QueryResult error field for syntax errors', async () => {
@@ -151,7 +151,7 @@ describe('TDTrinoClient', () => {
       });
 
       await expect(client.query('SELECT INVALID SQL')).rejects.toThrow(
-        'Query failed: line 1:8: mismatched input \'INVALID\'. Expecting: \'(\' (SYNTAX_ERROR: 1)'
+        'line 1:8: mismatched input \'INVALID\'. Expecting: \'(\' (SYNTAX_ERROR: 1)'
       );
     });
 
@@ -160,7 +160,7 @@ describe('TDTrinoClient', () => {
 
       mockQuery.mockRejectedValue(new Error(`Auth failed for user test-api-key-12345`));
 
-      await expect(client.query('SELECT 1')).rejects.toThrow('Trino query failed: Auth failed for user ***');
+      await expect(client.query('SELECT 1')).rejects.toThrow('Auth failed for user ***');
     });
   });
 
@@ -208,7 +208,7 @@ describe('TDTrinoClient', () => {
       });
 
       await expect(client.execute('UPDATE users SET active = true')).rejects.toThrow(
-        'Query failed: Table users does not exist (TABLE_NOT_FOUND: 42)'
+        'Table users does not exist (TABLE_NOT_FOUND: 42)'
       );
     });
   });

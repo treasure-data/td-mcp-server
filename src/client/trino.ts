@@ -60,7 +60,7 @@ export class TDTrinoClient {
         // Check for query errors first
         if (result.error) {
           const error = new Error(
-            `Query failed: ${result.error.message} (${result.error.errorName}: ${result.error.errorCode})`
+            `${result.error.message} (${result.error.errorName}: ${result.error.errorCode})`
           );
           throw error;
         }
@@ -121,7 +121,7 @@ export class TDTrinoClient {
         // Check for query errors first
         if (result.error) {
           const error = new Error(
-            `Query failed: ${result.error.message} (${result.error.errorName}: ${result.error.errorCode})`
+            `${result.error.message} (${result.error.errorName}: ${result.error.errorCode})`
           );
           throw error;
         }
@@ -196,9 +196,9 @@ export class TDTrinoClient {
     if (error instanceof Error) {
       // Don't expose API key in error messages
       const message = error.message.replace(this.config.td_api_key, '***');
-      return new Error(`Trino query failed: ${message}`);
+      return new Error(message);
     }
-    return new Error('Trino query failed: Unknown error');
+    return new Error('Unknown error');
   }
 
   destroy(): void {
