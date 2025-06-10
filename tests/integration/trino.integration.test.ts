@@ -201,7 +201,8 @@ describe.skipIf(!isIntegrationTest)('TDTrinoClient Integration Tests', () => {
         const errorMessage = (error as Error).message;
         // Ensure API key is not exposed in error
         expect(errorMessage).not.toContain(process.env.TD_API_KEY_DEVELOPMENT_AWS);
-        expect(errorMessage).toContain('Trino query failed');
+        // Check for syntax error in the message
+        expect(errorMessage).toContain('SYNTAX_ERROR');
       }
     });
   });
