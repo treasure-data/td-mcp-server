@@ -71,43 +71,26 @@ export class TDMcpServer {
    * @param database The database to switch to
    */
   async switchDatabase(database: string): Promise<void> {
-    // Create a temporary client to validate the database exists
-    const tempClient = new TDTrinoClient({
+    // Create new client with new database
+    const newClient = new TDTrinoClient({
       ...this.config,
-      database: this.currentDatabase // Use current database for validation
+      database: database
     });
 
-    try {
-      // Validate database exists
-      const databases = await tempClient.listDatabases();
-      if (!databases.includes(database)) {
-        throw new Error(`Database '${database}' does not exist`);
-      }
+    // Test connection with new client
+    const connected = await newClient.testConnection();
+    if (!connected) {
+      throw new Error(`Failed to connect with database '${database}'`);
+    }
 
-      // Create new client with new database
-      const newClient = new TDTrinoClient({
-        ...this.config,
-        database: database
-      });
+    // Replace the client and update current database
+    const oldClient = this.trinoClient;
+    this.trinoClient = newClient;
+    this.currentDatabase = database;
 
-      // Test connection with new client
-      const connected = await newClient.testConnection();
-      if (!connected) {
-        throw new Error(`Failed to connect with database '${database}'`);
-      }
-
-      // Replace the client and update current database
-      const oldClient = this.trinoClient;
-      this.trinoClient = newClient;
-      this.currentDatabase = database;
-
-      // Clean up old client
-      if (oldClient) {
-        oldClient.destroy();
-      }
-    } finally {
-      // Always clean up temp client
-      tempClient.destroy();
+    // Clean up old client
+    if (oldClient) {
+      oldClient.destroy();
     }
   }
 

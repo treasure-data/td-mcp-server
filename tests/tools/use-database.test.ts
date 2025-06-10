@@ -64,32 +64,40 @@ describe('use_database functionality', () => {
   });
 
   describe('switchDatabase', () => {
-    it('should successfully switch to an existing database', async () => {
+    it('should successfully switch to a database', async () => {
       await server.switchDatabase('test_db');
-
-      // Verify database validation was performed
-      expect(mockListDatabases).toHaveBeenCalled();
       
       // Verify connection test was performed
       expect(mockTestConnection).toHaveBeenCalled();
-      
-      // Verify old client was destroyed
-      expect(mockDestroy).toHaveBeenCalled();
       
       // Verify current database was updated
       expect(server.getCurrentDatabase()).toBe('test_db');
     });
 
-    it('should throw error when switching to non-existent database', async () => {
-      await expect(server.switchDatabase('non_existent_db')).rejects.toThrow(
-        "Database 'non_existent_db' does not exist"
-      );
-
-      // Verify temp client was cleaned up even on error
-      expect(mockDestroy).toHaveBeenCalled();
+    it('should destroy old client when switching databases', async () => {
+      // First switch to create an initial client
+      await server.switchDatabase('test_db');
       
-      // Verify current database was not changed
-      expect(server.getCurrentDatabase()).toBe('initial_db');
+      // Reset mocks
+      vi.clearAllMocks();
+      
+      // Switch again
+      await server.switchDatabase('prod_db');
+      
+      // Now old client should be destroyed
+      expect(mockDestroy).toHaveBeenCalled();
+      expect(server.getCurrentDatabase()).toBe('prod_db');
+    });
+
+    it('should let database validation happen at query time', async () => {
+      // Since we removed upfront validation, switching to non-existent database
+      // will succeed but queries will fail later
+      await server.switchDatabase('non_existent_db');
+      
+      // Database switch succeeds
+      expect(server.getCurrentDatabase()).toBe('non_existent_db');
+      
+      // The error will be caught when user tries to query
     });
 
     it('should throw error when connection test fails', async () => {
@@ -103,13 +111,11 @@ describe('use_database functionality', () => {
       expect(server.getCurrentDatabase()).toBe('initial_db');
     });
 
-    it('should create multiple clients during switch', async () => {
+    it('should create new client during switch', async () => {
       await server.switchDatabase('test_db');
 
-      // Should create 2 clients during switch:
-      // 1. Temp client for validation
-      // 2. New client with new database
-      expect(TDTrinoClient).toHaveBeenCalledTimes(2);
+      // Should create 1 new client with new database
+      expect(TDTrinoClient).toHaveBeenCalledTimes(1);
     });
   });
 
