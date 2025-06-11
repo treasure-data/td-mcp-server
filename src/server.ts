@@ -203,6 +203,14 @@ export class TDMcpServer {
             required: ['database'],
           },
         },
+        {
+          name: 'current_database',
+          description: 'Get the current database context being used for queries',
+          inputSchema: {
+            type: 'object',
+            properties: {},
+          },
+        },
       ],
     }));
 
@@ -337,6 +345,20 @@ export class TDMcpServer {
               // Note: Audit logging for failures could be added here
               throw error;
             }
+          }
+
+          case 'current_database': {
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: JSON.stringify({
+                    currentDatabase: this.currentDatabase,
+                    description: 'The current database context used for queries'
+                  }, null, 2),
+                },
+              ],
+            };
           }
 
           default:

@@ -195,6 +195,28 @@ Switch the current database context for subsequent queries.
 
 After switching, all queries will use the new database by default unless explicitly specified.
 
+### 7. current_database
+Get the current database context being used for queries.
+
+**Parameters:**
+None
+
+**Example:**
+```json
+{
+  "name": "current_database",
+  "arguments": {}
+}
+```
+
+**Response:**
+```json
+{
+  "currentDatabase": "sample_datasets",
+  "description": "The current database context used for queries"
+}
+```
+
 ## Security
 
 - **Read-only by default**: Write operations require explicit configuration
@@ -213,6 +235,7 @@ You have access to Treasure Data through the td-mcp-server. You can:
 - Describe table schemas
 - Execute SQL queries on the data
 - Switch between databases using use_database
+- Check current database context using current_database
 
 Start by listing available databases to understand what data is available.
 ```
