@@ -1,5 +1,7 @@
 # Integration Tests
 
+**Note: This directory is for internal Treasure Data development only.**
+
 This directory contains integration tests that connect to a real Treasure Data environment.
 
 ## Prerequisites

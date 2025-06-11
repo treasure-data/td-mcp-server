@@ -7,7 +7,7 @@ This directory contains example configurations for various MCP clients.
 ### claude-desktop-config.json
 Basic configuration for Claude Desktop using npx to run the server.
 
-### development-config.json
+### local-development-config.json
 Configuration for local development with console logging enabled.
 
 ### multi-region-config.json
@@ -19,7 +19,7 @@ Example of connecting to multiple TD regions simultaneously.
 2. Replace placeholder values:
    - `your_td_api_key_here` - Your actual Treasure Data API key
    - `/path/to/td-mcp-server` - Path to your local installation
-   - `TD_SITE` - Your TD region (us01, jp01, eu01, ap02, ap03, dev)
+   - `TD_SITE` - Your TD region (us01, jp01, eu01, ap02, ap03)
 
 3. For Claude Desktop:
    - Place the configuration in `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS)

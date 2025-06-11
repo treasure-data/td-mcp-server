@@ -24,13 +24,12 @@
     - Use [api-presto.treasuredata.com](http://api-presto.treasuredata.com) REST API (Presto/Trino API). This supports listing databases/tables/schema through information_schema catalog
 	    - Use X-Trino-User: (TD_API_KEY) header for the authentication. In trino-js-client, setting user = (TD_API_KEY) will automatically set the X-Trino-User header. password can be empty.
 	    - User need to set TD_API_KEY in the mcp server configuration
-    - Depending on the site, we need to use a different endpoints. us01, jp01, eu01, ap02, ap03, and dev (internal, hidden from public documentation)
+    - Depending on the site, we need to use a different endpoints. us01, jp01, eu01, ap02, ap03
 	    - us01: api-presto.treasuredata.com
 	    - jp01: api-presto.treasuredata.co.jp
 	    - eu01: api-presto.eu01.treasuredata.com
 	    - ap02: api-presto.ap02.treasuredata.com
 	    - ap03: api-presto.ap03.treasuredata.com
-	    - dev: api-development-presto.treasuredata.com
 	- catalog name: td
 	- list of schemas (databases), list of tables can be retrieved queries against information_schema. This need to be instructed in the MCP function definition
 - chat
@@ -123,7 +122,7 @@ td-mcp-server/
 ```json
 {
   "td_api_key": "YOUR_API_KEY",
-  "site": "us01",  // Options: us01, jp01, eu01, ap02, ap03, dev
+  "site": "us01",  // Options: us01, jp01, eu01, ap02, ap03
   "enable_updates": false  // Default: false. Set to true to allow UPDATE/DELETE/INSERT operations
 }
 ```
@@ -191,31 +190,3 @@ Add to your MCP client configuration (e.g., Claude Desktop):
 3. Result caching and pagination
 4. Advanced schema exploration tools
 
-
-### How to use LLM API for chat
-
-- Find your project ID
-```
-curl -v -H "Authorization: TD1 ${TD_API_KEY}" https://llm-api.treasuredata.com/api/projects | jq '.data[] | select(.attributes.name | test(".*(pattern).*"))’
-```
-- Find your agent ID: `/api/agents?filter%5Bproject_id%5D=(project id)`
-- Create a new chat for the agent POST /api/chats
-  - request body:
-```
-{"data":{"type":"chats", "attributes":{"agentId":"(agent id)"}}}
-```
-  - Content-Type: application/vnd.api+json
-  - (chat id) can be found in the response JSON data.id field.
-
-- Start (and continue) the chat with  POST /api/chats/(chat id)/continue request with `{"input":"(message)"}` message body
-Content-Type: application/json
-- Read SSE (server-sent events) response
-  - Content-Type:  text/event-stream
-  - Example response:
-```
-data: {"content":" and values.","at":"2025-02-04T20:50:14Z"}
-
-data: {"tool_call":{"id":"toolu_bdrk_01KUwKumkjRp291pGrdVYUm2","functionName":"ask_ceo","functionArguments":"{\"question\": \"Can you explain Treasure Data's company culture and core values?\"}"},"at":"2025-02-04T20:50:15Z"}
-
-data: {"tool":{"id":"toolu_bdrk_01KUwKumkjRp291pGrdVYUm2","functionName":"ask_ceo","functionArguments":"{\"question\": \"Can you explain Treasure Data's company culture and core values?\"}","content":"Certainly! I'd be happy to explain Treasure Data's company culture and core values. As the CEO, I can share our core principles that guide our organization. Let me outline the key aspects of our culture and values:\n\n1. Mission and Vision:\nOur mission is to \"Build the Intelligent Data Foundation to improve human life.\" This reflects our commitment to managing data responsibly and using it to make a positive impact on billions of people's lives.\n\nOur vision is to \"Put Connected Customer Experiences"}}
-```
