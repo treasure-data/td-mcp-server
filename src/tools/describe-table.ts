@@ -36,6 +36,8 @@ export class DescribeTableTool {
       throw new Error('Table parameter is required');
     }
 
+    const escapedDatabase = this.client.escapeStringLiteral(database);
+    const escapedTable = this.client.escapeStringLiteral(table);
     const query = `
       SELECT 
         column_name,
@@ -43,8 +45,8 @@ export class DescribeTableTool {
         is_nullable
       FROM td.information_schema.columns 
       WHERE table_catalog = 'td' 
-        AND table_schema = '${database}'
-        AND table_name = '${table}'
+        AND table_schema = ${escapedDatabase}
+        AND table_name = ${escapedTable}
       ORDER BY ordinal_position
     `.trim();
 
@@ -56,8 +58,8 @@ export class DescribeTableTool {
         SELECT 1 
         FROM td.information_schema.tables 
         WHERE table_catalog = 'td' 
-          AND table_schema = '${database}'
-          AND table_name = '${table}'
+          AND table_schema = ${escapedDatabase}
+          AND table_name = ${escapedTable}
       `.trim();
 
       const tableExists = await this.client.query(tableCheckQuery);
