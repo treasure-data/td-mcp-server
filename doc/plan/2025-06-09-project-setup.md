@@ -170,8 +170,8 @@ This document outlines the step-by-step implementation plan for setting up the T
   - Security features
 - [x] Create unit tests with mock Trino responses
 - [x] Create integration tests with real Trino connection:
-  - Use site: 'dev' for testing
-  - Use TD_API_KEY_DEVELOPMENT_AWS environment variable
+  - (Internal TD only) Use site: 'dev' for testing
+  - (Internal TD only) Use TD_API_KEY_DEVELOPMENT_AWS environment variable
   - Test actual database operations
   - Test against sample_datasets (www_access, nasdaq tables)
 - [x] Add CI/CD pipeline configuration with GitHub Actions

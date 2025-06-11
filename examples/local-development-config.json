@@ -1,11 +1,11 @@
 {
   "mcpServers": {
-    "treasuredata-dev": {
+    "treasuredata-local": {
       "command": "node",
       "args": ["/path/to/td-mcp-server/dist/index.js"],
       "env": {
-        "TD_API_KEY": "your_development_api_key",
-        "TD_SITE": "dev",
+        "TD_API_KEY": "your_api_key_here",
+        "TD_SITE": "us01",
         "TD_ENABLE_UPDATES": "false",
         "TD_DATABASE": "sample_datasets",
         "TD_MCP_LOG_TO_CONSOLE": "true"
