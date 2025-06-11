@@ -305,7 +305,7 @@ describe('TDTrinoClient', () => {
         const databases = await client.listDatabases();
         expect(databases).toEqual(['db1', 'db2', 'db3']);
         expect(mockQuery).toHaveBeenCalledWith(expect.objectContaining({
-          query: "SELECT schema_name FROM td.information_schema.schemata WHERE catalog_name = 'td' ORDER BY schema_name",
+          query: "SELECT schema_name FROM \"td\".information_schema.schemata WHERE catalog_name = 'td' ORDER BY schema_name",
           user: 'test-api-key-12345',
         }));
       });
@@ -325,7 +325,7 @@ describe('TDTrinoClient', () => {
         const tables = await client.listTables('mydb');
         expect(tables).toEqual(['users', 'products', 'orders']);
         expect(mockQuery).toHaveBeenCalledWith(expect.objectContaining({
-          query: "SELECT table_name FROM td.information_schema.tables WHERE table_catalog = 'td' AND table_schema = 'mydb' ORDER BY table_name",
+          query: "SELECT table_name FROM \"td\".information_schema.tables WHERE table_catalog = 'td' AND table_schema = 'mydb' ORDER BY table_name",
           user: 'test-api-key-12345',
         }));
       });

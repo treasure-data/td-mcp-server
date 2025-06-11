@@ -157,13 +157,35 @@ export class TDTrinoClient {
   }
 
   /**
+   * Escapes a SQL identifier to prevent SQL injection
+   * @param identifier - The identifier to escape
+   * @returns Escaped identifier
+   */
+  escapeIdentifier(identifier: string): string {
+    // Double any quotes in the identifier and wrap in double quotes
+    return '"' + identifier.replace(/"/g, '""') + '"';
+  }
+
+  /**
+   * Escapes a SQL string literal to prevent SQL injection
+   * @param value - The string value to escape
+   * @returns Escaped string literal
+   */
+  escapeStringLiteral(value: string): string {
+    // Escape single quotes by doubling them
+    return "'" + value.replace(/'/g, "''") + "'";
+  }
+
+  /**
    * Lists all databases accessible to the user
    * @returns Array of database names
    */
   async listDatabases(): Promise<string[]> {
     // Query information_schema to get all databases
+    const escapedCatalog = this.escapeIdentifier(this.catalog);
+    const escapedCatalogLiteral = this.escapeStringLiteral(this.catalog);
     const result = await this.query(
-      `SELECT schema_name FROM ${this.catalog}.information_schema.schemata WHERE catalog_name = '${this.catalog}' ORDER BY schema_name`
+      `SELECT schema_name FROM ${escapedCatalog}.information_schema.schemata WHERE catalog_name = ${escapedCatalogLiteral} ORDER BY schema_name`
     );
     return result.data.map((row) => row.schema_name as string);
   }
@@ -175,8 +197,11 @@ export class TDTrinoClient {
    */
   async listTables(database: string): Promise<string[]> {
     // Query information_schema to get tables in a specific database
+    const escapedCatalog = this.escapeIdentifier(this.catalog);
+    const escapedCatalogLiteral = this.escapeStringLiteral(this.catalog);
+    const escapedDatabaseLiteral = this.escapeStringLiteral(database);
     const result = await this.query(
-      `SELECT table_name FROM ${this.catalog}.information_schema.tables WHERE table_catalog = '${this.catalog}' AND table_schema = '${database}' ORDER BY table_name`
+      `SELECT table_name FROM ${escapedCatalog}.information_schema.tables WHERE table_catalog = ${escapedCatalogLiteral} AND table_schema = ${escapedDatabaseLiteral} ORDER BY table_name`
     );
     return result.data.map((row) => row.table_name as string);
   }
@@ -186,8 +211,12 @@ export class TDTrinoClient {
     table: string
   ): Promise<Array<{ name: string; type: string; nullable: boolean }>> {
     // Query information_schema to get column information
+    const escapedCatalog = this.escapeIdentifier(this.catalog);
+    const escapedCatalogLiteral = this.escapeStringLiteral(this.catalog);
+    const escapedDatabaseLiteral = this.escapeStringLiteral(database);
+    const escapedTableLiteral = this.escapeStringLiteral(table);
     const result = await this.query(
-      `SELECT column_name, data_type, is_nullable FROM ${this.catalog}.information_schema.columns WHERE table_catalog = '${this.catalog}' AND table_schema = '${database}' AND table_name = '${table}' ORDER BY ordinal_position`
+      `SELECT column_name, data_type, is_nullable FROM ${escapedCatalog}.information_schema.columns WHERE table_catalog = ${escapedCatalogLiteral} AND table_schema = ${escapedDatabaseLiteral} AND table_name = ${escapedTableLiteral} ORDER BY ordinal_position`
     );
     return result.data.map((row) => ({
       name: row.column_name as string,

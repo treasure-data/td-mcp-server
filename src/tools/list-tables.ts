@@ -25,11 +25,12 @@ export class ListTablesTool {
       throw new Error('Database parameter is required');
     }
 
+    const escapedDatabase = this.client.escapeStringLiteral(database);
     const query = `
       SELECT table_name 
       FROM td.information_schema.tables 
       WHERE table_catalog = 'td' 
-        AND table_schema = '${database}'
+        AND table_schema = ${escapedDatabase}
       ORDER BY table_name
     `.trim();
 
@@ -41,7 +42,7 @@ export class ListTablesTool {
         SELECT 1 
         FROM td.information_schema.schemata 
         WHERE catalog_name = 'td' 
-          AND schema_name = '${database}'
+          AND schema_name = ${escapedDatabase}
       `.trim();
 
       const dbExists = await this.client.query(dbCheckQuery);

@@ -11,6 +11,8 @@ describe('ListTablesTool', () => {
   beforeEach(() => {
     mockClient = {
       query: vi.fn(),
+      escapeStringLiteral: vi.fn((value: string) => `'${value.replace(/'/g, "''")}'`),
+      escapeIdentifier: vi.fn((identifier: string) => `"${identifier.replace(/"/g, '""')}"`),
     };
     
     mockAuditLogger = {
