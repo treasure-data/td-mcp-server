@@ -157,13 +157,13 @@ export class TDMcpServer {
         },
         {
           name: 'query',
-          description: 'Execute a read-only SQL query (SELECT, SHOW, DESCRIBE). For better performance on large tables, use td_interval(time, \'-30d/now\') to limit the time range.',
+          description: 'Execute a read-only SQL query (SELECT, SHOW, DESCRIBE) using Trino SQL dialect with Treasure Data UDFs. For better performance on large tables, use td_interval(time, \'-30d/now\') to limit the time range.',
           inputSchema: {
             type: 'object',
             properties: {
               sql: {
                 type: 'string',
-                description: 'The SQL query to execute. For tables with time column, consider using td_interval() or td_time_range() in WHERE clause to improve performance. Examples: td_interval(time, \'-30d/now\') for last 30 days, td_interval(time, \'-7d/now\') for last 7 days, td_interval(time, \'-1d\') for yesterday, td_interval(time, \'-1h/now\') for last hour, td_time_range(time, \'2024-01-01\', \'2024-01-31\') for specific date range.',
+                description: 'The SQL query to execute using Trino SQL dialect. Supports Treasure Data UDFs like td_interval() and td_time_range(). For tables with time column, consider using these UDFs in WHERE clause to improve performance. Examples: td_interval(time, \'-30d/now\') for last 30 days, td_interval(time, \'-7d/now\') for last 7 days, td_interval(time, \'-1d\') for yesterday, td_interval(time, \'-1h/now\') for last hour, td_time_range(time, \'2024-01-01\', \'2024-01-31\') for specific date range.',
               },
               limit: {
                 type: 'number',
