@@ -1,6 +1,6 @@
 {
   "name": "@treasuredata/mcp-server",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "description": "MCP server for Treasure Data - Query and interact with TD through Model Context Protocol",
   "main": "dist/index.js",
   "bin": {
@@ -17,7 +17,9 @@
     "test:unit": "vitest run --exclude tests/integration",
     "lint": "eslint src/**/*.ts",
     "format": "prettier --write src/**/*.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "prepare": "npm run build",
+    "prepack": "cp README.md LICENSE package.json dist/ 2>/dev/null || true"
   },
   "keywords": [
     "mcp",
