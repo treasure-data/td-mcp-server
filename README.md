@@ -18,15 +18,42 @@ Your feedback during this phase is invaluable and will help us shape the future 
 - 🌍 Multi-site support (US, JP, EU, AP regions)
 - 🚀 Zero-install execution via npx
 
+## Prerequisites
+
+### Node.js Installation
+
+This MCP server requires Node.js version 18.0.0 or higher. If you don't have Node.js installed:
+
+1. **Download Node.js** from [nodejs.org](https://nodejs.org/)
+   - Choose the LTS (Long Term Support) version
+   - The installer includes npm and npx
+
+2. **Verify installation** by running:
+   ```bash
+   node --version  # Should show v18.0.0 or higher
+   npx --version   # Included with npm 5.2+
+   ```
+
+3. **Alternative installation methods:**
+   - **macOS**: `brew install node` (using Homebrew)
+   - **Windows**: Use the installer from nodejs.org or `winget install OpenJS.NodeJS`
+   - **Linux**: Use your distribution's package manager or [NodeSource repositories](https://github.com/nodesource/distributions)
+
 ## Installation
 
 ### Using npx (recommended)
+
+No installation needed! Just run directly:
 
 ```bash
 npx @treasuredata/mcp-server
 ```
 
+> **What is npx?** npx is a package runner that comes with npm 5.2+. It downloads and runs packages without installing them globally, ensuring you always use the latest version.
+
 ### Global installation
+
+If you prefer a traditional installation:
 
 ```bash
 npm install -g @treasuredata/mcp-server
