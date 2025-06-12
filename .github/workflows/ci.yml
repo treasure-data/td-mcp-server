@@ -9,6 +9,8 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     
     strategy:
       matrix:
@@ -49,6 +51,9 @@ jobs:
   publish:
     needs: test
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write  # For OIDC authentication with npm
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     
     steps:
