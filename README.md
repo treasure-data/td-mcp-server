@@ -26,7 +26,7 @@ This MCP server requires Node.js version 18.0.0 or higher. If you don't have Nod
 
 1. **Download Node.js** from [nodejs.org](https://nodejs.org/)
    - Choose the LTS (Long Term Support) version
-   - The installer includes npm and npx
+   - The installer includes `npm` and `npx`
 
 2. **Verify installation** by running:
    ```bash
@@ -43,7 +43,7 @@ This MCP server requires Node.js version 18.0.0 or higher. If you don't have Nod
 
 ### Using npx (recommended)
 
-No installation needed! Just run directly:
+No installation needed! Configure your MCP tool to run `@treasuredata/mcp-server` directly via `npx`:
 
 ```bash
 npx @treasuredata/mcp-server
@@ -161,7 +161,7 @@ Execute read-only SQL queries (SELECT, SHOW, DESCRIBE).
 
 **Performance Tip:** For tables with a `time` column, use `td_interval()` or `td_time_range()` to limit the time range:
 - `td_interval(time, '-30d/now')` - Last 30 days
-- `td_interval(time, '-7d/now')` - Last 7 days  
+- `td_interval(time, '-7d/now')` - Last 7 days
 - `td_interval(time, '-1d')` - Yesterday only
 - `td_interval(time, '-1h/now')` - Last hour
 - `td_time_range(time, '2024-01-01', '2024-01-31')` - Specific date range
@@ -350,11 +350,11 @@ Now switched to production_logs database. All subsequent queries will use this d
 
 2. Now I'll analyze the overall traffic pattern for the past month:
 ```sql
-SELECT 
+SELECT
   DATE(time) as date,
   COUNT(*) as daily_requests,
   COUNT(DISTINCT host) as unique_visitors
-FROM www_access 
+FROM www_access
 WHERE td_interval(time, '-30d/now')
 GROUP BY DATE(time)
 ORDER BY date
@@ -362,7 +362,7 @@ ORDER BY date
 
 3. Let me identify the most popular pages:
 ```sql
-SELECT 
+SELECT
   path,
   COUNT(*) as visits,
   COUNT(DISTINCT host) as unique_visitors
