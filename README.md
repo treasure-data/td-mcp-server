@@ -334,7 +334,7 @@ Get detailed information about a specific segment, including its rules and metad
 ```
 
 ### 13. audience_sql
-Get the base SQL statement for an audience (parent segment).
+Get the SQL statement for a parent segment (audience).
 
 **Parameters:**
 - `audience_id` (integer, required): The parent segment (audience) ID

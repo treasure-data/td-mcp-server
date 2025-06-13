@@ -26,7 +26,7 @@ describe('audienceSql', () => {
 
   it('should have correct metadata', () => {
     expect(audienceSql.name).toBe('audience_sql');
-    expect(audienceSql.description).toContain('Get the base SQL statement for an audience');
+    expect(audienceSql.description).toContain('Get the SQL statement for a parent segment');
     expect(audienceSql.inputSchema).toBeDefined();
   });
 

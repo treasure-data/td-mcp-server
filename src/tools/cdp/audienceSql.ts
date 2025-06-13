@@ -10,7 +10,7 @@ type AudienceSqlInput = z.infer<typeof audienceSqlSchema>;
 
 export const audienceSql = {
   name: 'audience_sql',
-  description: '[EXPERIMENTAL] Get the base SQL statement for an audience (parent segment)',
+  description: '[EXPERIMENTAL] Get the SQL statement for a parent segment (audience)',
   inputSchema: audienceSqlSchema,
   
   async execute(args: AudienceSqlInput) {
@@ -19,7 +19,7 @@ export const audienceSql = {
     try {
       const client = createCDPClient(config.td_api_key, config.site);
       
-      // Generate the base SQL for the audience
+      // Generate the SQL for the parent segment (audience)
       const queryResponse = await client.getSegmentQuery(args.audience_id, {
         format: 'sql'
       });

@@ -76,7 +76,7 @@ The CDP (Customer Data Platform) integration is currently experimental and provi
   - `list_segments`: Lists segments under a parent
   - `list_activations`: Lists activations (syndications) for a segment
   - `get_segment`: Gets detailed information about a specific segment (requires audience_id and segment_id)
-  - `audience_sql`: Gets the base SQL statement for an audience (parent segment)
+  - `audience_sql`: Gets the SQL statement for a parent segment (audience)
   - `segment_sql`: Gets the SQL statement for a segment with filtering conditions applied (requires audience_id and segment_id)
 - **Note**: Current implementation is read-only. Write operations (create/update/delete segments) and other advanced features are not yet implemented.
 
