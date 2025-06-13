@@ -15,6 +15,12 @@ import { ListTablesTool } from './tools/list-tables';
 import { DescribeTableTool } from './tools/describe-table';
 import { QueryTool } from './tools/query';
 import { ExecuteTool } from './tools/execute';
+import { 
+  listParentSegmentsTool,
+  getParentSegmentTool,
+  listSegmentsTool,
+  listActivationsTool
+} from './tools/cdp';
 
 /**
  * Treasure Data MCP Server implementation
@@ -211,6 +217,27 @@ export class TDMcpServer {
             properties: {},
           },
         },
+        // CDP Tools
+        {
+          name: listParentSegmentsTool.name,
+          description: listParentSegmentsTool.description,
+          inputSchema: listParentSegmentsTool.schema.input,
+        },
+        {
+          name: getParentSegmentTool.name,
+          description: getParentSegmentTool.description,
+          inputSchema: getParentSegmentTool.schema.input,
+        },
+        {
+          name: listSegmentsTool.name,
+          description: listSegmentsTool.description,
+          inputSchema: listSegmentsTool.schema.input,
+        },
+        {
+          name: listActivationsTool.name,
+          description: listActivationsTool.description,
+          inputSchema: listActivationsTool.schema.input,
+        },
       ],
     }));
 
@@ -359,6 +386,27 @@ export class TDMcpServer {
                 },
               ],
             };
+          }
+
+          // CDP Tools
+          case listParentSegmentsTool.name: {
+            const result = await listParentSegmentsTool.handler(args || {}, {});
+            return result;
+          }
+
+          case getParentSegmentTool.name: {
+            const result = await getParentSegmentTool.handler(args || {}, {});
+            return result;
+          }
+
+          case listSegmentsTool.name: {
+            const result = await listSegmentsTool.handler(args || {}, {});
+            return result;
+          }
+
+          case listActivationsTool.name: {
+            const result = await listActivationsTool.handler(args || {}, {});
+            return result;
           }
 
           default:
