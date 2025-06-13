@@ -9,7 +9,7 @@ const inputSchema = z.object({
 
 export const listActivationsTool = {
   name: 'list_activations',
-  description: 'Retrieve activation list under a specific segment from TD-CDP API',
+  description: '[EXPERIMENTAL] Retrieve activation list under a specific segment from TD-CDP API',
   schema: {
     input: {
       type: 'object',

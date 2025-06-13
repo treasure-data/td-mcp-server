@@ -8,7 +8,7 @@ const inputSchema = z.object({
 
 export const listSegmentsTool = {
   name: 'list_segments',
-  description: 'Retrieve segment list under a specific parent segment from TD-CDP API',
+  description: '[EXPERIMENTAL] Retrieve segment list under a specific parent segment from TD-CDP API',
   schema: {
     input: {
       type: 'object',

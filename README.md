@@ -17,7 +17,7 @@ Your feedback during this phase is invaluable and will help us shape the future 
 - 🔒 Security-first design with read-only mode by default
 - 🌍 Multi-site support (US, JP, EU, AP regions)
 - 🚀 Zero-install execution via npx
-- 🎯 CDP (Customer Data Platform) integration for segment and activation management
+- 🎯 CDP (Customer Data Platform) integration for segment and activation management (Experimental)
 
 ## Prerequisites
 
@@ -245,7 +245,9 @@ None
 }
 ```
 
-### CDP Tools (Customer Data Platform)
+### CDP Tools (Customer Data Platform) - EXPERIMENTAL
+
+**Note:** CDP tools are currently experimental and may not cover all use cases. Additional functionality will be added based on user feedback.
 
 The following tools are available for interacting with Treasure Data's Customer Data Platform (CDP):
 

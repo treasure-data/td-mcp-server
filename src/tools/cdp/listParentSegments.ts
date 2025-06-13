@@ -4,7 +4,7 @@ import { loadConfig } from '../../config';
 
 export const listParentSegmentsTool = {
   name: 'list_parent_segments',
-  description: 'Retrieve parent segment list from TD-CDP API',
+  description: '[EXPERIMENTAL] Retrieve parent segment list from TD-CDP API',
   schema: {
     input: {
       type: 'object',
