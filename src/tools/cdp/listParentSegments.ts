@@ -1,5 +1,4 @@
 import { createCDPClient } from '../../client/cdp';
-import { ParentSegment } from '../../types/cdp';
 import { loadConfig } from '../../config';
 
 
