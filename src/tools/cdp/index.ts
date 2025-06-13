@@ -4,3 +4,4 @@ export { listSegmentsTool } from './listSegments';
 export { listActivationsTool } from './listActivations';
 export { audienceSql } from './audienceSql';
 export { segmentSql } from './segmentSql';
+export { getSegment } from './getSegment';

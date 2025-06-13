@@ -1,13 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { audienceSql } from '../../../src/tools/cdp/audienceSql';
 import { createCDPClient } from '../../../src/client/cdp';
-import { getConfig } from '../../../src/config';
+import { loadConfig } from '../../../src/config';
 
 vi.mock('../../../src/client/cdp', () => ({
   createCDPClient: vi.fn()
 }));
 vi.mock('../../../src/config', () => ({
-  getConfig: vi.fn()
+  loadConfig: vi.fn()
 }));
 
 describe('audienceSql', () => {
@@ -18,7 +18,7 @@ describe('audienceSql', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     (createCDPClient as any).mockReturnValue(mockClient);
-    (getConfig as any).mockReturnValue({
+    (loadConfig as any).mockReturnValue({
       td_api_key: 'test-key',
       site: 'us01'
     });

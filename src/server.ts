@@ -21,7 +21,8 @@ import {
   listSegmentsTool,
   listActivationsTool,
   audienceSql,
-  segmentSql
+  segmentSql,
+  getSegment
 } from './tools/cdp';
 
 /**
@@ -250,6 +251,11 @@ export class TDMcpServer {
           description: segmentSql.description,
           inputSchema: segmentSql.inputSchema,
         },
+        {
+          name: getSegment.name,
+          description: getSegment.description,
+          inputSchema: getSegment.inputSchema,
+        },
       ],
     }));
 
@@ -456,6 +462,11 @@ export class TDMcpServer {
 
           case segmentSql.name: {
             const result = await segmentSql.execute(args as any || {});
+            return result;
+          }
+
+          case getSegment.name: {
+            const result = await getSegment.execute(args as any || {});
             return result;
           }
 

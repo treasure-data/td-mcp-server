@@ -3,6 +3,7 @@ import { createCDPClient } from '../../client/cdp';
 import { loadConfig } from '../../config';
 
 const segmentSqlSchema = z.object({
+  audience_id: z.number().describe('The parent segment (audience) ID'),
   segment_id: z.number().describe('The segment ID'),
 });
 
@@ -19,37 +20,8 @@ export const segmentSql = {
     try {
       const client = createCDPClient(config.td_api_key, config.site);
       
-      // First, we need to get the segment details to find the audience ID and rule
-      // We'll need to search through parent segments to find which one contains this segment
-      const parentSegments = await client.getParentSegments();
-      
-      let audienceId: number | null = null;
-      let segmentDetails = null;
-      
-      // Search for the segment in each parent segment
-      for (const parent of parentSegments) {
-        const parentId = parseInt(parent.id);
-        if (isNaN(parentId)) continue;
-        
-        try {
-          segmentDetails = await client.getSegmentDetails(parentId, args.segment_id);
-          audienceId = parentId;
-          break;
-        } catch (error) {
-          // This segment doesn't belong to this parent, continue searching
-          continue;
-        }
-      }
-      
-      if (!audienceId || !segmentDetails) {
-        return {
-          content: [{
-            type: 'text',
-            text: `Segment with ID ${args.segment_id} not found`
-          }],
-          isError: true
-        };
-      }
+      // Get the segment details to retrieve the rule
+      const segmentDetails = await client.getSegmentDetails(args.audience_id, args.segment_id);
       
       // Generate the SQL with the segment's rule
       const queryRequest = {
@@ -57,7 +29,7 @@ export const segmentSql = {
         ...(segmentDetails.rule ? { rule: segmentDetails.rule } : {})
       };
       
-      const queryResponse = await client.getSegmentQuery(audienceId, queryRequest);
+      const queryResponse = await client.getSegmentQuery(args.audience_id, queryRequest);
       
       return {
         content: [{
