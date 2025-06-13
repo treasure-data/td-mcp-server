@@ -30,10 +30,10 @@ This MCP server requires Node.js version 18.0.0 or higher. If you don't have Nod
    - The installer includes `npm` and `npx`
 
 2. **Verify installation** by running:
-   ```bash
-   node --version  # Should show v18.0.0 or higher
-   npx --version   # Included with npm 5.2+
-   ```
+```bash
+node --version  # Should show v18.0.0 or higher
+npx --version   # Included with npm 5.2+
+```
 
 3. **Alternative installation methods:**
    - **macOS**: `brew install node` (using Homebrew)
@@ -372,19 +372,19 @@ For the www_access table, analyze the last 7 days of data:
 ### With Claude Desktop
 
 1. Ask Claude to analyze your data:
-   ```
-   Can you show me what databases I have access to in Treasure Data?
-   ```
+```
+Can you show me what databases I have access to in Treasure Data?
+```
 
 2. Query specific data:
-   ```
-   Show me the top 10 most frequent HTTP methods in the www_access table
-   ```
+```
+Show me the top 10 most frequent HTTP methods in the www_access table
+```
 
 3. Get table schemas:
-   ```
-   What columns are in the nasdaq table in sample_datasets?
-   ```
+```
+What columns are in the nasdaq table in sample_datasets?
+```
 
 ### Example Conversations
 
