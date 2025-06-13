@@ -315,6 +315,75 @@ List all activations (syndications) for a specific segment.
 }
 ```
 
+### 12. get_segment
+Get detailed information about a specific segment, including its rules and metadata.
+
+**Parameters:**
+- `audience_id` (integer, required): The parent segment (audience) ID
+- `segment_id` (integer, required): The segment ID
+
+**Example:**
+```json
+{
+  "name": "get_segment",
+  "arguments": {
+    "audience_id": 287197,
+    "segment_id": 1536120
+  }
+}
+```
+
+### 13. audience_sql
+Get the base SQL statement for an audience (parent segment).
+
+**Parameters:**
+- `audience_id` (integer, required): The parent segment (audience) ID
+
+**Example:**
+```json
+{
+  "name": "audience_sql",
+  "arguments": {
+    "audience_id": 287197
+  }
+}
+```
+
+**Response Example:**
+```sql
+select
+  a.*
+from "cdp_audience_287197"."customers" a
+```
+
+### 14. segment_sql
+Get the SQL statement for a segment with filtering conditions applied to the parent segment.
+
+**Parameters:**
+- `audience_id` (integer, required): The parent segment (audience) ID
+- `segment_id` (integer, required): The segment ID
+
+**Example:**
+```json
+{
+  "name": "segment_sql",
+  "arguments": {
+    "audience_id": 287197,
+    "segment_id": 1536120
+  }
+}
+```
+
+**Response Example:**
+```sql
+select
+  a.*
+from "cdp_audience_287197"."customers" a
+where (
+  (position('Male' in a."gender") > 0)
+)
+```
+
 ## Security
 
 - **Read-only by default**: Write operations require explicit configuration
@@ -334,6 +403,8 @@ You have access to Treasure Data through the td-mcp-server. You can:
 - Execute SQL queries on the data
 - Switch between databases using use_database
 - Check current database context using current_database
+- Work with CDP segments and activations (experimental)
+- Generate SQL queries for CDP audiences and segments
 
 Start by listing available databases to understand what data is available.
 ```
@@ -365,6 +436,16 @@ For the www_access table, analyze the last 7 days of data:
 - Show daily traffic trends
 - Compare weekday vs weekend patterns
 - Identify peak usage times
+```
+
+**CDP Segment Analysis:**
+```
+Help me understand my CDP segments:
+1. List all parent segments (audiences) available
+2. For audience ID 287197, show all child segments
+3. Get the SQL query that defines this audience
+4. For segment 1536120, show the SQL with filtering conditions applied
+5. Explain what filtering rules are being applied in this segment
 ```
 
 ## Usage Examples
