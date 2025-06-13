@@ -153,15 +153,14 @@ describe('CDP Integration Tests', () => {
         
         const result = await listParentSegmentsTool.handler({}, {});
         
-        expect(result).toHaveProperty('content');
-        expect(Array.isArray(result.content)).toBe(true);
-        expect(result.content[0]).toHaveProperty('type', 'text');
+        expect(result).toHaveProperty('parentSegments');
+        expect(Array.isArray(result.parentSegments)).toBe(true);
+        expect(result).toHaveProperty('total');
         
-        const text = result.content[0].text;
-        console.log('Tool output preview:', text.substring(0, 200) + '...');
-        
-        // Should contain parent segments info
-        expect(text).toMatch(/Parent Segments|No parent segments found/);
+        console.log(`Tool returned ${result.total} parent segments`);
+        if (result.parentSegments.length > 0) {
+          console.log('First parent segment:', JSON.stringify(result.parentSegments[0], null, 2));
+        }
       } finally {
         // Restore original env vars
         if (originalApiKey !== undefined) {

@@ -26,20 +26,13 @@ describe('listParentSegmentsTool', () => {
     });
   });
 
-  it('should return error when API key is missing', async () => {
+  it('should throw error when API key is missing', async () => {
     (configModule.loadConfig as any).mockReturnValue({
       td_api_key: null,
       site: 'us01'
     });
 
-    const result = await listParentSegmentsTool.handler({}, {});
-
-    expect(result).toEqual({
-      content: [{
-        type: 'text',
-        text: 'Error: TD_API_KEY is required'
-      }]
-    });
+    await expect(listParentSegmentsTool.handler({}, {})).rejects.toThrow();
   });
 
   it('should return parent segments successfully', async () => {
@@ -76,27 +69,26 @@ describe('listParentSegmentsTool', () => {
     expect(cdpClientModule.createCDPClient).toHaveBeenCalledWith('test-key', 'us01');
     expect(mockClient.getParentSegments).toHaveBeenCalled();
 
-    const expectedText = `Parent Segments (Total: 2):
-
-ID: 123
-Name: Parent Segment 1
-Description: Test description
-Created: 2024-01-01T00:00:00Z
-Updated: 2024-01-02T00:00:00Z
----
-ID: 456
-Name: Parent Segment 2
-Description: N/A
-Created: 2024-01-03T00:00:00Z
-Updated: 2024-01-04T00:00:00Z
----
-`;
-
     expect(result).toEqual({
-      content: [{
-        type: 'text',
-        text: expectedText
-      }]
+      parentSegments: [
+        {
+          id: '123',
+          name: 'Parent Segment 1',
+          description: 'Test description',
+          createdAt: '2024-01-01T00:00:00Z',
+          updatedAt: '2024-01-02T00:00:00Z',
+          type: undefined
+        },
+        {
+          id: '456',
+          name: 'Parent Segment 2',
+          description: null,
+          createdAt: '2024-01-03T00:00:00Z',
+          updatedAt: '2024-01-04T00:00:00Z',
+          type: undefined
+        }
+      ],
+      total: 2
     });
   });
 
@@ -111,10 +103,8 @@ Updated: 2024-01-04T00:00:00Z
     const result = await listParentSegmentsTool.handler({}, {});
 
     expect(result).toEqual({
-      content: [{
-        type: 'text',
-        text: 'No parent segments found'
-      }]
+      parentSegments: [],
+      total: 0
     });
   });
 
@@ -135,17 +125,18 @@ Updated: 2024-01-04T00:00:00Z
 
     const result = await listParentSegmentsTool.handler({}, {});
 
-    const expectedText = `Parent Segments (Total: 1):
-
-ID: 789
----
-`;
-
     expect(result).toEqual({
-      content: [{
-        type: 'text',
-        text: expectedText
-      }]
+      parentSegments: [
+        {
+          id: '789',
+          name: undefined,
+          description: null,
+          createdAt: undefined,
+          updatedAt: undefined,
+          type: undefined
+        }
+      ],
+      total: 1
     });
   });
 
@@ -157,13 +148,6 @@ ID: 789
 
     mockClient.getParentSegments.mockRejectedValue(new Error('API connection failed'));
 
-    const result = await listParentSegmentsTool.handler({}, {});
-
-    expect(result).toEqual({
-      content: [{
-        type: 'text',
-        text: 'Error calling TD-CDP API: API connection failed'
-      }]
-    });
+    await expect(listParentSegmentsTool.handler({}, {})).rejects.toThrow('API connection failed');
   });
 });

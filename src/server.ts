@@ -391,22 +391,50 @@ export class TDMcpServer {
           // CDP Tools
           case listParentSegmentsTool.name: {
             const result = await listParentSegmentsTool.handler(args || {}, {});
-            return result;
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: JSON.stringify(result, null, 2),
+                },
+              ],
+            };
           }
 
           case getParentSegmentTool.name: {
             const result = await getParentSegmentTool.handler(args || {}, {});
-            return result;
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: JSON.stringify(result, null, 2),
+                },
+              ],
+            };
           }
 
           case listSegmentsTool.name: {
             const result = await listSegmentsTool.handler(args || {}, {});
-            return result;
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: JSON.stringify(result, null, 2),
+                },
+              ],
+            };
           }
 
           case listActivationsTool.name: {
             const result = await listActivationsTool.handler(args || {}, {});
-            return result;
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: JSON.stringify(result, null, 2),
+                },
+              ],
+            };
           }
 
           default:

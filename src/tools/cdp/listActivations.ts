@@ -24,12 +24,7 @@ export const listActivationsTool = {
     const config = loadConfig();
     
     if (!config.td_api_key) {
-      return {
-        content: [{
-          type: 'text',
-          text: 'Error: TD_API_KEY is required'
-        }]
-      };
+      throw new Error('TD_API_KEY is required');
     }
 
     try {
@@ -37,55 +32,26 @@ export const listActivationsTool = {
       const client = createCDPClient(config.td_api_key, config.site);
       const activations = await client.getActivations(parent_segment_id, segment_id);
 
-      if (activations.length === 0) {
-        return {
-          content: [{
-            type: 'text',
-            text: `No activations found for segment ${segment_id} under parent segment ${parent_segment_id}`
-          }]
-        };
-      }
-
-      let resultText = `Activations for Segment ${segment_id} (Total: ${activations.length}):\n\n`;
-      
-      activations.forEach(activation => {
-        resultText += `ID: ${activation.id}\n`;
-        
-        if (activation.attributes) {
-          resultText += `Name: ${activation.attributes.name}\n`;
-          resultText += `Description: ${activation.attributes.description || 'N/A'}\n`;
-          resultText += `Connection ID: ${activation.attributes.connectionId}\n`;
-          resultText += `Last Workflow Run: ${activation.attributes.lastWorkflowRun || 'N/A'}\n`;
-          resultText += `Created: ${activation.attributes.createdAt}\n`;
-          resultText += `Updated: ${activation.attributes.updatedAt}\n`;
-        }
-        
-        resultText += '---\n';
-      });
-
       return {
-        content: [{
-          type: 'text',
-          text: resultText
-        }]
+        parentSegmentId: parent_segment_id,
+        segmentId: segment_id,
+        activations: activations.map(activation => ({
+          id: activation.id,
+          name: activation.attributes?.name,
+          description: activation.attributes?.description || null,
+          connectionId: activation.attributes?.connectionId,
+          lastWorkflowRun: activation.attributes?.lastWorkflowRun || null,
+          createdAt: activation.attributes?.createdAt,
+          updatedAt: activation.attributes?.updatedAt,
+          type: activation.type
+        })),
+        total: activations.length
       };
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return {
-          content: [{
-            type: 'text',
-            text: `Invalid input: ${error.errors.map(e => e.message).join(', ')}`
-          }]
-        };
+        throw new Error(`Invalid input: ${error.errors.map(e => e.message).join(', ')}`);
       }
-      
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      return {
-        content: [{
-          type: 'text',
-          text: `Error calling TD-CDP API: ${errorMessage}`
-        }]
-      };
+      throw error;
     }
   }
 };
