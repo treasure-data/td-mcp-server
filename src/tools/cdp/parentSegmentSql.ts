@@ -2,25 +2,25 @@ import { z } from 'zod';
 import { createCDPClient } from '../../client/cdp';
 import { loadConfig } from '../../config';
 
-const audienceSqlSchema = z.object({
-  audience_id: z.number().describe('The parent segment (audience) ID'),
+const parentSegmentSqlSchema = z.object({
+  parent_segment_id: z.number().describe('The parent segment ID'),
 });
 
-type AudienceSqlInput = z.infer<typeof audienceSqlSchema>;
+type ParentSegmentSqlInput = z.infer<typeof parentSegmentSqlSchema>;
 
-export const audienceSql = {
-  name: 'audience_sql',
-  description: '[EXPERIMENTAL] Get the SQL statement for a parent segment (audience)',
-  inputSchema: audienceSqlSchema,
+export const parentSegmentSql = {
+  name: 'parent_segment_sql',
+  description: '[EXPERIMENTAL] Get the SQL statement for a parent segment',
+  inputSchema: parentSegmentSqlSchema,
   
-  async execute(args: AudienceSqlInput) {
+  async execute(args: ParentSegmentSqlInput) {
     const config = loadConfig();
     
     try {
       const client = createCDPClient(config.td_api_key, config.site);
       
-      // Generate the SQL for the parent segment (audience)
-      const queryResponse = await client.getSegmentQuery(args.audience_id, {
+      // Generate the SQL for the parent segment
+      const queryResponse = await client.getSegmentQuery(args.parent_segment_id, {
         format: 'sql'
       });
       
@@ -35,7 +35,7 @@ export const audienceSql = {
       return {
         content: [{
           type: 'text',
-          text: `Error generating audience SQL: ${errorMessage}`
+          text: `Error generating parent segment SQL: ${errorMessage}`
         }],
         isError: true
       };

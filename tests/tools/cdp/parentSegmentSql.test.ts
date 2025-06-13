@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { audienceSql } from '../../../src/tools/cdp/audienceSql';
+import { parentSegmentSql } from '../../../src/tools/cdp/parentSegmentSql';
 import { createCDPClient } from '../../../src/client/cdp';
 import { loadConfig } from '../../../src/config';
 
@@ -10,7 +10,7 @@ vi.mock('../../../src/config', () => ({
   loadConfig: vi.fn()
 }));
 
-describe('audienceSql', () => {
+describe('parentSegmentSql', () => {
   const mockClient = {
     getSegmentQuery: vi.fn()
   };
@@ -25,18 +25,18 @@ describe('audienceSql', () => {
   });
 
   it('should have correct metadata', () => {
-    expect(audienceSql.name).toBe('audience_sql');
-    expect(audienceSql.description).toContain('Get the SQL statement for a parent segment');
-    expect(audienceSql.inputSchema).toBeDefined();
+    expect(parentSegmentSql.name).toBe('parent_segment_sql');
+    expect(parentSegmentSql.description).toContain('Get the SQL statement for a parent segment');
+    expect(parentSegmentSql.inputSchema).toBeDefined();
   });
 
-  it('should generate SQL for audience successfully', async () => {
+  it('should generate SQL for parent segment successfully', async () => {
     const mockSql = 'select\n  a.*\nfrom "cdp_audience_287197"."customers" a\n';
     mockClient.getSegmentQuery.mockResolvedValueOnce({
       sql: mockSql
     });
 
-    const result = await audienceSql.execute({ audience_id: 287197 });
+    const result = await parentSegmentSql.execute({ parent_segment_id: 287197 });
 
     expect(mockClient.getSegmentQuery).toHaveBeenCalledWith(287197, { format: 'sql' });
     expect(result.isError).toBeFalsy();
@@ -49,9 +49,9 @@ describe('audienceSql', () => {
   it('should handle errors gracefully', async () => {
     mockClient.getSegmentQuery.mockRejectedValueOnce(new Error('API Error'));
 
-    const result = await audienceSql.execute({ audience_id: 999999 });
+    const result = await parentSegmentSql.execute({ parent_segment_id: 999999 });
 
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain('Error generating audience SQL: API Error');
+    expect(result.content[0].text).toContain('Error generating parent segment SQL: API Error');
   });
 });

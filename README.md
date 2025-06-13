@@ -319,7 +319,7 @@ List all activations (syndications) for a specific segment.
 Get detailed information about a specific segment, including its rules and metadata.
 
 **Parameters:**
-- `audience_id` (integer, required): The parent segment (audience) ID
+- `parent_segment_id` (integer, required): The parent segment ID
 - `segment_id` (integer, required): The segment ID
 
 **Example:**
@@ -327,24 +327,24 @@ Get detailed information about a specific segment, including its rules and metad
 {
   "name": "get_segment",
   "arguments": {
-    "audience_id": 287197,
+    "parent_segment_id": 287197,
     "segment_id": 1536120
   }
 }
 ```
 
-### 13. audience_sql
-Get the SQL statement for a parent segment (audience).
+### 13. parent_segment_sql
+Get the SQL statement for a parent segment.
 
 **Parameters:**
-- `audience_id` (integer, required): The parent segment (audience) ID
+- `parent_segment_id` (integer, required): The parent segment ID
 
 **Example:**
 ```json
 {
-  "name": "audience_sql",
+  "name": "parent_segment_sql",
   "arguments": {
-    "audience_id": 287197
+    "parent_segment_id": 287197
   }
 }
 ```
@@ -360,7 +360,7 @@ from "cdp_audience_287197"."customers" a
 Get the SQL statement for a segment with filtering conditions applied to the parent segment.
 
 **Parameters:**
-- `audience_id` (integer, required): The parent segment (audience) ID
+- `parent_segment_id` (integer, required): The parent segment ID
 - `segment_id` (integer, required): The segment ID
 
 **Example:**
@@ -368,7 +368,7 @@ Get the SQL statement for a segment with filtering conditions applied to the par
 {
   "name": "segment_sql",
   "arguments": {
-    "audience_id": 287197,
+    "parent_segment_id": 287197,
     "segment_id": 1536120
   }
 }
@@ -442,8 +442,8 @@ For the www_access table, analyze the last 7 days of data:
 ```
 Help me understand my CDP segments:
 1. List all parent segments (audiences) available
-2. For audience ID 287197, show all child segments
-3. Get the SQL query that defines this audience
+2. For parent segment ID 287197, show all child segments
+3. Get the SQL query that defines this parent segment
 4. For segment 1536120, show the SQL with filtering conditions applied
 5. Explain what filtering rules are being applied in this segment
 ```

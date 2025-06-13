@@ -3,7 +3,7 @@ import { createCDPClient } from '../../client/cdp';
 import { loadConfig } from '../../config';
 
 const getSegmentSchema = z.object({
-  audience_id: z.number().describe('The parent segment (audience) ID'),
+  parent_segment_id: z.number().describe('The parent segment ID'),
   segment_id: z.number().describe('The segment ID'),
 });
 
@@ -21,7 +21,7 @@ export const getSegment = {
       const client = createCDPClient(config.td_api_key, config.site);
       
       // Get the segment details
-      const segmentDetails = await client.getSegmentDetails(args.audience_id, args.segment_id);
+      const segmentDetails = await client.getSegmentDetails(args.parent_segment_id, args.segment_id);
       
       return {
         content: [{

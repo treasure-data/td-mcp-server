@@ -58,7 +58,7 @@ describe('segmentSql', () => {
     const mockSql = 'select\n  a.*\nfrom "cdp_audience_287197"."customers" a\nwhere (\n  (position(\'Male\' in a."gender") > 0)\n)\n';
     mockClient.getSegmentQuery.mockResolvedValueOnce({ sql: mockSql });
 
-    const result = await segmentSql.execute({ audience_id: 287197, segment_id: 1536120 });
+    const result = await segmentSql.execute({ parent_segment_id: 287197, segment_id: 1536120 });
 
     expect(mockClient.getSegmentDetails).toHaveBeenCalledWith(287197, 1536120);
     expect(mockClient.getSegmentQuery).toHaveBeenCalledWith(287197, {
@@ -84,7 +84,7 @@ describe('segmentSql', () => {
     const mockSql = 'select\n  a.*\nfrom "cdp_audience_287197"."customers" a\n';
     mockClient.getSegmentQuery.mockResolvedValueOnce({ sql: mockSql });
 
-    const result = await segmentSql.execute({ audience_id: 287197, segment_id: 1536120 });
+    const result = await segmentSql.execute({ parent_segment_id: 287197, segment_id: 1536120 });
 
     expect(mockClient.getSegmentQuery).toHaveBeenCalledWith(287197, {
       format: 'sql'
@@ -97,7 +97,7 @@ describe('segmentSql', () => {
     // Mock segment not found
     mockClient.getSegmentDetails.mockRejectedValueOnce(new Error('Not found'));
 
-    const result = await segmentSql.execute({ audience_id: 287197, segment_id: 999999 });
+    const result = await segmentSql.execute({ parent_segment_id: 287197, segment_id: 999999 });
 
     expect(result.isError).toBe(true);
     expect(result.content[0].text).toContain('Error generating segment SQL: Not found');
@@ -106,7 +106,7 @@ describe('segmentSql', () => {
   it('should handle errors gracefully', async () => {
     mockClient.getSegmentDetails.mockRejectedValueOnce(new Error('API Error'));
 
-    const result = await segmentSql.execute({ audience_id: 287197, segment_id: 1536120 });
+    const result = await segmentSql.execute({ parent_segment_id: 287197, segment_id: 1536120 });
 
     expect(result.isError).toBe(true);
     expect(result.content[0].text).toContain('Error generating segment SQL: API Error');
