@@ -85,13 +85,7 @@ When implementing new features:
 3. Ensure error cases are covered
 4. Run `npm run test:coverage` to verify coverage
 5. Use Vitest's `describe`, `it`, `expect`, `beforeEach`, `vi` imports
-
-## Future Features
-
-Phase 2 will add chat functionality using TD LLM API:
-- SSE streaming for responses
-- Session management for conversations
-- Tool call parsing from agent responses
+6. For MCP tools requiring API access, add an integration test
 
 ## Git Workflow
 - use squash commits for merging pr
