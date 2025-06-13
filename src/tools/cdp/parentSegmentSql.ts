@@ -11,16 +11,26 @@ type ParentSegmentSqlInput = z.infer<typeof parentSegmentSqlSchema>;
 export const parentSegmentSql = {
   name: 'parent_segment_sql',
   description: '[EXPERIMENTAL] Get the SQL statement for a parent segment (audience). Requires parent_segment_id parameter. Use list_parent_segments first to find available parent segment IDs.',
-  inputSchema: parentSegmentSqlSchema,
+  inputSchema: {
+    type: 'object',
+    properties: {
+      parent_segment_id: {
+        type: 'integer',
+        description: 'The parent segment ID (required). Use list_parent_segments to find available IDs.'
+      }
+    },
+    required: ['parent_segment_id']
+  },
   
-  async execute(args: ParentSegmentSqlInput) {
+  async execute(args: unknown) {
     const config = loadConfig();
     
     try {
+      const parsedArgs = parentSegmentSqlSchema.parse(args);
       const client = createCDPClient(config.td_api_key, config.site);
       
       // Generate the SQL for the parent segment
-      const queryResponse = await client.getSegmentQuery(args.parent_segment_id, {
+      const queryResponse = await client.getSegmentQuery(parsedArgs.parent_segment_id, {
         format: 'sql'
       });
       
