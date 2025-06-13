@@ -224,22 +224,22 @@ export class TDMcpServer {
         {
           name: listParentSegmentsTool.name,
           description: listParentSegmentsTool.description,
-          inputSchema: listParentSegmentsTool.schema.input,
+          inputSchema: listParentSegmentsTool.inputSchema,
         },
         {
           name: getParentSegmentTool.name,
           description: getParentSegmentTool.description,
-          inputSchema: getParentSegmentTool.schema.input,
+          inputSchema: getParentSegmentTool.inputSchema,
         },
         {
           name: listSegmentsTool.name,
           description: listSegmentsTool.description,
-          inputSchema: listSegmentsTool.schema.input,
+          inputSchema: listSegmentsTool.inputSchema,
         },
         {
           name: listActivationsTool.name,
           description: listActivationsTool.description,
-          inputSchema: listActivationsTool.schema.input,
+          inputSchema: listActivationsTool.inputSchema,
         },
         {
           name: parentSegmentSql.name,

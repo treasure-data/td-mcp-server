@@ -3,22 +3,26 @@ import { createCDPClient } from '../../client/cdp';
 import { loadConfig } from '../../config';
 
 const inputSchema = z.object({
-  parent_segment_id: z.number().int().positive(),
-  segment_id: z.number().int().positive()
+  parent_segment_id: z.number().int().positive().describe('The parent segment ID'),
+  segment_id: z.number().int().positive().describe('The segment ID')
 });
 
 export const listActivationsTool = {
   name: 'list_activations',
-  description: '[EXPERIMENTAL] Retrieve activation list under a specific segment from TD-CDP API',
-  schema: {
-    input: {
-      type: 'object',
-      properties: {
-        parent_segment_id: { type: 'integer', description: 'The ID of the parent segment' },
-        segment_id: { type: 'integer', description: 'The ID of the segment' }
+  description: '[EXPERIMENTAL] List all activations (syndications) for a specific segment. Requires both parent_segment_id and segment_id parameters. Use list_parent_segments and list_segments first to find available IDs.',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      parent_segment_id: { 
+        type: 'integer', 
+        description: 'The parent segment ID (required). Use list_parent_segments to find available IDs.' 
       },
-      required: ['parent_segment_id', 'segment_id']
-    }
+      segment_id: { 
+        type: 'integer', 
+        description: 'The segment ID (required). Use list_segments to find available IDs under the parent segment.' 
+      }
+    },
+    required: ['parent_segment_id', 'segment_id']
   },
   handler: async (args: unknown, _context: unknown) => {
     const config = loadConfig();

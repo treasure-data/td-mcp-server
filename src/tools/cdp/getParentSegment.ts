@@ -3,20 +3,21 @@ import { createCDPClient } from '../../client/cdp';
 import { loadConfig } from '../../config';
 
 const inputSchema = z.object({
-  parent_segment_id: z.number().int().positive()
+  parent_segment_id: z.number().int().positive().describe('The parent segment ID to retrieve details for')
 });
 
 export const getParentSegmentTool = {
   name: 'get_parent_segment',
-  description: '[EXPERIMENTAL] Get details of a specific parent segment from TD-CDP API',
-  schema: {
-    input: {
-      type: 'object',
-      properties: {
-        parent_segment_id: { type: 'integer', description: 'The ID of the parent segment to retrieve' }
-      },
-      required: ['parent_segment_id']
-    }
+  description: '[EXPERIMENTAL] Get details of a specific parent segment by its ID. Requires parent_segment_id parameter. Use list_parent_segments first to find available parent segment IDs.',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      parent_segment_id: { 
+        type: 'integer', 
+        description: 'The parent segment ID to retrieve details for (required). Use list_parent_segments to find available IDs.' 
+      }
+    },
+    required: ['parent_segment_id']
   },
   handler: async (args: unknown, _context: unknown) => {
     const config = loadConfig();

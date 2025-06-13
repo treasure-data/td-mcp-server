@@ -4,13 +4,11 @@ import { loadConfig } from '../../config';
 
 export const listParentSegmentsTool = {
   name: 'list_parent_segments',
-  description: '[EXPERIMENTAL] Retrieve parent segment list from TD-CDP API',
-  schema: {
-    input: {
-      type: 'object',
-      properties: {},
-      required: []
-    }
+  description: '[EXPERIMENTAL] List all parent segments (audiences) in Customer Data Platform. No parameters required.',
+  inputSchema: {
+    type: 'object',
+    properties: {},
+    required: []
   },
   handler: async (_args: unknown, _context: unknown) => {
     const config = loadConfig();

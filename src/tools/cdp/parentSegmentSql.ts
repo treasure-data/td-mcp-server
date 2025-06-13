@@ -10,7 +10,7 @@ type ParentSegmentSqlInput = z.infer<typeof parentSegmentSqlSchema>;
 
 export const parentSegmentSql = {
   name: 'parent_segment_sql',
-  description: '[EXPERIMENTAL] Get the SQL statement for a parent segment',
+  description: '[EXPERIMENTAL] Get the SQL statement for a parent segment (audience). Requires parent_segment_id parameter. Use list_parent_segments first to find available parent segment IDs.',
   inputSchema: parentSegmentSqlSchema,
   
   async execute(args: ParentSegmentSqlInput) {
