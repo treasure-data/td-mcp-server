@@ -65,8 +65,8 @@ The MCP tools use specific information_schema queries:
 - Trino errors should be caught and wrapped with user-friendly messages
 - All errors must mask sensitive data before returning to user
 
-### CDP Integration
-The CDP (Customer Data Platform) integration provides access to segments and activations:
+### CDP Integration (Experimental)
+The CDP (Customer Data Platform) integration is currently experimental and provides basic access to segments and activations:
 - **Authentication**: Uses the same TD API key with `TD1` prefix in Authorization header
 - **Endpoints**: CDP endpoints follow the same site pattern (e.g., `api-cdp.treasuredata.com` for us01)
 - **Response Format**: CDP API returns JSON:API formatted responses that need special handling
@@ -75,6 +75,7 @@ The CDP (Customer Data Platform) integration provides access to segments and act
   - `get_parent_segment`: Gets details of a specific parent segment
   - `list_segments`: Lists segments under a parent
   - `list_activations`: Lists activations (syndications) for a segment
+- **Note**: Current implementation is read-only. Write operations (create/update/delete segments) and other advanced features are not yet implemented.
 
 ## Current Implementation Status
 

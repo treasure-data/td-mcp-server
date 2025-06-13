@@ -8,7 +8,7 @@ const inputSchema = z.object({
 
 export const getParentSegmentTool = {
   name: 'get_parent_segment',
-  description: 'Get details of a specific parent segment from TD-CDP API',
+  description: '[EXPERIMENTAL] Get details of a specific parent segment from TD-CDP API',
   schema: {
     input: {
       type: 'object',

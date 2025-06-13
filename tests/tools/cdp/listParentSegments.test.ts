@@ -18,7 +18,7 @@ describe('listParentSegmentsTool', () => {
 
   it('should have correct metadata', () => {
     expect(listParentSegmentsTool.name).toBe('list_parent_segments');
-    expect(listParentSegmentsTool.description).toBe('Retrieve parent segment list from TD-CDP API');
+    expect(listParentSegmentsTool.description).toBe('[EXPERIMENTAL] Retrieve parent segment list from TD-CDP API');
     expect(listParentSegmentsTool.schema.input).toEqual({
       type: 'object',
       properties: {},
