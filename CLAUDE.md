@@ -104,3 +104,7 @@ Phase 2 will add chat functionality using TD LLM API:
 - SSE streaming for responses
 - Session management for conversations
 - Tool call parsing from agent responses
+
+## Git Workflow
+- use squash commits for merging pr
+- for release, create a new pr and after merging it, add a release tag
