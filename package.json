@@ -36,7 +36,6 @@
   "bugs": {
     "url": "https://github.com/treasure-data/td-mcp-server/issues"
   },
-  "homepage": "https://github.com/treasure-data/td-mcp-server#readme",
   "publishConfig": {
     "access": "public"
   },
