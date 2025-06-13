@@ -271,7 +271,7 @@ describe('CDPClient', () => {
   });
 
   describe('getSegmentQuery', () => {
-    it('should generate audience SQL without rule', async () => {
+    it('should generate parent segment SQL without rule', async () => {
       const mockResponse = {
         sql: 'select\n  a.*\nfrom "cdp_audience_287197"."customers" a\n'
       };

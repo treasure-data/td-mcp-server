@@ -290,7 +290,7 @@ describe('CDP Integration Tests', () => {
       }
     });
 
-    it('should test new CDP tools: audience_sql, segment_sql, get_segment', async () => {
+    it('should test new CDP tools: parent_segment_sql, segment_sql, get_segment', async () => {
       // Temporarily set env vars
       const originalApiKey = process.env.TD_API_KEY;
       const originalSite = process.env.TD_SITE;
@@ -300,7 +300,7 @@ describe('CDP Integration Tests', () => {
       
       try {
         // Import tools fresh to pick up env vars
-        const { audienceSql, segmentSql, getSegment, listParentSegmentsTool, listSegmentsTool } = await import('../../src/tools/cdp');
+        const { parentSegmentSql, segmentSql, getSegment, listParentSegmentsTool, listSegmentsTool } = await import('../../src/tools/cdp');
         
         // First, get parent segments to find test data
         const parentResult = await listParentSegmentsTool.handler({}, {});
@@ -313,9 +313,9 @@ describe('CDP Integration Tests', () => {
         const parentId = parseInt(parentResult.parentSegments[0].id);
         console.log(`Testing new tools with audience ID: ${parentId}`);
 
-        // Test audience_sql tool
-        console.log('\nTesting audience_sql tool...');
-        const audienceResult = await audienceSql.execute({ audience_id: parentId });
+        // Test parent_segment_sql tool
+        console.log('\nTesting parent_segment_sql tool...');
+        const audienceResult = await parentSegmentSql.execute({ parent_segment_id: parentId });
         
         expect(audienceResult.content[0].type).toBe('text');
         expect(audienceResult.content[0].text).toContain('select');
@@ -332,7 +332,7 @@ describe('CDP Integration Tests', () => {
           // Test get_segment tool
           console.log('\nTesting get_segment tool...');
           const getSegmentResult = await getSegment.execute({ 
-            audience_id: parentId, 
+            parent_segment_id: parentId, 
             segment_id: segmentId 
           });
           
@@ -345,7 +345,7 @@ describe('CDP Integration Tests', () => {
           // Test segment_sql tool
           console.log('\nTesting segment_sql tool...');
           const segmentSqlResult = await segmentSql.execute({ 
-            audience_id: parentId, 
+            parent_segment_id: parentId, 
             segment_id: segmentId 
           });
           
@@ -386,20 +386,20 @@ describe('CDP Integration Tests', () => {
       process.env.TD_SITE = 'dev';
       
       try {
-        const { audienceSql, segmentSql, getSegment } = await import('../../src/tools/cdp');
+        const { parentSegmentSql, segmentSql, getSegment } = await import('../../src/tools/cdp');
         
         // Test with non-existent IDs
         console.log('\nTesting error handling with non-existent IDs...');
         
-        // Test audience_sql with invalid ID
-        const audienceResult = await audienceSql.execute({ audience_id: 999999999 });
+        // Test parent_segment_sql with invalid ID
+        const audienceResult = await parentSegmentSql.execute({ parent_segment_id: 999999999 });
         expect(audienceResult.isError).toBe(true);
         expect(audienceResult.content[0].text).toContain('Error');
         console.log('Audience SQL error:', audienceResult.content[0].text);
 
         // Test segment_sql with invalid IDs
         const segmentSqlResult = await segmentSql.execute({ 
-          audience_id: 999999999, 
+          parent_segment_id: 999999999, 
           segment_id: 999999999 
         });
         expect(segmentSqlResult.isError).toBe(true);
@@ -408,7 +408,7 @@ describe('CDP Integration Tests', () => {
 
         // Test get_segment with invalid IDs
         const getSegmentResult = await getSegment.execute({ 
-          audience_id: 999999999, 
+          parent_segment_id: 999999999, 
           segment_id: 999999999 
         });
         expect(getSegmentResult.isError).toBe(true);

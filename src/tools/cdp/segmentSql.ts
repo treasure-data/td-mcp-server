@@ -3,7 +3,7 @@ import { createCDPClient } from '../../client/cdp';
 import { loadConfig } from '../../config';
 
 const segmentSqlSchema = z.object({
-  audience_id: z.number().describe('The parent segment (audience) ID'),
+  parent_segment_id: z.number().describe('The parent segment ID'),
   segment_id: z.number().describe('The segment ID'),
 });
 
@@ -11,7 +11,7 @@ type SegmentSqlInput = z.infer<typeof segmentSqlSchema>;
 
 export const segmentSql = {
   name: 'segment_sql',
-  description: '[EXPERIMENTAL] Get the SQL statement for a segment with filtering conditions applied to the parent segment (audience) SQL',
+  description: '[EXPERIMENTAL] Get the SQL statement for a segment with filtering conditions applied to the parent segment SQL',
   inputSchema: segmentSqlSchema,
   
   async execute(args: SegmentSqlInput) {
@@ -21,7 +21,7 @@ export const segmentSql = {
       const client = createCDPClient(config.td_api_key, config.site);
       
       // Get the segment details to retrieve the rule
-      const segmentDetails = await client.getSegmentDetails(args.audience_id, args.segment_id);
+      const segmentDetails = await client.getSegmentDetails(args.parent_segment_id, args.segment_id);
       
       // Generate the SQL with the segment's rule
       const queryRequest = {
@@ -29,7 +29,7 @@ export const segmentSql = {
         ...(segmentDetails.rule ? { rule: segmentDetails.rule } : {})
       };
       
-      const queryResponse = await client.getSegmentQuery(args.audience_id, queryRequest);
+      const queryResponse = await client.getSegmentQuery(args.parent_segment_id, queryRequest);
       
       return {
         content: [{

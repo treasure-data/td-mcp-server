@@ -73,7 +73,7 @@ describe('getSegment', () => {
 
     mockClient.getSegmentDetails.mockResolvedValueOnce(mockSegmentDetails);
 
-    const result = await getSegment.execute({ audience_id: 287197, segment_id: 1536120 });
+    const result = await getSegment.execute({ parent_segment_id: 287197, segment_id: 1536120 });
 
     expect(mockClient.getSegmentDetails).toHaveBeenCalledWith(287197, 1536120);
     expect(result.isError).toBeFalsy();
@@ -86,7 +86,7 @@ describe('getSegment', () => {
   it('should handle errors gracefully', async () => {
     mockClient.getSegmentDetails.mockRejectedValueOnce(new Error('API Error'));
 
-    const result = await getSegment.execute({ audience_id: 287197, segment_id: 999999 });
+    const result = await getSegment.execute({ parent_segment_id: 287197, segment_id: 999999 });
 
     expect(result.isError).toBe(true);
     expect(result.content[0].text).toContain('Error fetching segment details: API Error');
