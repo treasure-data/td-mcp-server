@@ -77,18 +77,6 @@ The CDP (Customer Data Platform) integration is currently experimental and provi
   - `list_activations`: Lists activations (syndications) for a segment
 - **Note**: Current implementation is read-only. Write operations (create/update/delete segments) and other advanced features are not yet implemented.
 
-## Current Implementation Status
-
-✅ Completed:
-- Project setup with TypeScript strict mode
-- Configuration module with 100% test coverage
-- NPX packaging configuration
-
-⏳ In Progress:
-- Trino client wrapper implementation
-- MCP tool implementations
-- Security module for query validation
-
 ## Testing Requirements
 
 When implementing new features:
@@ -108,3 +96,4 @@ Phase 2 will add chat functionality using TD LLM API:
 ## Git Workflow
 - use squash commits for merging pr
 - for release, create a new pr and after merging it, add a release tag
+- Release notes will be generated upon pushing a new release tag
