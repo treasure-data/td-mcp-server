@@ -11,7 +11,7 @@ type GetSegmentInput = z.infer<typeof getSegmentSchema>;
 
 export const getSegment = {
   name: 'get_segment',
-  description: '[EXPERIMENTAL] Get detailed information about a specific segment',
+  description: '[EXPERIMENTAL] Get detailed information about a specific segment including its filtering rules. Requires both parent_segment_id and segment_id parameters. Use list_parent_segments and list_segments first to find available IDs.',
   inputSchema: getSegmentSchema,
   
   async execute(args: GetSegmentInput) {
