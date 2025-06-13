@@ -17,56 +17,26 @@ export const listParentSegmentsTool = {
     const config = loadConfig();
     
     if (!config.td_api_key) {
-      return {
-        content: [{
-          type: 'text',
-          text: 'Error: TD_API_KEY is required'
-        }]
-      };
+      throw new Error('TD_API_KEY is required');
     }
 
     try {
       const client = createCDPClient(config.td_api_key, config.site);
       const parentSegments = await client.getParentSegments();
 
-      if (parentSegments.length === 0) {
-        return {
-          content: [{
-            type: 'text',
-            text: 'No parent segments found'
-          }]
-        };
-      }
-
-      let resultText = `Parent Segments (Total: ${parentSegments.length}):\n\n`;
-      
-      parentSegments.forEach((ps: ParentSegment) => {
-        resultText += `ID: ${ps.id}\n`;
-        
-        if (ps.attributes) {
-          resultText += `Name: ${ps.attributes.name}\n`;
-          resultText += `Description: ${ps.attributes.description || 'N/A'}\n`;
-          resultText += `Created: ${ps.attributes.createdAt}\n`;
-          resultText += `Updated: ${ps.attributes.updatedAt}\n`;
-        }
-        
-        resultText += '---\n';
-      });
-
       return {
-        content: [{
-          type: 'text',
-          text: resultText
-        }]
+        parentSegments: parentSegments.map(ps => ({
+          id: ps.id,
+          name: ps.attributes?.name,
+          description: ps.attributes?.description || null,
+          createdAt: ps.attributes?.createdAt,
+          updatedAt: ps.attributes?.updatedAt,
+          type: ps.type
+        })),
+        total: parentSegments.length
       };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      return {
-        content: [{
-          type: 'text',
-          text: `Error calling TD-CDP API: ${errorMessage}`
-        }]
-      };
+      throw error; // Let the server handle error formatting
     }
   }
 };
