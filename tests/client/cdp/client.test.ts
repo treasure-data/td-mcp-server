@@ -198,6 +198,146 @@ describe('CDPClient', () => {
     });
   });
 
+  describe('getSegmentDetails', () => {
+    it('should fetch segment details successfully', async () => {
+      const mockResponse = {
+        audienceId: '287197',
+        id: '1536120',
+        name: 'Test Segment',
+        realtime: false,
+        isVisible: true,
+        numSyndications: 5,
+        description: 'Test description',
+        segmentFolderId: '795863',
+        population: 14665,
+        createdAt: '2024-10-16T21:26:30.815Z',
+        updatedAt: '2025-04-30T22:50:10.188Z',
+        createdBy: {
+          id: '381',
+          td_user_id: '1275',
+          name: 'Test User'
+        },
+        updatedBy: {
+          id: '381',
+          td_user_id: '1275',
+          name: 'Test User'
+        },
+        kind: 0,
+        rule: {
+          type: 'And',
+          conditions: [
+            {
+              type: 'And',
+              conditions: [
+                {
+                  type: 'Value',
+                  leftValue: { name: 'gender' },
+                  operator: {
+                    not: false,
+                    rightValues: ['Male'],
+                    type: 'Contain'
+                  },
+                  exclude: false,
+                  limit: null
+                }
+              ]
+            }
+          ]
+        },
+        referencedBy: []
+      };
+
+      (global.fetch as any).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockResponse
+      });
+
+      const result = await client.getSegmentDetails(287197, 1536120);
+
+      expect(global.fetch).toHaveBeenCalledWith(
+        'https://api-cdp.treasuredata.com/audiences/287197/segments/1536120',
+        expect.objectContaining({
+          method: 'GET',
+          headers: expect.objectContaining({
+            'Authorization': 'TD1 test-api-key-12345',
+            'Content-Type': 'application/json',
+            'Accept': 'application/vnd.treasuredata.v1+json'
+          })
+        })
+      );
+
+      expect(result).toEqual(mockResponse);
+    });
+  });
+
+  describe('getSegmentQuery', () => {
+    it('should generate audience SQL without rule', async () => {
+      const mockResponse = {
+        sql: 'select\n  a.*\nfrom "cdp_audience_287197"."customers" a\n'
+      };
+
+      (global.fetch as any).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockResponse
+      });
+
+      const result = await client.getSegmentQuery(287197, { format: 'sql' });
+
+      expect(global.fetch).toHaveBeenCalledWith(
+        'https://api-cdp.treasuredata.com/audiences/287197/segments/query',
+        expect.objectContaining({
+          method: 'POST',
+          headers: expect.objectContaining({
+            'Authorization': 'TD1 test-api-key-12345',
+            'Content-Type': 'application/json',
+            'Accept': 'application/vnd.treasuredata.v1+json'
+          }),
+          body: JSON.stringify({ format: 'sql' })
+        })
+      );
+
+      expect(result).toEqual(mockResponse);
+    });
+
+    it('should generate segment SQL with rule', async () => {
+      const mockRule = {
+        type: 'And',
+        conditions: [
+          {
+            type: 'Value',
+            leftValue: { name: 'gender' },
+            operator: {
+              not: false,
+              rightValues: ['Male'],
+              type: 'Contain'
+            }
+          }
+        ]
+      };
+
+      const mockResponse = {
+        sql: 'select\n  a.*\nfrom "cdp_audience_287197"."customers" a\nwhere (\n  (position(\'Male\' in a."gender") > 0)\n)\n'
+      };
+
+      (global.fetch as any).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockResponse
+      });
+
+      const result = await client.getSegmentQuery(287197, { format: 'sql', rule: mockRule });
+
+      expect(global.fetch).toHaveBeenCalledWith(
+        'https://api-cdp.treasuredata.com/audiences/287197/segments/query',
+        expect.objectContaining({
+          method: 'POST',
+          body: JSON.stringify({ format: 'sql', rule: mockRule })
+        })
+      );
+
+      expect(result).toEqual(mockResponse);
+    });
+  });
+
   describe('error handling', () => {
     it('should handle non-JSON error responses', async () => {
       (global.fetch as any).mockResolvedValueOnce({

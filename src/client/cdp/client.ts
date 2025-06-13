@@ -2,6 +2,9 @@ import { CDP_ENDPOINTS } from './endpoints';
 import { 
   ParentSegment, 
   Segment, 
+  SegmentDetails,
+  SegmentQueryRequest,
+  SegmentQueryResponse,
   Activation, 
   CDPApiError,
   CDPRequestOptions 
@@ -105,6 +108,23 @@ export class CDPClient {
     }
     
     return response.data || [];
+  }
+
+  async getSegmentDetails(parentId: number, segmentId: number): Promise<SegmentDetails> {
+    const response = await this.request<SegmentDetails>(
+      'GET',
+      `/audiences/${parentId}/segments/${segmentId}`
+    );
+    return response;
+  }
+
+  async getSegmentQuery(parentId: number, request: SegmentQueryRequest): Promise<SegmentQueryResponse> {
+    const response = await this.request<SegmentQueryResponse>(
+      'POST',
+      `/audiences/${parentId}/segments/query`,
+      { body: request }
+    );
+    return response;
   }
 }
 
