@@ -7,8 +7,6 @@ const segmentSqlSchema = z.object({
   segment_id: z.number().describe('The segment ID'),
 });
 
-type SegmentSqlInput = z.infer<typeof segmentSqlSchema>;
-
 export const segmentSql = {
   name: 'segment_sql',
   description: '[EXPERIMENTAL] Get the SQL statement for a segment with filtering conditions applied to the parent segment (audience) SQL. Requires both parent_segment_id and segment_id parameters. Use list_parent_segments and list_segments first to find available IDs.',
