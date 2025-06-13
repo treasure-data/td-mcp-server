@@ -31,8 +31,10 @@ This is an MCP (Model Context Protocol) server that exposes Treasure Data functi
 1. **MCP Server** (`src/index.ts`) - Entry point that registers tools with the MCP SDK
 2. **Configuration** (`src/config.ts`) - Validates and manages all server settings with environment variable support
 3. **Trino Client** (`src/client/`) - Wraps trino-client for TD-specific authentication using X-Trino-User header
-4. **Security Layer** (`src/security/`) - Validates SQL queries and maintains audit logs
-5. **MCP Tools** (`src/tools/`) - Individual tool implementations for database operations
+4. **CDP Client** (`src/client/cdp/`) - HTTP client for TD Customer Data Platform API using TD1 authentication
+5. **Security Layer** (`src/security/`) - Validates SQL queries and maintains audit logs
+6. **MCP Tools** (`src/tools/`) - Individual tool implementations for database operations
+7. **CDP Tools** (`src/tools/cdp/`) - Tools for interacting with CDP segments and activations
 
 ### Key Design Patterns
 
@@ -62,6 +64,17 @@ The MCP tools use specific information_schema queries:
 - ConfigurationError for invalid settings
 - Trino errors should be caught and wrapped with user-friendly messages
 - All errors must mask sensitive data before returning to user
+
+### CDP Integration
+The CDP (Customer Data Platform) integration provides access to segments and activations:
+- **Authentication**: Uses the same TD API key with `TD1` prefix in Authorization header
+- **Endpoints**: CDP endpoints follow the same site pattern (e.g., `api-cdp.treasuredata.com` for us01)
+- **Response Format**: CDP API returns JSON:API formatted responses that need special handling
+- **Tools Available**:
+  - `list_parent_segments`: Lists all parent segments
+  - `get_parent_segment`: Gets details of a specific parent segment
+  - `list_segments`: Lists segments under a parent
+  - `list_activations`: Lists activations (syndications) for a segment
 
 ## Current Implementation Status
 

@@ -17,6 +17,7 @@ Your feedback during this phase is invaluable and will help us shape the future 
 - 🔒 Security-first design with read-only mode by default
 - 🌍 Multi-site support (US, JP, EU, AP regions)
 - 🚀 Zero-install execution via npx
+- 🎯 CDP (Customer Data Platform) integration for segment and activation management
 
 ## Prerequisites
 
@@ -241,6 +242,74 @@ None
 {
   "currentDatabase": "sample_datasets",
   "description": "The current database context used for queries"
+}
+```
+
+### CDP Tools (Customer Data Platform)
+
+The following tools are available for interacting with Treasure Data's Customer Data Platform (CDP):
+
+### 8. list_parent_segments
+List all parent segments in your CDP account.
+
+**Parameters:**
+None
+
+**Example:**
+```json
+{
+  "name": "list_parent_segments",
+  "arguments": {}
+}
+```
+
+### 9. get_parent_segment
+Get details of a specific parent segment.
+
+**Parameters:**
+- `parent_segment_id` (integer, required): The ID of the parent segment
+
+**Example:**
+```json
+{
+  "name": "get_parent_segment",
+  "arguments": {
+    "parent_segment_id": 12345
+  }
+}
+```
+
+### 10. list_segments
+List all segments under a specific parent segment.
+
+**Parameters:**
+- `parent_segment_id` (integer, required): The ID of the parent segment
+
+**Example:**
+```json
+{
+  "name": "list_segments",
+  "arguments": {
+    "parent_segment_id": 12345
+  }
+}
+```
+
+### 11. list_activations
+List all activations (syndications) for a specific segment.
+
+**Parameters:**
+- `parent_segment_id` (integer, required): The ID of the parent segment
+- `segment_id` (integer, required): The ID of the segment
+
+**Example:**
+```json
+{
+  "name": "list_activations",
+  "arguments": {
+    "parent_segment_id": 12345,
+    "segment_id": 67890
+  }
 }
 ```
 
