@@ -49,8 +49,10 @@ export function validateConfig(config: Config): void {
 
   // Validate site
   if (!VALID_SITES.includes(config.site)) {
+    // Don't expose 'dev' site in error messages
+    const publicSites = VALID_SITES.filter(site => site !== 'dev');
     throw new ConfigurationError(
-      `Invalid TD_SITE: ${config.site}. Must be one of: ${VALID_SITES.join(', ')}`
+      `Invalid TD_SITE: ${config.site}. Must be one of: ${publicSites.join(', ')}`
     );
   }
 
