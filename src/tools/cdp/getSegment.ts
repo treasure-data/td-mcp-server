@@ -7,21 +7,33 @@ const getSegmentSchema = z.object({
   segment_id: z.number().describe('The segment ID'),
 });
 
-type GetSegmentInput = z.infer<typeof getSegmentSchema>;
-
 export const getSegment = {
   name: 'get_segment',
   description: '[EXPERIMENTAL] Get detailed information about a specific segment including its filtering rules. Requires both parent_segment_id and segment_id parameters. Use list_parent_segments and list_segments first to find available IDs.',
-  inputSchema: getSegmentSchema,
+  inputSchema: {
+    type: 'object',
+    properties: {
+      parent_segment_id: {
+        type: 'integer',
+        description: 'The parent segment ID (required). Use list_parent_segments to find available IDs.'
+      },
+      segment_id: {
+        type: 'integer',
+        description: 'The segment ID (required). Use list_segments to find available IDs under the parent segment.'
+      }
+    },
+    required: ['parent_segment_id', 'segment_id']
+  },
   
-  async execute(args: GetSegmentInput) {
+  async execute(args: unknown) {
     const config = loadConfig();
     
     try {
+      const parsedArgs = getSegmentSchema.parse(args);
       const client = createCDPClient(config.td_api_key, config.site);
       
       // Get the segment details
-      const segmentDetails = await client.getSegmentDetails(args.parent_segment_id, args.segment_id);
+      const segmentDetails = await client.getSegmentDetails(parsedArgs.parent_segment_id, parsedArgs.segment_id);
       
       return {
         content: [{
