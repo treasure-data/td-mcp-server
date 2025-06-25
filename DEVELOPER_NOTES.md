@@ -156,3 +156,70 @@ The MCP server exposes these tools that can be invoked through natural language:
    ```
 
 4. The server implements proper error handling and graceful shutdown, so you can safely Ctrl+C to stop it during testing.
+
+## Release Process
+
+This project uses GitHub Actions for automated releases. Follow these steps to create a new release:
+
+### 1. Determine Version Number
+
+Follow semantic versioning (MAJOR.MINOR.PATCH):
+- **MAJOR**: Breaking changes
+- **MINOR**: New features (backwards compatible)
+- **PATCH**: Bug fixes and dependency updates
+
+### 2. Create Release
+
+1. **Update version in package.json**:
+   ```bash
+   # Create a new branch
+   git checkout -b release-vX.Y.Z
+   
+   # Update version in package.json
+   npm version patch  # or minor/major
+   ```
+
+2. **Create and merge release PR**:
+   ```bash
+   # Commit the version change
+   git add package.json
+   git commit -m "Release vX.Y.Z"
+   
+   # Push branch and create PR
+   git push origin release-vX.Y.Z
+   gh pr create --title "Release vX.Y.Z" --body "Bump version to X.Y.Z"
+   
+   # After review, merge the PR (using squash merge)
+   gh pr merge --squash
+   ```
+
+3. **Create and push release tag**:
+   ```bash
+   # Switch back to main and pull latest
+   git checkout main
+   git pull origin main
+   
+   # Create and push tag
+   git tag vX.Y.Z
+   git push origin vX.Y.Z
+   ```
+
+### 3. Automated Release
+
+Once the tag is pushed:
+- GitHub Actions workflow (`.github/workflows/release.yml`) automatically triggers
+- Creates a GitHub release with auto-generated release notes
+- Release notes include all PRs merged since the last release
+
+### 4. Verify Release
+
+1. Check the [Actions tab](https://github.com/treasure-data/td-mcp-server/actions) for workflow status
+2. Once complete, view the release at [Releases page](https://github.com/treasure-data/td-mcp-server/releases)
+3. Release notes will include all merged PRs with their titles
+
+### Release Guidelines
+
+- Use descriptive PR titles as they become release notes
+- All PRs should be squash-merged to keep history clean
+- Tag format must be `vX.Y.Z` to trigger the workflow
+- The release workflow only runs on tags, not on branch pushes
