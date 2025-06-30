@@ -18,7 +18,7 @@ describe('Workflow Endpoints', () => {
       expect(WORKFLOW_ENDPOINTS.eu01).toBe('https://api-workflow.eu01.treasuredata.com');
       expect(WORKFLOW_ENDPOINTS.ap02).toBe('https://api-workflow.ap02.treasuredata.com');
       expect(WORKFLOW_ENDPOINTS.ap03).toBe('https://api-workflow.ap03.treasuredata.com');
-      expect(WORKFLOW_ENDPOINTS.dev).toBe('https://api-development-workflow.connect.treasuredata.com');
+      expect(WORKFLOW_ENDPOINTS.dev).toBe('https://api-development-workflow.us01.treasuredata.com');
     });
   });
 
@@ -27,7 +27,7 @@ describe('Workflow Endpoints', () => {
       expect(getWorkflowEndpoint('us01')).toBe('https://api-workflow.treasuredata.com');
       expect(getWorkflowEndpoint('jp01')).toBe('https://api-workflow.treasuredata.co.jp');
       expect(getWorkflowEndpoint('eu01')).toBe('https://api-workflow.eu01.treasuredata.com');
-      expect(getWorkflowEndpoint('dev')).toBe('https://api-development-workflow.connect.treasuredata.com');
+      expect(getWorkflowEndpoint('dev')).toBe('https://api-development-workflow.us01.treasuredata.com');
     });
 
     it('should throw error for unsupported site', () => {
@@ -54,6 +54,9 @@ describe('Workflow Endpoints', () => {
     });
 
     it('should transform development endpoints correctly', () => {
+      expect(transformToWorkflowEndpoint('api-development.treasuredata.com'))
+        .toBe('https://api-development-workflow.treasuredata.com');
+      
       expect(transformToWorkflowEndpoint('api-development.connect.treasuredata.com'))
         .toBe('https://api-development-workflow.connect.treasuredata.com');
       

@@ -31,14 +31,28 @@ export interface SessionAttempt {
 
 export interface Session {
   id: string;
-  project: string;
-  workflow: string;
-  session_uuid: string;
-  session_time: string;
-  finish_time?: string;
-  status: WorkflowStatus;
-  params: Record<string, unknown>;
-  attempt?: SessionAttempt;
+  project: {
+    id: string;
+    name: string;
+  };
+  workflow: {
+    id: string;
+    name: string;
+  };
+  sessionUuid: string;
+  sessionTime: string;
+  lastAttempt?: {
+    id: string;
+    retryAttemptName: string | null;
+    done: boolean;
+    success: boolean;
+    cancelRequested: boolean;
+    params: Record<string, unknown>;
+    createdAt: string;
+    finishedAt: string | null;
+    status: string;
+    poolId: string;
+  };
 }
 
 export interface SessionListResponse {
@@ -50,13 +64,13 @@ export interface Attempt {
   id: string;
   index: number;
   status: WorkflowStatus;
-  state_params: Record<string, unknown>;
+  stateParams: Record<string, unknown>;
   done: boolean;
   success: boolean;
-  cancel_requested: boolean;
-  created_at: string;
-  finished_at?: string;
-  retry_attempt_name?: string;
+  cancelRequested: boolean;
+  createdAt: string;
+  finishedAt?: string;
+  retryAttemptName?: string;
 }
 
 export interface AttemptsResponse {
@@ -71,17 +85,17 @@ export interface TaskError {
 
 export interface Task {
   id: string;
-  full_name: string;
-  parent_id?: string;
+  fullName: string;
+  parentId?: string;
   config: Record<string, unknown>;
-  upstream_ids: string[];
+  upstreamIds: string[];
   state: TaskState;
-  export_params: Record<string, unknown>;
-  store_params: Record<string, unknown>;
-  state_params: Record<string, unknown>;
-  updated_at: string;
-  retry_at?: string;
-  started_at?: string;
+  exportParams: Record<string, unknown>;
+  storeParams: Record<string, unknown>;
+  stateParams: Record<string, unknown>;
+  updatedAt: string;
+  retryAt?: string;
+  startedAt?: string;
   error?: TaskError;
 }
 
