@@ -31,7 +31,6 @@ import {
   getSessionAttempts,
   getAttemptTasks,
   getTaskLogs,
-  getAttemptLogs,
   killAttempt,
   retrySession,
   retryAttempt
@@ -298,11 +297,6 @@ export class TDMcpServer {
           name: getTaskLogs.name,
           description: getTaskLogs.description,
           inputSchema: getTaskLogs.inputSchema,
-        },
-        {
-          name: getAttemptLogs.name,
-          description: getAttemptLogs.description,
-          inputSchema: getAttemptLogs.inputSchema,
         },
         {
           name: killAttempt.name,
@@ -596,18 +590,6 @@ export class TDMcpServer {
 
           case getTaskLogs.name: {
             const result = await getTaskLogs.handler(args || {});
-            return {
-              content: [
-                {
-                  type: 'text',
-                  text: JSON.stringify(result, null, 2),
-                },
-              ],
-            };
-          }
-
-          case getAttemptLogs.name: {
-            const result = await getAttemptLogs.handler(args || {});
             return {
               content: [
                 {

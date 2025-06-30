@@ -6,7 +6,6 @@ import {
   getSessionAttempts,
   getAttemptTasks,
   getTaskLogs,
-  getAttemptLogs,
 } from '../../src/tools/workflow';
 
 const isIntegrationTest = !!process.env.TD_API_KEY_DEVELOPMENT_AWS;
@@ -360,73 +359,6 @@ describe.skipIf(!isIntegrationTest)('Workflow MCP Tools Integration Tests', () =
     });
   });
 
-  describe('get_attempt_logs tool', () => {
-    it('should retrieve aggregated logs with filtering', async () => {
-      // Find an error session
-      const sessionsResult = await listSessions.handler({
-        status: 'error',
-        limit: 5,
-      });
-
-      if (sessionsResult.sessions.length === 0) {
-        console.log('No error sessions found for log test');
-        return;
-      }
-
-      let attemptId = null;
-      for (const session of sessionsResult.sessions) {
-        try {
-          const attemptsResult = await getSessionAttempts.handler({
-            session_id: session.id,
-          });
-
-          if (attemptsResult.attempts.length > 0) {
-            attemptId = attemptsResult.attempts[0].id;
-            break;
-          }
-        } catch (error) {
-          continue;
-        }
-      }
-
-      if (!attemptId) {
-        console.log('No attempts found for aggregated log test');
-        return;
-      }
-
-      try {
-        const result = await getAttemptLogs.handler({
-          attempt_id: attemptId,
-          level_filter: 'ERROR',
-          limit: 2000,
-        });
-
-        expect(result).toHaveProperty('logs');
-        expect(result).toHaveProperty('count');
-        expect(result).toHaveProperty('has_more');
-        expect(Array.isArray(result.logs)).toBe(true);
-
-        console.log(`MCP tool retrieved ${result.count} ERROR log entries`);
-        
-        if (result.logs.length > 0) {
-          // All logs should be ERROR level
-          for (const log of result.logs) {
-            // Note: With the new API, all logs are returned as INFO level
-          // The actual log level would need to be parsed from the file content
-          expect(log.level).toBe('INFO');
-          }
-
-          console.log('First error log entry:', {
-            task: result.logs[0].task,
-            timestamp: result.logs[0].timestamp,
-            message: result.logs[0].message.substring(0, 80) + '...',
-          });
-        }
-      } catch (error) {
-        console.log('Could not retrieve aggregated logs:', error);
-      }
-    }, 60000);
-  });
 
   describe('Workflow Control Operations', () => {
 

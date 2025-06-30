@@ -7,14 +7,11 @@ import type {
   AttemptsResponse,
   TasksResponse,
   LogsResponse,
-  AttemptLogsResponse,
   KillAttemptResponse,
   RetrySessionResponse,
   RetryAttemptResponse,
   ProjectListResponse,
   WorkflowStatus,
-  LogLevel,
-  LogEntry,
 } from '../../types/workflow.js';
 
 export interface WorkflowClientOptions {
@@ -180,63 +177,6 @@ export class WorkflowClient {
     );
   }
 
-  /**
-   * Get aggregated logs for an attempt
-   * Note: The Digdag API doesn't provide a direct endpoint for aggregated logs.
-   * This method lists log files and returns them as a structured response.
-   */
-  async getAttemptLogs(params: {
-    attempt_id: string;
-    task_filter?: string;
-    level_filter?: LogLevel;
-    offset?: number;
-    limit?: number;
-  }): Promise<AttemptLogsResponse> {
-    try {
-      // Get the list of log files for this attempt
-      const filesResponse = await this.request<{ files: Array<{ fileName: string; fileSize: number; taskName: string; fileTime: string; agent: string }> }>(
-        'GET',
-        `/api/logs/${params.attempt_id}/files`
-      );
-
-      // Filter files by task name if specified
-      let files = filesResponse.files || [];
-      if (params.task_filter) {
-        files = files.filter(f => f.taskName.includes(params.task_filter!));
-      }
-
-      // Convert file list to log entries format
-      // Note: This is a simplified implementation that doesn't fetch actual log content
-      // In a full implementation, we would fetch each file's content and parse it
-      const logs: LogEntry[] = files.map(file => ({
-        task: file.taskName,
-        timestamp: file.fileTime,
-        level: 'INFO' as LogLevel, // Default level since file list doesn't provide this
-        message: `Log file: ${file.fileName} (${file.fileSize} bytes)`,
-        context: {
-          attempt_id: params.attempt_id,
-          session_id: '', // Not available from file list
-        },
-      }));
-
-      // Apply limit if specified
-      const limitedLogs = params.limit ? logs.slice(0, params.limit) : logs;
-
-      return {
-        logs: limitedLogs,
-        has_more: logs.length > limitedLogs.length,
-      };
-    } catch (error) {
-      // If the new endpoint also fails, return empty logs
-      if (error instanceof Error && error.message.includes('404')) {
-        return {
-          logs: [],
-          has_more: false,
-        };
-      }
-      throw error;
-    }
-  }
 
   /**
    * Kill a running attempt
@@ -290,26 +230,6 @@ export class WorkflowClient {
         force: params.force,
       }
     );
-  }
-
-  /**
-   * Get log file content
-   */
-  async getLogFileContent(attemptId: string, fileName: string): Promise<string> {
-    const response = await fetch(
-      `${this.baseUrl}/api/logs/${attemptId}/files/${encodeURIComponent(fileName)}`,
-      {
-        headers: {
-          'Authorization': `TD1 ${this.apiKey}`,
-        },
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch log file: ${response.status}`);
-    }
-
-    return response.text();
   }
 
   /**

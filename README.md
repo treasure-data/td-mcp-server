@@ -505,31 +505,7 @@ Retrieve logs for a specific task within an attempt.
 }
 ```
 
-### 21. get_attempt_logs
-List log files for an attempt.
-
-**Note:** Due to Digdag API limitations, this tool returns information about available log files rather than the actual log content. To retrieve full log content, individual files need to be fetched separately.
-
-**Parameters:**
-- `attempt_id` (string, required): Attempt ID
-- `task_filter` (string, optional): Filter by task name pattern
-- `level_filter` (string, optional): Currently not used (reserved for future use)
-- `offset` (number, optional): Currently not used (reserved for future use)
-- `limit` (number, optional): Maximum number of log entries to return
-
-**Example:**
-```json
-{
-  "name": "get_attempt_logs",
-  "arguments": {
-    "attempt_id": "67890",
-    "level_filter": "ERROR",
-    "limit": 100
-  }
-}
-```
-
-### 22. kill_attempt
+### 21. kill_attempt
 Request cancellation of a running attempt.
 
 **Parameters:**
@@ -547,7 +523,7 @@ Request cancellation of a running attempt.
 }
 ```
 
-### 23. retry_session
+### 22. retry_session
 Retry a session from the beginning or a specific task.
 
 **Parameters:**
@@ -566,7 +542,7 @@ Retry a session from the beginning or a specific task.
 }
 ```
 
-### 24. retry_attempt
+### 23. retry_attempt
 Retry a specific attempt with resume capabilities.
 
 **Parameters:**
