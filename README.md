@@ -386,7 +386,9 @@ where (
 )
 ```
 
-### Workflow Tools - Monitor and Control Digdag Workflows
+### Workflow Tools (Experimental) - Monitor and Control Digdag Workflows
+
+> **Note**: These workflow tools are experimental and provide detailed access to workflow sessions, attempts, and tasks. They are subject to change in future releases.
 
 The following tools are available for monitoring and controlling Digdag workflows. These tools integrate with Treasure Data's workflow engine based on [Digdag](https://docs.digdag.io/api/):
 
