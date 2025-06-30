@@ -24,6 +24,17 @@ import {
   segmentSql,
   getSegment
 } from './tools/cdp';
+import {
+  listWorkflows,
+  listSessions,
+  getSessionAttempts,
+  getAttemptTasks,
+  getTaskLogs,
+  getAttemptLogs,
+  killAttempt,
+  retrySession,
+  retryAttempt
+} from './tools/workflow';
 
 /**
  * Treasure Data MCP Server implementation
@@ -256,6 +267,52 @@ export class TDMcpServer {
           description: getSegment.description,
           inputSchema: getSegment.inputSchema,
         },
+        // Workflow Tools
+        {
+          name: listWorkflows.name,
+          description: listWorkflows.description,
+          inputSchema: listWorkflows.inputSchema,
+        },
+        {
+          name: listSessions.name,
+          description: listSessions.description,
+          inputSchema: listSessions.inputSchema,
+        },
+        {
+          name: getSessionAttempts.name,
+          description: getSessionAttempts.description,
+          inputSchema: getSessionAttempts.inputSchema,
+        },
+        {
+          name: getAttemptTasks.name,
+          description: getAttemptTasks.description,
+          inputSchema: getAttemptTasks.inputSchema,
+        },
+        {
+          name: getTaskLogs.name,
+          description: getTaskLogs.description,
+          inputSchema: getTaskLogs.inputSchema,
+        },
+        {
+          name: getAttemptLogs.name,
+          description: getAttemptLogs.description,
+          inputSchema: getAttemptLogs.inputSchema,
+        },
+        {
+          name: killAttempt.name,
+          description: killAttempt.description,
+          inputSchema: killAttempt.inputSchema,
+        },
+        {
+          name: retrySession.name,
+          description: retrySession.description,
+          inputSchema: retrySession.inputSchema,
+        },
+        {
+          name: retryAttempt.name,
+          description: retryAttempt.description,
+          inputSchema: retryAttempt.inputSchema,
+        },
       ],
     }));
 
@@ -468,6 +525,115 @@ export class TDMcpServer {
           case getSegment.name: {
             const result = await getSegment.execute(args as any || {});
             return result;
+          }
+
+          // Workflow Tools
+          case listWorkflows.name: {
+            const result = await listWorkflows.handler(args || {});
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: JSON.stringify(result, null, 2),
+                },
+              ],
+            };
+          }
+
+          case listSessions.name: {
+            const result = await listSessions.handler(args || {});
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: JSON.stringify(result, null, 2),
+                },
+              ],
+            };
+          }
+
+          case getSessionAttempts.name: {
+            const result = await getSessionAttempts.handler(args || {});
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: JSON.stringify(result, null, 2),
+                },
+              ],
+            };
+          }
+
+          case getAttemptTasks.name: {
+            const result = await getAttemptTasks.handler(args || {});
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: JSON.stringify(result, null, 2),
+                },
+              ],
+            };
+          }
+
+          case getTaskLogs.name: {
+            const result = await getTaskLogs.handler(args || {});
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: JSON.stringify(result, null, 2),
+                },
+              ],
+            };
+          }
+
+          case getAttemptLogs.name: {
+            const result = await getAttemptLogs.handler(args || {});
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: JSON.stringify(result, null, 2),
+                },
+              ],
+            };
+          }
+
+          case killAttempt.name: {
+            const result = await killAttempt.handler(args || {});
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: JSON.stringify(result, null, 2),
+                },
+              ],
+            };
+          }
+
+          case retrySession.name: {
+            const result = await retrySession.handler(args || {});
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: JSON.stringify(result, null, 2),
+                },
+              ],
+            };
+          }
+
+          case retryAttempt.name: {
+            const result = await retryAttempt.handler(args || {});
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: JSON.stringify(result, null, 2),
+                },
+              ],
+            };
           }
 
           default:
