@@ -5,6 +5,9 @@ Date: 2025-06-30
 ## Overview
 This document outlines the proposed MCP functions for monitoring workflow execution states and retrieving failure data from Digdag workflows in Treasure Data.
 
+## References
+- [Digdag REST API Documentation](https://docs.digdag.io/api/)
+
 ## Proposed MCP Tools
 
 ### 1. list_workflows
