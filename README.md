@@ -18,6 +18,8 @@ Your feedback during this phase is invaluable and will help us shape the future 
 - 🌍 Multi-site support (US, JP, EU, AP regions)
 - 🚀 Zero-install execution via npx
 - 🎯 CDP (Customer Data Platform) integration for segment and activation management (Experimental)
+- 🔄 Workflow monitoring and control - view execution status, logs, and retry failed workflows
+- 📝 Comprehensive audit logging for all operations
 
 ## Prerequisites
 
@@ -84,8 +86,8 @@ Add to your MCP client configuration (e.g., Claude Desktop):
 ### Configuration Options
 
 - `TD_API_KEY` (required): Your Treasure Data API key
-- `TD_SITE` (optional): Region endpoint - `us01` (default), `jp01`, `eu01`, `ap02`, `ap03`
-- `TD_ENABLE_UPDATES` (optional): Enable write operations - `false` (default), `true`
+- `TD_SITE` (optional): Region endpoint - `us01` (default), `jp01`, `eu01`, `ap02`, `ap03`, `dev`
+- `TD_ENABLE_UPDATES` (optional): Enable write operations (execute tool) - `false` (default), `true`
 - `TD_DATABASE` (optional): Default database for queries (e.g., `sample_datasets`)
 
 ## Available Tools
@@ -384,12 +386,197 @@ where (
 )
 ```
 
+### Workflow Tools - Monitor and Control Digdag Workflows
+
+The following tools are available for monitoring and controlling Digdag workflows. These tools integrate with Treasure Data's workflow engine based on [Digdag](https://docs.digdag.io/api/):
+
+### 13. list_workflows
+List all workflows in a specific project.
+
+**Parameters:**
+- `project_name` (string, required): Project name
+- `limit` (number, optional): Maximum results (default: 100)
+- `last_id` (string, optional): Pagination cursor
+
+**Example:**
+```json
+{
+  "name": "list_workflows",
+  "arguments": {
+    "project_name": "my_project",
+    "limit": 50
+  }
+}
+```
+
+### 14. list_sessions
+List workflow execution sessions with filtering options.
+
+**Parameters:**
+- `project_name` (string, optional): Filter by project name
+- `workflow_name` (string, optional): Filter by workflow name
+- `status` (string, optional): Filter by status (`running`, `success`, `error`, `killed`, `planned`)
+- `from_time` (string, optional): Start time (ISO 8601)
+- `to_time` (string, optional): End time (ISO 8601)
+- `limit` (number, optional): Maximum results (default: 100)
+- `last_id` (string, optional): Pagination cursor
+
+**Example:**
+```json
+{
+  "name": "list_sessions",
+  "arguments": {
+    "status": "error",
+    "from_time": "2024-01-01T00:00:00Z",
+    "limit": 20
+  }
+}
+```
+
+### 15. get_session_attempts
+Get all attempts for a specific session.
+
+**Parameters:**
+- `session_id` (string, required): Session ID
+
+**Example:**
+```json
+{
+  "name": "get_session_attempts",
+  "arguments": {
+    "session_id": "12345"
+  }
+}
+```
+
+### 16. get_attempt_tasks
+List all tasks within an attempt with their execution status.
+
+**Parameters:**
+- `attempt_id` (string, required): Attempt ID
+- `include_subtasks` (boolean, optional): Include subtasks (default: true)
+
+**Example:**
+```json
+{
+  "name": "get_attempt_tasks",
+  "arguments": {
+    "attempt_id": "67890",
+    "include_subtasks": false
+  }
+}
+```
+
+### 17. get_task_logs
+Retrieve logs for a specific task within an attempt.
+
+**Parameters:**
+- `attempt_id` (string, required): Attempt ID
+- `task_name` (string, required): Task name (e.g., "+main+task1")
+- `offset` (number, optional): Log offset in bytes
+- `limit` (number, optional): Maximum bytes to retrieve (default: 1MB)
+
+**Example:**
+```json
+{
+  "name": "get_task_logs",
+  "arguments": {
+    "attempt_id": "67890",
+    "task_name": "+main+process_data",
+    "limit": 5000
+  }
+}
+```
+
+### 18. get_attempt_logs
+Retrieve aggregated logs from all tasks in an attempt.
+
+**Parameters:**
+- `attempt_id` (string, required): Attempt ID
+- `task_filter` (string, optional): Filter by task name pattern
+- `level_filter` (string, optional): Filter by log level (`ERROR`, `WARN`, `INFO`, `DEBUG`)
+- `offset` (number, optional): Pagination offset
+- `limit` (number, optional): Maximum entries (default: 1000)
+
+**Example:**
+```json
+{
+  "name": "get_attempt_logs",
+  "arguments": {
+    "attempt_id": "67890",
+    "level_filter": "ERROR",
+    "limit": 100
+  }
+}
+```
+
+### 19. kill_attempt
+Request cancellation of a running attempt.
+
+**Parameters:**
+- `attempt_id` (string, required): Attempt ID
+- `reason` (string, optional): Reason for cancellation
+
+**Example:**
+```json
+{
+  "name": "kill_attempt",
+  "arguments": {
+    "attempt_id": "67890",
+    "reason": "Stopping for maintenance"
+  }
+}
+```
+
+### 20. retry_session
+Retry a session from the beginning or a specific task.
+
+**Parameters:**
+- `session_id` (string, required): Session ID
+- `from_task` (string, optional): Task name to retry from
+- `retry_params` (object, optional): Override parameters for retry
+
+**Example:**
+```json
+{
+  "name": "retry_session",
+  "arguments": {
+    "session_id": "12345",
+    "from_task": "+main+failed_task"
+  }
+}
+```
+
+### 21. retry_attempt
+Retry a specific attempt with resume capabilities.
+
+**Parameters:**
+- `attempt_id` (string, required): Attempt ID to retry
+- `resume_from` (string, optional): Task name to resume from (skip successful tasks)
+- `retry_params` (object, optional): Override parameters for retry
+- `force` (boolean, optional): Force retry even if attempt is running (default: false)
+
+**Example:**
+```json
+{
+  "name": "retry_attempt",
+  "arguments": {
+    "attempt_id": "67890",
+    "resume_from": "+main+failed_task",
+    "retry_params": {
+      "batch_size": 1000
+    }
+  }
+}
+```
+
 ## Security
 
-- **Read-only by default**: Write operations require explicit configuration
+- **Read-only by default**: Write operations (execute tool) require explicit configuration with `TD_ENABLE_UPDATES=true`
 - **Query validation**: All queries are validated before execution
 - **Audit logging**: All operations are logged for security monitoring
 - **Row limiting**: Automatic LIMIT injection for SELECT queries to prevent large responses
+- **Workflow control operations**: kill_attempt, retry_session, and retry_attempt are enabled by default as they are safe operations that don't modify data directly
 
 ## Basic Prompt for Using td-mcp-server
 
@@ -405,6 +592,9 @@ You have access to Treasure Data through the td-mcp-server. You can:
 - Check current database context using current_database
 - Work with CDP segments and activations (experimental)
 - Generate SQL queries for CDP audiences and segments
+- Monitor and control Digdag workflows
+- View workflow execution status and logs
+- Retry failed workflows and attempts
 
 Start by listing available databases to understand what data is available.
 ```
@@ -446,6 +636,26 @@ Help me understand my CDP segments:
 3. Get the SQL query that defines this parent segment
 4. For segment 1536120, show the SQL with filtering conditions applied
 5. Explain what filtering rules are being applied in this segment
+```
+
+**Workflow Monitoring:**
+```
+Help me monitor my Digdag workflows:
+1. List all workflows in project "my_etl_project"
+2. Show me all failed sessions from the last 24 hours
+3. For session ID 12345, show all attempts and their status
+4. Get the error logs for the failed tasks in attempt 67890
+5. Retry the failed session from the task that failed
+```
+
+**Workflow Troubleshooting:**
+```
+I have a failed workflow execution. Please help me:
+1. List recent error sessions for project "data_pipeline"
+2. For the most recent failed session, show me the attempts
+3. List all tasks in the failed attempt and identify which ones failed
+4. Show me the error logs for the failed tasks
+5. Suggest how to retry this workflow
 ```
 
 ## Usage Examples

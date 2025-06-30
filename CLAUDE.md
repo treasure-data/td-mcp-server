@@ -32,9 +32,11 @@ This is an MCP (Model Context Protocol) server that exposes Treasure Data functi
 2. **Configuration** (`src/config.ts`) - Validates and manages all server settings with environment variable support
 3. **Trino Client** (`src/client/`) - Wraps trino-client for TD-specific authentication using X-Trino-User header
 4. **CDP Client** (`src/client/cdp/`) - HTTP client for TD Customer Data Platform API using TD1 authentication
-5. **Security Layer** (`src/security/`) - Validates SQL queries and maintains audit logs
-6. **MCP Tools** (`src/tools/`) - Individual tool implementations for database operations
-7. **CDP Tools** (`src/tools/cdp/`) - Tools for interacting with CDP segments and activations
+5. **Workflow Client** (`src/client/workflow/`) - HTTP client for Digdag workflow API using TD1 authentication
+6. **Security Layer** (`src/security/`) - Validates SQL queries and maintains audit logs
+7. **MCP Tools** (`src/tools/`) - Individual tool implementations for database operations
+8. **CDP Tools** (`src/tools/cdp/`) - Tools for interacting with CDP segments and activations
+9. **Workflow Tools** (`src/tools/workflow/`) - Tools for monitoring and controlling Digdag workflows
 
 ### Key Design Patterns
 
@@ -79,6 +81,23 @@ The CDP (Customer Data Platform) integration is currently experimental and provi
   - `parent_segment_sql`: Gets the SQL statement for a parent segment
   - `segment_sql`: Gets the SQL statement for a segment with filtering conditions applied (requires parent_segment_id and segment_id)
 - **Note**: Current implementation is read-only. Write operations (create/update/delete segments) and other advanced features are not yet implemented.
+
+### Workflow Integration
+The workflow integration provides access to Digdag workflow monitoring and control:
+- **Authentication**: Uses the same TD API key with `TD1` prefix in Authorization header
+- **Endpoints**: Workflow endpoints follow a specific pattern (e.g., `api-workflow.treasuredata.com` for us01, `api-development-workflow.us01.treasuredata.com` for dev)
+- **API Compatibility**: Based on [Digdag API](https://docs.digdag.io/api/)
+- **Tools Available**:
+  - `list_workflows`: Lists all workflows in a project
+  - `list_sessions`: Lists workflow execution sessions with filtering options
+  - `get_session_attempts`: Gets all attempts for a specific session
+  - `get_attempt_tasks`: Lists all tasks within an attempt
+  - `get_task_logs`: Retrieves logs for a specific task
+  - `get_attempt_logs`: Retrieves aggregated logs from all tasks in an attempt
+  - `kill_attempt`: Requests cancellation of a running attempt
+  - `retry_session`: Retries a session from the beginning or a specific task
+  - `retry_attempt`: Retries a specific attempt with resume capabilities
+- **Note**: All workflow control operations (kill/retry) are enabled by default as they are safe operations that don't modify data directly
 
 ## Testing Requirements
 
