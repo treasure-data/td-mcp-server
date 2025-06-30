@@ -506,14 +506,16 @@ Retrieve logs for a specific task within an attempt.
 ```
 
 ### 21. get_attempt_logs
-Retrieve aggregated logs from all tasks in an attempt.
+List log files for an attempt.
+
+**Note:** Due to Digdag API limitations, this tool returns information about available log files rather than the actual log content. To retrieve full log content, individual files need to be fetched separately.
 
 **Parameters:**
 - `attempt_id` (string, required): Attempt ID
 - `task_filter` (string, optional): Filter by task name pattern
-- `level_filter` (string, optional): Filter by log level (`ERROR`, `WARN`, `INFO`, `DEBUG`)
-- `offset` (number, optional): Pagination offset
-- `limit` (number, optional): Maximum entries (default: 1000)
+- `level_filter` (string, optional): Currently not used (reserved for future use)
+- `offset` (number, optional): Currently not used (reserved for future use)
+- `limit` (number, optional): Maximum number of log entries to return
 
 **Example:**
 ```json

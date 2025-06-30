@@ -4,7 +4,7 @@ import type { LogLevel } from '../../types/workflow.js';
 
 export const getAttemptLogs = {
   name: 'get_attempt_logs',
-  description: 'Retrieve aggregated logs for an entire attempt',
+  description: 'List log files for an attempt (Note: returns file information, not full log content)',
   inputSchema: {
     type: 'object',
     properties: {

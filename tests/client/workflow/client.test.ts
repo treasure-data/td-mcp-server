@@ -274,38 +274,84 @@ describe('WorkflowClient', () => {
   });
 
   describe('getAttemptLogs', () => {
-    it('should get aggregated logs with filters', async () => {
-      const mockResponse = {
-        logs: [
+    it('should get log files for an attempt', async () => {
+      const mockFilesResponse = {
+        files: [
           {
-            task: '+main+task1',
-            timestamp: '2024-01-01T00:00:00Z',
-            level: 'ERROR' as const,
-            message: 'Task failed',
-            context: { attempt_id: 'attempt123', session_id: 'session123' },
+            fileName: 'task1.log',
+            fileSize: 1024,
+            taskName: '+main+task1',
+            fileTime: '2024-01-01T00:00:00Z',
+            agent: 'agent1',
+          },
+          {
+            fileName: 'task2.log',
+            fileSize: 2048,
+            taskName: '+main+task2',
+            fileTime: '2024-01-01T00:01:00Z',
+            agent: 'agent1',
           },
         ],
-        next_offset: 2048,
-        has_more: false,
       };
 
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => mockResponse,
+        json: async () => mockFilesResponse,
       });
 
       const result = await client.getAttemptLogs({
         attempt_id: 'attempt123',
         task_filter: 'main',
         level_filter: 'ERROR',
-        limit: 5000,
+        limit: 1,
       });
 
-      expect(result).toEqual(mockResponse);
+      expect(result.logs).toHaveLength(1);
+      expect(result.logs[0]).toMatchObject({
+        task: '+main+task1',
+        timestamp: '2024-01-01T00:00:00Z',
+        level: 'INFO',
+        message: expect.stringContaining('Log file: task1.log'),
+      });
+      expect(result.has_more).toBe(true);
+      
       expect(mockFetch).toHaveBeenCalledWith(
-        expect.stringContaining('task_filter=main&level_filter=ERROR'),
+        expect.stringContaining('/api/logs/attempt123/files'),
         expect.any(Object)
       );
+    });
+
+    it('should handle empty log files', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ files: [] }),
+      });
+
+      const result = await client.getAttemptLogs({
+        attempt_id: 'attempt123',
+      });
+
+      expect(result).toEqual({
+        logs: [],
+        has_more: false,
+      });
+    });
+
+    it('should handle 404 errors gracefully', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        status: 404,
+        text: async () => 'Not found',
+      });
+
+      const result = await client.getAttemptLogs({
+        attempt_id: 'nonexistent',
+      });
+
+      expect(result).toEqual({
+        logs: [],
+        has_more: false,
+      });
     });
   });
 
