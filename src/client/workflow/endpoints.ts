@@ -39,5 +39,5 @@ export function transformToWorkflowEndpoint(apiEndpoint: string): string {
   
   const [, envPrefix, suffix, connectDomain, regionPrefix, tld] = match;
   
-  return `https://api${envPrefix || ''}-workflow${suffix || ''}.${connectDomain || ''}${regionPrefix || ''}treasuredata.${tld}`;
+  return `https://api${envPrefix || ''}-workflow${suffix || ''}.${connectDomain || ''}${regionPrefix || ''}treasuredata.${tld}`.toLowerCase();
 }
