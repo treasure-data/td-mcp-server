@@ -7,9 +7,13 @@ export type LogLevel = 'ERROR' | 'WARN' | 'INFO' | 'DEBUG';
 export interface Workflow {
   id: string;
   name: string;
-  project: string;
+  project: {
+    id: string;
+    name: string;
+  };
   revision: string;
   timezone: string;
+  config?: Record<string, unknown>;
   last_session_time?: string;
   last_session_status?: WorkflowStatus;
 }

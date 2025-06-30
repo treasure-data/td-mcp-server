@@ -89,21 +89,31 @@ export class WorkflowClient {
   }
 
   /**
-   * List all workflows in a project
+   * List all workflows, optionally filtered by project name
    */
   async listWorkflows(params: {
-    project_name: string;
+    project_name?: string;
     limit?: number;
     last_id?: string;
   }): Promise<WorkflowListResponse> {
-    return this.request<WorkflowListResponse>(
+    // API doesn't support project filtering, so we always request all workflows
+    const response = await this.request<WorkflowListResponse>(
       'GET',
-      `/api/projects/${encodeURIComponent(params.project_name)}/workflows`,
+      '/api/workflows',
       {
-        page_size: params.limit,
+        count: params.limit,
         last_id: params.last_id,
       }
     );
+
+    // Filter by project name if provided (client-side filtering)
+    if (params.project_name) {
+      response.workflows = response.workflows.filter(
+        wf => wf.project?.name === params.project_name
+      );
+    }
+
+    return response;
   }
 
   /**
