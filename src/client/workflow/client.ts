@@ -14,6 +14,7 @@ import type {
   ProjectListResponse,
   WorkflowStatus,
   LogLevel,
+  LogEntry,
 } from '../../types/workflow.js';
 
 export interface WorkflowClientOptions {
@@ -201,7 +202,7 @@ export class WorkflowClient {
       // Filter files by task name if specified
       let files = filesResponse.files || [];
       if (params.task_filter) {
-        files = files.filter(f => f.taskName.includes(params.task_filter));
+        files = files.filter(f => f.taskName.includes(params.task_filter!));
       }
 
       // Convert file list to log entries format
