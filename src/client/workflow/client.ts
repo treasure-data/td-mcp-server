@@ -72,7 +72,7 @@ export class WorkflowClient {
       if (!response.ok) {
         const errorText = await response.text().catch(() => 'Unknown error');
         throw new Error(
-          `Workflow API error (${response.status}): ${errorText}`
+          `Workflow API error (${response.status}): ${maskApiKey(errorText)}`
         );
       }
 

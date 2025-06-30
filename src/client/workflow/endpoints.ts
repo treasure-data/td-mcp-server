@@ -11,7 +11,7 @@ export const WORKFLOW_ENDPOINTS: Record<TDSite, string> = {
   eu01: 'https://api-workflow.eu01.treasuredata.com',
   ap02: 'https://api-workflow.ap02.treasuredata.com',
   ap03: 'https://api-workflow.ap03.treasuredata.com',
-  dev: 'https://api-development-workflow.connect.treasuredata.com',
+  dev: 'https://api-development-workflow.us01.treasuredata.com',
 };
 
 /**

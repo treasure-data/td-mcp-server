@@ -31,14 +31,28 @@ export interface SessionAttempt {
 
 export interface Session {
   id: string;
-  project: string;
-  workflow: string;
-  session_uuid: string;
-  session_time: string;
-  finish_time?: string;
-  status: WorkflowStatus;
-  params: Record<string, unknown>;
-  attempt?: SessionAttempt;
+  project: {
+    id: string;
+    name: string;
+  };
+  workflow: {
+    id: string;
+    name: string;
+  };
+  sessionUuid: string;
+  sessionTime: string;
+  lastAttempt?: {
+    id: string;
+    retryAttemptName: string | null;
+    done: boolean;
+    success: boolean;
+    cancelRequested: boolean;
+    params: Record<string, unknown>;
+    createdAt: string;
+    finishedAt: string | null;
+    status: string;
+    poolId: string;
+  };
 }
 
 export interface SessionListResponse {

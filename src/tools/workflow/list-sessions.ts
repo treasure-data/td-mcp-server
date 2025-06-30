@@ -76,8 +76,18 @@ export const listSessions = {
         last_id,
       });
 
+      // Transform the response to a more consistent format
+      const transformedSessions = response.sessions.map(session => ({
+        ...session,
+        // Add a top-level status derived from lastAttempt
+        status: session.lastAttempt?.status || 'unknown',
+        // Keep original structure but also provide convenience fields
+        project_name: session.project.name,
+        workflow_name: session.workflow.name,
+      }));
+
       return {
-        sessions: response.sessions,
+        sessions: transformedSessions,
         next_page_id: response.next_page_id,
         count: response.sessions.length,
       };
