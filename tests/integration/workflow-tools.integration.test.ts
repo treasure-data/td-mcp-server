@@ -261,7 +261,7 @@ describe.skipIf(!isIntegrationTest)('Workflow MCP Tools Integration Tests', () =
         const firstTask = attemptWithTasks.tasks[0];
         expect(firstTask.state).toBe('error');
         console.log('First task (failed):', {
-          full_name: firstTask.full_name,
+          fullName: firstTask.fullName,
           state: firstTask.state,
           error: firstTask.error,
         });
