@@ -390,7 +390,24 @@ where (
 
 The following tools are available for monitoring and controlling Digdag workflows. These tools integrate with Treasure Data's workflow engine based on [Digdag](https://docs.digdag.io/api/):
 
-### 13. list_workflows
+### 15. list_projects
+List all workflow projects.
+
+**Parameters:**
+- `limit` (number, optional): Maximum results (default: 100)
+- `last_id` (string, optional): Pagination cursor
+
+**Example:**
+```json
+{
+  "name": "list_projects",
+  "arguments": {
+    "limit": 50
+  }
+}
+```
+
+### 16. list_workflows
 List all workflows in a specific project.
 
 **Parameters:**
@@ -409,7 +426,7 @@ List all workflows in a specific project.
 }
 ```
 
-### 14. list_sessions
+### 17. list_sessions
 List workflow execution sessions with filtering options.
 
 **Parameters:**
@@ -433,7 +450,7 @@ List workflow execution sessions with filtering options.
 }
 ```
 
-### 15. get_session_attempts
+### 18. get_session_attempts
 Get all attempts for a specific session.
 
 **Parameters:**
@@ -449,7 +466,7 @@ Get all attempts for a specific session.
 }
 ```
 
-### 16. get_attempt_tasks
+### 19. get_attempt_tasks
 List all tasks within an attempt with their execution status.
 
 **Parameters:**
@@ -467,7 +484,7 @@ List all tasks within an attempt with their execution status.
 }
 ```
 
-### 17. get_task_logs
+### 20. get_task_logs
 Retrieve logs for a specific task within an attempt.
 
 **Parameters:**
@@ -488,7 +505,7 @@ Retrieve logs for a specific task within an attempt.
 }
 ```
 
-### 18. get_attempt_logs
+### 21. get_attempt_logs
 Retrieve aggregated logs from all tasks in an attempt.
 
 **Parameters:**
@@ -510,7 +527,7 @@ Retrieve aggregated logs from all tasks in an attempt.
 }
 ```
 
-### 19. kill_attempt
+### 22. kill_attempt
 Request cancellation of a running attempt.
 
 **Parameters:**
@@ -528,7 +545,7 @@ Request cancellation of a running attempt.
 }
 ```
 
-### 20. retry_session
+### 23. retry_session
 Retry a session from the beginning or a specific task.
 
 **Parameters:**
@@ -547,7 +564,7 @@ Retry a session from the beginning or a specific task.
 }
 ```
 
-### 21. retry_attempt
+### 24. retry_attempt
 Retry a specific attempt with resume capabilities.
 
 **Parameters:**
@@ -641,11 +658,12 @@ Help me understand my CDP segments:
 **Workflow Monitoring:**
 ```
 Help me monitor my Digdag workflows:
-1. List all workflows in project "my_etl_project"
-2. Show me all failed sessions from the last 24 hours
-3. For session ID 12345, show all attempts and their status
-4. Get the error logs for the failed tasks in attempt 67890
-5. Retry the failed session from the task that failed
+1. List all workflow projects available
+2. List all workflows in project "my_etl_project"
+3. Show me all failed sessions from the last 24 hours
+4. For session ID 12345, show all attempts and their status
+5. Get the error logs for the failed tasks in attempt 67890
+6. Retry the failed session from the task that failed
 ```
 
 **Workflow Troubleshooting:**
