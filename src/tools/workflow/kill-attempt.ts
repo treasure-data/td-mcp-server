@@ -29,13 +29,6 @@ export const killAttempt = {
     }
 
     const config = loadConfig();
-    
-    // Check if updates are enabled for workflow control operations
-    if (!config.enable_updates) {
-      throw new Error(
-        'Workflow control operations are disabled. Set TD_ENABLE_UPDATES=true to enable.'
-      );
-    }
 
     const client = new WorkflowClient({
       apiKey: config.td_api_key,

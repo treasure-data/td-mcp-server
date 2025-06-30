@@ -97,20 +97,29 @@ describe('killAttempt tool', () => {
       );
     });
 
-    it('should throw error when updates are disabled', async () => {
+    it('should work even when enable_updates is false', async () => {
       mockLoadConfig.mockReturnValue({
         td_api_key: 'test_key',
         site: 'us01',
-        enable_updates: false,
+        enable_updates: false, // No longer required for workflow control operations
       });
 
-      await expect(killAttempt.handler({
-        attempt_id: 'attempt123',
-      })).rejects.toThrow(
-        'Workflow control operations are disabled. Set TD_ENABLE_UPDATES=true to enable.'
-      );
+      mockClient.killAttempt.mockResolvedValue({
+        success: true,
+        message: 'Cancellation requested',
+      });
 
-      expect(mockClient.killAttempt).not.toHaveBeenCalled();
+      const result = await killAttempt.handler({
+        attempt_id: 'attempt123',
+        reason: 'Testing',
+      });
+
+      expect(result).toEqual({
+        success: true,
+        message: 'Cancellation requested',
+      });
+
+      expect(mockClient.killAttempt).toHaveBeenCalledWith('attempt123', 'Testing');
     });
 
     it('should throw error when attempt_id is missing', async () => {
@@ -164,19 +173,27 @@ describe('killAttempt tool', () => {
       })).rejects.toThrow('Failed to kill attempt: Network error');
     });
 
-    it('should check enable_updates before creating client', async () => {
+    it('should create client regardless of enable_updates setting', async () => {
       mockLoadConfig.mockReturnValue({
         td_api_key: 'test_key',
         site: 'us01',
-        enable_updates: false,
+        enable_updates: false, // No longer affects workflow control operations
       });
 
-      await expect(killAttempt.handler({
-        attempt_id: 'attempt123',
-      })).rejects.toThrow();
+      mockClient.killAttempt.mockResolvedValue({
+        success: true,
+        message: 'Cancellation requested',
+      });
 
-      // Client should not be created when updates are disabled
-      expect(MockWorkflowClient).not.toHaveBeenCalled();
+      await killAttempt.handler({
+        attempt_id: 'attempt123',
+      });
+
+      // Client should be created even when enable_updates is false
+      expect(MockWorkflowClient).toHaveBeenCalledWith({
+        apiKey: 'test_key',
+        site: 'us01',
+      });
     });
   });
 });
