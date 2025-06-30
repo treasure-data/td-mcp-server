@@ -353,67 +353,6 @@ describe.skipIf(!isIntegrationTest)('Workflow Integration Tests', () => {
       }
     }, 60000);
 
-    it('should retrieve aggregated attempt logs', async () => {
-      // Find an attempt with error status
-      const sessions = await client.listSessions({
-        status: 'error',
-        limit: 10,
-      });
-
-      if (sessions.sessions.length === 0) {
-        console.log('No error sessions found, skipping aggregated log test');
-        return;
-      }
-
-      let attemptId = null;
-      for (const session of sessions.sessions) {
-        try {
-          const attempts = await client.getSessionAttempts(session.id);
-          if (attempts.attempts.length > 0) {
-            attemptId = attempts.attempts[0].id;
-            break;
-          }
-        } catch (error) {
-          continue;
-        }
-      }
-
-      if (!attemptId) {
-        console.log('No attempts found for aggregated log test');
-        return;
-      }
-
-      try {
-        const logsResponse = await client.getAttemptLogs({
-          attempt_id: attemptId,
-          level_filter: 'ERROR',
-          limit: 5000,
-        });
-
-        expect(logsResponse).toHaveProperty('logs');
-        expect(Array.isArray(logsResponse.logs)).toBe(true);
-        expect(logsResponse).toHaveProperty('has_more');
-        
-        console.log(`Retrieved ${logsResponse.logs.length} ERROR log entries for attempt ${attemptId}`);
-        
-        if (logsResponse.logs.length > 0) {
-          const firstLog = logsResponse.logs[0];
-          expect(firstLog).toHaveProperty('task');
-          expect(firstLog).toHaveProperty('timestamp');
-          expect(firstLog).toHaveProperty('level');
-          expect(firstLog).toHaveProperty('message');
-          expect(firstLog.level).toBe('ERROR');
-          
-          console.log('First error log:', {
-            task: firstLog.task,
-            timestamp: firstLog.timestamp,
-            message: firstLog.message.substring(0, 100) + '...',
-          });
-        }
-      } catch (error) {
-        console.log('Could not retrieve aggregated logs:', error);
-      }
-    }, 60000);
   });
 
   describe('Error Handling', () => {

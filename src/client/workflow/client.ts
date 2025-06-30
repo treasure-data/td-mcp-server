@@ -7,13 +7,11 @@ import type {
   AttemptsResponse,
   TasksResponse,
   LogsResponse,
-  AttemptLogsResponse,
   KillAttemptResponse,
   RetrySessionResponse,
   RetryAttemptResponse,
   ProjectListResponse,
   WorkflowStatus,
-  LogLevel,
 } from '../../types/workflow.js';
 
 export interface WorkflowClientOptions {
@@ -179,27 +177,6 @@ export class WorkflowClient {
     );
   }
 
-  /**
-   * Get aggregated logs for an attempt
-   */
-  async getAttemptLogs(params: {
-    attempt_id: string;
-    task_filter?: string;
-    level_filter?: LogLevel;
-    offset?: number;
-    limit?: number;
-  }): Promise<AttemptLogsResponse> {
-    return this.request<AttemptLogsResponse>(
-      'GET',
-      `/api/attempts/${params.attempt_id}/logs`,
-      {
-        task_filter: params.task_filter,
-        level_filter: params.level_filter,
-        offset: params.offset,
-        limit: params.limit,
-      }
-    );
-  }
 
   /**
    * Kill a running attempt

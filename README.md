@@ -505,29 +505,7 @@ Retrieve logs for a specific task within an attempt.
 }
 ```
 
-### 21. get_attempt_logs
-Retrieve aggregated logs from all tasks in an attempt.
-
-**Parameters:**
-- `attempt_id` (string, required): Attempt ID
-- `task_filter` (string, optional): Filter by task name pattern
-- `level_filter` (string, optional): Filter by log level (`ERROR`, `WARN`, `INFO`, `DEBUG`)
-- `offset` (number, optional): Pagination offset
-- `limit` (number, optional): Maximum entries (default: 1000)
-
-**Example:**
-```json
-{
-  "name": "get_attempt_logs",
-  "arguments": {
-    "attempt_id": "67890",
-    "level_filter": "ERROR",
-    "limit": 100
-  }
-}
-```
-
-### 22. kill_attempt
+### 21. kill_attempt
 Request cancellation of a running attempt.
 
 **Parameters:**
@@ -545,7 +523,7 @@ Request cancellation of a running attempt.
 }
 ```
 
-### 23. retry_session
+### 22. retry_session
 Retry a session from the beginning or a specific task.
 
 **Parameters:**
@@ -564,7 +542,7 @@ Retry a session from the beginning or a specific task.
 }
 ```
 
-### 24. retry_attempt
+### 23. retry_attempt
 Retry a specific attempt with resume capabilities.
 
 **Parameters:**

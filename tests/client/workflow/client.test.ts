@@ -273,41 +273,6 @@ describe('WorkflowClient', () => {
     });
   });
 
-  describe('getAttemptLogs', () => {
-    it('should get aggregated logs with filters', async () => {
-      const mockResponse = {
-        logs: [
-          {
-            task: '+main+task1',
-            timestamp: '2024-01-01T00:00:00Z',
-            level: 'ERROR' as const,
-            message: 'Task failed',
-            context: { attempt_id: 'attempt123', session_id: 'session123' },
-          },
-        ],
-        next_offset: 2048,
-        has_more: false,
-      };
-
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockResponse,
-      });
-
-      const result = await client.getAttemptLogs({
-        attempt_id: 'attempt123',
-        task_filter: 'main',
-        level_filter: 'ERROR',
-        limit: 5000,
-      });
-
-      expect(result).toEqual(mockResponse);
-      expect(mockFetch).toHaveBeenCalledWith(
-        expect.stringContaining('task_filter=main&level_filter=ERROR'),
-        expect.any(Object)
-      );
-    });
-  });
 
   describe('killAttempt', () => {
     it('should kill an attempt with reason', async () => {
