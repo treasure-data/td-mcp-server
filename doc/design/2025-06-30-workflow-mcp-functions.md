@@ -299,7 +299,10 @@ function getWorkflowEndpoint(apiEndpoint: string): string {
 - Validate all input parameters
 - Implement rate limiting for log retrieval
 - Add audit logging for all workflow operations
-- Consider read-only mode by default (similar to query/execute pattern)
+- All workflow control operations (kill/retry) are enabled by default as they are safe:
+  - `retry_session` and `retry_attempt` create new attempts rather than modifying existing ones
+  - `kill_attempt` sends a cancellation request, doesn't forcefully terminate
+  - These operations don't directly modify or delete data
 
 ### Testing
 - Mock workflow API responses for unit tests

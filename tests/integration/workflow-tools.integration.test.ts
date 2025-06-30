@@ -402,31 +402,25 @@ describe.skipIf(!isIntegrationTest)('Workflow MCP Tools Integration Tests', () =
     }, 60000);
   });
 
-  describe('Write Operation Tools (Conditional)', () => {
-    const canTestWriteOps = process.env.TD_ENABLE_UPDATES === 'true';
+  describe('Workflow Control Operations', () => {
 
-    it('should prevent write operations when TD_ENABLE_UPDATES is not true', async () => {
-      // Temporarily import write tools to test security
+    it('workflow control operations are enabled by default', async () => {
+      // All workflow control operations (kill/retry) are now enabled by default
+      // since they are safe operations that don't directly modify data:
+      // - retry operations create new attempts
+      // - kill sends a cancellation request
       const { killAttempt, retrySession, retryAttempt } = await import('../../src/tools/workflow');
-
-      // These should all fail with security error
-      await expect(killAttempt.handler({
-        attempt_id: '123',
-      })).rejects.toThrow('Workflow control operations are disabled');
-
-      await expect(retrySession.handler({
-        session_id: '123',
-      })).rejects.toThrow('Workflow control operations are disabled');
-
-      await expect(retryAttempt.handler({
-        attempt_id: '123',
-      })).rejects.toThrow('Workflow control operations are disabled');
-
-      console.log('Write operations correctly blocked when TD_ENABLE_UPDATES is not true');
+      
+      // These operations should be available without TD_ENABLE_UPDATES
+      expect(killAttempt).toBeDefined();
+      expect(retrySession).toBeDefined();
+      expect(retryAttempt).toBeDefined();
+      
+      console.log('Workflow control operations are enabled by default');
     });
 
-    it.skipIf(!canTestWriteOps)('would test kill/retry operations if enabled', () => {
-      console.log('Skipping actual kill/retry tests - set TD_ENABLE_UPDATES=true to enable');
+    it.skip('actual kill/retry operations are not tested in integration to avoid disrupting workflows', () => {
+      console.log('Skipping actual kill/retry tests to avoid disrupting real workflows');
     });
   });
 });

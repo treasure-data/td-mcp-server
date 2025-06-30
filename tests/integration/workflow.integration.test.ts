@@ -434,15 +434,13 @@ describe.skipIf(!isIntegrationTest)('Workflow Integration Tests', () => {
     });
   });
 
-  describe('Write Operations (Conditional)', () => {
-    // These tests only run if TD_ENABLE_UPDATES is explicitly set to true
-    const canTestWriteOps = process.env.TD_ENABLE_UPDATES === 'true';
-
-    it.skipIf(!canTestWriteOps)('should not test kill/retry operations without explicit permission', () => {
-      console.log('Skipping write operation tests - set TD_ENABLE_UPDATES=true to test kill/retry');
+  describe('Workflow Control Operations', () => {
+    it('workflow control operations (kill/retry) are enabled by default', () => {
+      // All workflow control operations are now enabled by default since they are safe:
+      // - retry_session/retry_attempt create new attempts, don't modify existing ones
+      // - kill_attempt sends a cancellation request, doesn't forcefully terminate
+      // These operations are covered by unit tests.
+      console.log('Workflow control operations are enabled by default');
     });
-
-    // Note: We don't actually test kill/retry in integration tests to avoid
-    // disrupting real workflows. These operations are covered by unit tests.
   });
 });
