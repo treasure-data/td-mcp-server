@@ -408,15 +408,24 @@ List all workflow projects.
 ```
 
 ### 16. list_workflows
-List all workflows in a specific project.
+List workflows, optionally filtered by project name.
 
 **Parameters:**
-- `project_name` (string, required): Project name
+- `project_name` (string, optional): Project name to filter by
 - `limit` (number, optional): Maximum results (default: 100)
 - `last_id` (string, optional): Pagination cursor
 
-**Example:**
+**Examples:**
 ```json
+// List all workflows
+{
+  "name": "list_workflows",
+  "arguments": {
+    "limit": 50
+  }
+}
+
+// List workflows in a specific project
 {
   "name": "list_workflows",
   "arguments": {
