@@ -50,8 +50,8 @@ describe('WorkflowClient', () => {
     it('should fetch workflows successfully', async () => {
       const mockResponse = {
         workflows: [
-          { id: '1', name: 'workflow1', project: 'test', revision: 'abc', timezone: 'UTC' },
-          { id: '2', name: 'workflow2', project: 'test', revision: 'def', timezone: 'UTC' },
+          { id: '1', name: 'workflow1', project: { id: '1', name: 'test' }, revision: 'abc', timezone: 'UTC' },
+          { id: '2', name: 'workflow2', project: { id: '1', name: 'test' }, revision: 'def', timezone: 'UTC' },
         ],
         next_page_id: 'next123',
       };
@@ -68,7 +68,7 @@ describe('WorkflowClient', () => {
 
       expect(result).toEqual(mockResponse);
       expect(mockFetch).toHaveBeenCalledWith(
-        'https://api-workflow.treasuredata.com/api/projects/test/workflows?page_size=10',
+        'https://api-workflow.treasuredata.com/api/workflows?count=10',
         expect.objectContaining({
           method: 'GET',
           headers: expect.objectContaining({
@@ -93,7 +93,7 @@ describe('WorkflowClient', () => {
       });
 
       expect(mockFetch).toHaveBeenCalledWith(
-        expect.stringContaining('page_size=50&last_id=last123'),
+        expect.stringContaining('count=50&last_id=last123'),
         expect.any(Object)
       );
     });

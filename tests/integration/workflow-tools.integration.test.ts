@@ -103,9 +103,17 @@ describe.skipIf(!isIntegrationTest)('Workflow MCP Tools Integration Tests', () =
       }
     }, 30000);
 
-    it('should handle missing project_name parameter', async () => {
-      await expect(listWorkflows.handler({}))
-        .rejects.toThrow('project_name is required');
+    it('should list all workflows when project_name is not provided', async () => {
+      const result = await listWorkflows.handler({
+        limit: 10,
+      });
+
+      expect(result).toHaveProperty('workflows');
+      expect(result).toHaveProperty('count');
+      expect(Array.isArray(result.workflows)).toBe(true);
+      expect(result.count).toBe(result.workflows.length);
+      
+      console.log(`Found ${result.count} workflows when no project_name provided`);
     });
   });
 

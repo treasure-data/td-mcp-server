@@ -3,13 +3,13 @@ import { WorkflowClient } from '../../client/workflow/index.js';
 
 export const listWorkflows = {
   name: 'list_workflows',
-  description: 'List all workflows in a project with their current status',
+  description: 'List workflows. Optionally filter by project name.',
   inputSchema: {
     type: 'object',
     properties: {
       project_name: {
         type: 'string',
-        description: 'Name of the project',
+        description: 'Name of the project to filter by (optional)',
       },
       limit: {
         type: 'number',
@@ -20,18 +20,14 @@ export const listWorkflows = {
         description: 'Pagination cursor for next page',
       },
     },
-    required: ['project_name'],
+    required: [],
   },
   handler: async (args: unknown) => {
     const { project_name, limit = 100, last_id } = args as {
-      project_name: string;
+      project_name?: string;
       limit?: number;
       last_id?: string;
     };
-
-    if (!project_name) {
-      throw new Error('project_name is required');
-    }
 
     const config = loadConfig();
     const client = new WorkflowClient({

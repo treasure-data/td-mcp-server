@@ -357,9 +357,12 @@ describe.skipIf(!isIntegrationTest)('Workflow Integration Tests', () => {
 
   describe('Error Handling', () => {
     it('should handle non-existent project gracefully', async () => {
-      await expect(client.listWorkflows({
+      // With client-side filtering, non-existent projects return empty array
+      const result = await client.listWorkflows({
         project_name: 'non_existent_project_12345',
-      })).rejects.toThrow(/404/);
+      });
+      
+      expect(result.workflows).toEqual([]);
     });
 
     it('should handle non-existent session gracefully', async () => {

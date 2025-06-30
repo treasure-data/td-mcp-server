@@ -29,13 +29,13 @@ describe('listWorkflows tool', () => {
   describe('metadata', () => {
     it('should have correct tool metadata', () => {
       expect(listWorkflows.name).toBe('list_workflows');
-      expect(listWorkflows.description).toBe('List all workflows in a project with their current status');
+      expect(listWorkflows.description).toBe('List workflows. Optionally filter by project name.');
       expect(listWorkflows.inputSchema).toEqual({
         type: 'object',
         properties: {
           project_name: {
             type: 'string',
-            description: 'Name of the project',
+            description: 'Name of the project to filter by (optional)',
           },
           limit: {
             type: 'number',
@@ -46,7 +46,7 @@ describe('listWorkflows tool', () => {
             description: 'Pagination cursor for next page',
           },
         },
-        required: ['project_name'],
+        required: [],
       });
     });
   });
@@ -58,7 +58,7 @@ describe('listWorkflows tool', () => {
           {
             id: '1',
             name: 'daily_etl',
-            project: 'test_project',
+            project: { id: '1', name: 'test_project' },
             revision: 'abc123',
             timezone: 'UTC',
             last_session_time: '2024-01-01T00:00:00Z',
@@ -67,7 +67,7 @@ describe('listWorkflows tool', () => {
           {
             id: '2',
             name: 'hourly_sync',
-            project: 'test_project',
+            project: { id: '1', name: 'test_project' },
             revision: 'def456',
             timezone: 'UTC',
             last_session_time: '2024-01-01T01:00:00Z',
@@ -132,11 +132,40 @@ describe('listWorkflows tool', () => {
       });
     });
 
-    it('should throw error when project_name is missing', async () => {
-      await expect(listWorkflows.handler({}))
-        .rejects.toThrow('project_name is required');
+    it('should list all workflows when project_name is not provided', async () => {
+      mockClient.listWorkflows.mockResolvedValue({
+        workflows: [
+          {
+            id: '1',
+            name: 'workflow1',
+            project: { id: '1', name: 'test' },
+            revision: 'abc123',
+            timezone: 'UTC',
+          },
+        ],
+        next_page_id: undefined,
+      });
 
-      expect(mockClient.listWorkflows).not.toHaveBeenCalled();
+      const result = await listWorkflows.handler({});
+
+      expect(mockClient.listWorkflows).toHaveBeenCalledWith({
+        project_name: undefined,
+        limit: 100,
+        last_id: undefined,
+      });
+      expect(result).toEqual({
+        workflows: [
+          {
+            id: '1',
+            name: 'workflow1',
+            project: { id: '1', name: 'test' },
+            revision: 'abc123',
+            timezone: 'UTC',
+          },
+        ],
+        next_page_id: undefined,
+        count: 1,
+      });
     });
 
     it('should handle client errors gracefully', async () => {
