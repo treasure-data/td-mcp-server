@@ -25,6 +25,7 @@ import {
   getSegment
 } from './tools/cdp';
 import {
+  listProjects,
   listWorkflows,
   listSessions,
   getSessionAttempts,
@@ -268,6 +269,11 @@ export class TDMcpServer {
           inputSchema: getSegment.inputSchema,
         },
         // Workflow Tools
+        {
+          name: listProjects.name,
+          description: listProjects.description,
+          inputSchema: listProjects.inputSchema,
+        },
         {
           name: listWorkflows.name,
           description: listWorkflows.description,
@@ -528,6 +534,18 @@ export class TDMcpServer {
           }
 
           // Workflow Tools
+          case listProjects.name: {
+            const result = await listProjects.handler(args || {});
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: JSON.stringify(result, null, 2),
+                },
+              ],
+            };
+          }
+
           case listWorkflows.name: {
             const result = await listWorkflows.handler(args || {});
             return {

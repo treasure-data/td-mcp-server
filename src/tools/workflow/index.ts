@@ -1,3 +1,4 @@
+export { listProjects } from './list-projects.js';
 export { listWorkflows } from './list-workflows.js';
 export { listSessions } from './list-sessions.js';
 export { getSessionAttempts } from './get-session-attempts.js';

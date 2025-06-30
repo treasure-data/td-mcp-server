@@ -11,6 +11,7 @@ import type {
   KillAttemptResponse,
   RetrySessionResponse,
   RetryAttemptResponse,
+  ProjectListResponse,
   WorkflowStatus,
   LogLevel,
 } from '../../types/workflow.js';
@@ -250,6 +251,23 @@ export class WorkflowClient {
         resume_from: params.resume_from,
         params: params.retry_params,
         force: params.force,
+      }
+    );
+  }
+
+  /**
+   * List all projects
+   */
+  async listProjects(params?: {
+    limit?: number;
+    last_id?: string;
+  }): Promise<ProjectListResponse> {
+    return this.request<ProjectListResponse>(
+      'GET',
+      '/api/projects',
+      {
+        page_size: params?.limit,
+        last_id: params?.last_id,
       }
     );
   }
