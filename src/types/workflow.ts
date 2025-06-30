@@ -88,8 +88,9 @@ export interface Task {
   fullName: string;
   parentId?: string;
   config: Record<string, unknown>;
-  upstreamIds: string[];
+  upstreams: string[];
   state: TaskState;
+  cancelRequested?: boolean;
   exportParams: Record<string, unknown>;
   storeParams: Record<string, unknown>;
   stateParams: Record<string, unknown>;
@@ -97,6 +98,7 @@ export interface Task {
   retryAt?: string;
   startedAt?: string;
   error?: TaskError;
+  isGroup?: boolean;
 }
 
 export interface TasksResponse {
@@ -141,4 +143,19 @@ export interface RetryAttemptResponse {
   session_id: string;
   message: string;
   resumed_from?: string;
+}
+
+export interface Project {
+  id: string;
+  name: string;
+  revision: string;
+  createdAt: string;
+  updatedAt: string;
+  archiveType: string;
+  archiveMd5: string;
+}
+
+export interface ProjectListResponse {
+  projects: Project[];
+  next_page_id?: string;
 }

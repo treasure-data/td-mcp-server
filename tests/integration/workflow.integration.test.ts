@@ -21,6 +21,34 @@ describe.skipIf(!isIntegrationTest)('Workflow Integration Tests', () => {
     });
   });
 
+  describe('Project Operations', () => {
+    it('should list all projects', async () => {
+      const response = await client.listProjects({
+        limit: 10,
+      });
+
+      console.log(`Found ${response.projects.length} projects`);
+      
+      expect(response).toHaveProperty('projects');
+      expect(Array.isArray(response.projects)).toBe(true);
+      
+      if (response.projects.length > 0) {
+        const firstProject = response.projects[0];
+        expect(firstProject).toHaveProperty('id');
+        expect(firstProject).toHaveProperty('name');
+        expect(firstProject).toHaveProperty('revision');
+        expect(firstProject).toHaveProperty('createdAt');
+        expect(firstProject).toHaveProperty('updatedAt');
+        
+        console.log('First project:', {
+          id: firstProject.id,
+          name: firstProject.name,
+          revision: firstProject.revision,
+        });
+      }
+    }, 30000);
+  });
+
   describe('Workflow Operations', () => {
     it('should list workflows in a project', async () => {
       try {
@@ -250,7 +278,7 @@ describe.skipIf(!isIntegrationTest)('Workflow Integration Tests', () => {
         expect(firstTask).toHaveProperty('fullName');
         
         expect(firstTask).toHaveProperty('state');
-        expect(firstTask).toHaveProperty('upstreamIds');
+        expect(firstTask).toHaveProperty('upstreams');
         expect(firstTask).toHaveProperty('updatedAt');
         
         console.log('First task summary:', {
@@ -288,7 +316,7 @@ describe.skipIf(!isIntegrationTest)('Workflow Integration Tests', () => {
           if (tasks.tasks.length > 0) {
             taskWithLogs = {
               attemptId: attempts.attempts[0].id,
-              taskName: tasks.tasks[0].full_name,
+              taskName: tasks.tasks[0].fullName,
             };
             break;
           }

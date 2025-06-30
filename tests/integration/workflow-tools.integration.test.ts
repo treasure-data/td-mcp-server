@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { 
+  listProjects,
   listWorkflows,
   listSessions,
   getSessionAttempts,
@@ -47,6 +48,29 @@ describe.skipIf(!isIntegrationTest)('Workflow MCP Tools Integration Tests', () =
     } else {
       delete process.env.TD_ENABLE_UPDATES;
     }
+  });
+
+  describe('list_projects tool', () => {
+    it('should list projects using MCP tool handler', async () => {
+      const result = await listProjects.handler({
+        limit: 10,
+      });
+
+      expect(result).toHaveProperty('projects');
+      expect(result).toHaveProperty('count');
+      expect(Array.isArray(result.projects)).toBe(true);
+      expect(result.count).toBe(result.projects.length);
+
+      console.log(`MCP tool found ${result.count} projects`);
+      
+      if (result.projects.length > 0) {
+        console.log('First project from MCP tool:', {
+          id: result.projects[0].id,
+          name: result.projects[0].name,
+          revision: result.projects[0].revision,
+        });
+      }
+    }, 30000);
   });
 
   describe('list_workflows tool', () => {

@@ -207,7 +207,7 @@ describe('WorkflowClient', () => {
             fullName: '+main+task1',
             state: 'success' as const,
             config: {},
-            upstreamIds: [],
+            upstreams: [],
             exportParams: {},
             storeParams: {},
             stateParams: {},
@@ -456,6 +456,62 @@ describe('WorkflowClient', () => {
 
       await expect(client.listWorkflows({ project_name: 'test' }))
         .rejects.toThrow('Workflow API error (500): Unknown error');
+    });
+  });
+
+  describe('listProjects', () => {
+    it('should list all projects', async () => {
+      const mockResponse = {
+        projects: [
+          {
+            id: '1',
+            name: 'project1',
+            revision: 'abc123',
+            createdAt: '2024-01-01T00:00:00Z',
+            updatedAt: '2024-01-01T00:00:00Z',
+            archiveType: 's3',
+            archiveMd5: 'md5hash',
+          },
+          {
+            id: '2',
+            name: 'project2',
+            revision: 'def456',
+            createdAt: '2024-01-02T00:00:00Z',
+            updatedAt: '2024-01-02T00:00:00Z',
+            archiveType: 's3',
+            archiveMd5: 'md5hash2',
+          },
+        ],
+      };
+
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockResponse,
+      });
+
+      const result = await client.listProjects({ limit: 10 });
+
+      expect(result).toEqual(mockResponse);
+      expect(mockFetch).toHaveBeenCalledWith(
+        'https://api-workflow.treasuredata.com/api/projects?page_size=10',
+        expect.objectContaining({
+          method: 'GET',
+        })
+      );
+    });
+
+    it('should handle pagination parameters', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ projects: [] }),
+      });
+
+      await client.listProjects({ limit: 20, last_id: 'abc' });
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        'https://api-workflow.treasuredata.com/api/projects?page_size=20&last_id=abc',
+        expect.any(Object)
+      );
     });
   });
 });
