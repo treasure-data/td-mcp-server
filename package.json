@@ -49,7 +49,7 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.17.2",
+    "@modelcontextprotocol/sdk": "^1.17.3",
     "trino-client": "^0.2.8"
   },
   "devDependencies": {
