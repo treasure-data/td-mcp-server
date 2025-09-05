@@ -90,6 +90,33 @@ Add to your MCP client configuration (e.g., Claude Desktop):
 - `TD_ENABLE_UPDATES` (optional): Enable write operations (execute tool) - `false` (default), `true`
 - `TD_DATABASE` (optional): Default database for queries (e.g., `sample_datasets`)
 
+## Claude Code Integration
+
+[Claude Code](https://claude.ai/code) provides built-in support for MCP servers through the `claude mcp add` command. To use this MCP server with Claude Code:
+
+```bash
+claude mcp add td -e TD_API_KEY=$TD_API_KEY -- npx @treasuredata/mcp-server
+```
+
+This command:
+- Adds the server with the name "td"
+- Sets the TD_API_KEY environment variable to your API key value
+- Configures Claude Code to use `npx @treasuredata/mcp-server` (always uses latest version)
+
+### Additional Configuration
+
+You can also specify additional environment variables:
+
+```bash
+claude mcp add td \
+  -e TD_API_KEY=$TD_API_KEY \
+  -e TD_SITE=us01 \
+  -e TD_DATABASE=sample_datasets \
+  -- npx @treasuredata/mcp-server
+```
+
+Once configured, Claude Code will automatically have access to all the tools described below for querying and analyzing your Treasure Data.
+
 ## Available Tools
 
 ### 1. list_databases
