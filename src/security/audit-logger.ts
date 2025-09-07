@@ -203,7 +203,8 @@ export class AuditLogger {
     const database = entry.database ? `[${entry.database}]` : '';
     const rowCount = entry.rowCount !== undefined ? ` -> ${entry.rowCount} rows` : '';
 
-    console.log(
+    // Important: use stderr to avoid interfering with MCP stdio JSON stream
+    console.error(
       `[${entry.timestamp.toISOString()}] ${status} ${entry.queryType} ${database}${duration}${rowCount}`
     );
 

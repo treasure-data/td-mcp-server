@@ -24,6 +24,7 @@ import {
   segmentSql,
   getSegment
 } from './tools/cdp';
+import { hiveQuery, hiveExecute, hiveJobStatus, hiveJobResult } from './tools/hive';
 import {
   listProjects,
   listWorkflows,
@@ -230,6 +231,27 @@ export class TDMcpServer {
             type: 'object',
             properties: {},
           },
+        },
+        // Hive Tools
+        {
+          name: hiveQuery.name,
+          description: hiveQuery.description,
+          inputSchema: hiveQuery.inputSchema,
+        },
+        {
+          name: hiveExecute.name,
+          description: hiveExecute.description,
+          inputSchema: hiveExecute.inputSchema,
+        },
+        {
+          name: hiveJobStatus.name,
+          description: hiveJobStatus.description,
+          inputSchema: hiveJobStatus.inputSchema,
+        },
+        {
+          name: hiveJobResult.name,
+          description: hiveJobResult.description,
+          inputSchema: hiveJobResult.inputSchema,
         },
         // CDP Tools
         {
@@ -632,6 +654,40 @@ export class TDMcpServer {
                   type: 'text',
                   text: JSON.stringify(result, null, 2),
                 },
+              ],
+            };
+          }
+
+          // Hive tools
+          case hiveQuery.name: {
+            const result = await hiveQuery.handler(args || {});
+            return {
+              content: [
+                { type: 'text', text: JSON.stringify(result, null, 2) },
+              ],
+            };
+          }
+          case hiveExecute.name: {
+            const result = await hiveExecute.handler(args || {});
+            return {
+              content: [
+                { type: 'text', text: JSON.stringify(result, null, 2) },
+              ],
+            };
+          }
+          case hiveJobStatus.name: {
+            const result = await hiveJobStatus.handler(args || {});
+            return {
+              content: [
+                { type: 'text', text: JSON.stringify(result, null, 2) },
+              ],
+            };
+          }
+          case hiveJobResult.name: {
+            const result = await hiveJobResult.handler(args || {});
+            return {
+              content: [
+                { type: 'text', text: JSON.stringify(result, null, 2) },
               ],
             };
           }

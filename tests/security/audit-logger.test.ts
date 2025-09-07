@@ -72,8 +72,8 @@ describe('AuditLogger', () => {
       logger = new AuditLogger({ logToConsole: true });
       logger.logSuccess('SELECT', 'SELECT 1', 'mydb', 100, 1);
       
-      expect(consoleLogSpy).toHaveBeenCalled();
-      const logMessage = consoleLogSpy.mock.calls[0][0] as string;
+      expect(consoleErrorSpy).toHaveBeenCalled();
+      const logMessage = consoleErrorSpy.mock.calls[0][0] as string;
       expect(logMessage).toContain('✓ SELECT [mydb] (100ms) -> 1 rows');
     });
 
@@ -81,17 +81,16 @@ describe('AuditLogger', () => {
       logger = new AuditLogger({ logToConsole: true });
       logger.logFailure('UPDATE', 'UPDATE x', 'Permission denied');
       
-      expect(consoleLogSpy).toHaveBeenCalled();
       expect(consoleErrorSpy).toHaveBeenCalled();
-      const errorMessage = consoleErrorSpy.mock.calls[0][0] as string;
-      expect(errorMessage).toContain('Permission denied');
+      const messages = consoleErrorSpy.mock.calls.map(call => call[0] as string);
+      expect(messages.some(m => m.includes('Permission denied'))).toBe(true);
     });
 
     it('should not log to console when disabled', () => {
       logger = new AuditLogger({ logToConsole: false });
       logger.logSuccess('SELECT', 'SELECT 1');
       
-      expect(consoleLogSpy).not.toHaveBeenCalled();
+      expect(consoleErrorSpy).not.toHaveBeenCalled();
     });
   });
 
