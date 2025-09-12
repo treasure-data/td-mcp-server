@@ -64,9 +64,6 @@ export const hiveExecute = {
     }
 
     if (validator.isReadOnly(validation.queryType)) {
-      if (process.env.TD_MCP_LOG_TO_CONSOLE === 'true') {
-        console.error('[Hive] hive_execute received read-only SQL; routing to hive_query');
-      }
       // Reuse hive_query for SELECT/SHOW/DESCRIBE to return data rows
       return await hiveQuery.handler({ sql, database, limit: limit ?? 40 });
     }

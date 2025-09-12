@@ -90,7 +90,11 @@ export class TDHiveClient {
     }
   }
 
-  private async requestWithFallback<T>(method: string, paths: string[], body?: unknown): Promise<T> {
+  private async requestWithFallback<T>(
+    method: string,
+    paths: string[],
+    body?: unknown
+  ): Promise<T> {
     let lastError: unknown;
     for (const p of paths) {
       try {
@@ -166,7 +170,11 @@ export class TDHiveClient {
   /**
    * Issues a Hive job and returns job id
    */
-  async issueHive(query: string, database?: string, options?: HiveIssueJobOptions): Promise<{ job_id: string }> {
+  async issueHive(
+    query: string,
+    database?: string,
+    options?: HiveIssueJobOptions
+  ): Promise<{ job_id: string }> {
     if (!query) throw new Error('Query is required');
     const payload: Record<string, unknown> = {
       query,
@@ -178,10 +186,14 @@ export class TDHiveClient {
     // Try v3 endpoints first (spec: /job/issue/{job_type}/{database_name})
     const db = (database || this.database).trim();
     if (!db) throw new Error('Database name is required');
-    return await this.requestWithFallback<{ job_id: string }>('POST', [
-      `/v3/job/issue/hive/${encodeURIComponent(db)}`,
-      `/v3/jobs/issue/hive/${encodeURIComponent(db)}`,
-    ], payload);
+    return await this.requestWithFallback<{ job_id: string }>(
+      'POST',
+      [
+        `/v3/job/issue/hive/${encodeURIComponent(db)}`,
+        `/v3/jobs/issue/hive/${encodeURIComponent(db)}`,
+      ],
+      payload
+    );
   }
 
   /**
@@ -201,7 +213,10 @@ export class TDHiveClient {
    */
   async jobResult(jobId: string): Promise<{ rows: unknown[][] }> {
     if (!jobId) throw new Error('job_id is required');
-    const text = await this.requestText('GET', `/v3/job/result/${encodeURIComponent(jobId)}?format=json`);
+    const text = await this.requestText(
+      'GET',
+      `/v3/job/result/${encodeURIComponent(jobId)}?format=json`
+    );
     return { rows: this.parseResultText(text) };
   }
 
@@ -210,12 +225,17 @@ export class TDHiveClient {
    */
   async jobResultSchema(jobId: string): Promise<Array<{ name: string; type: string }>> {
     if (!jobId) throw new Error('job_id is required');
-    const show = await this.request<JobShowResponse>('GET', `/v3/job/show/${encodeURIComponent(jobId)}`);
+    const show = await this.request<JobShowResponse>(
+      'GET',
+      `/v3/job/show/${encodeURIComponent(jobId)}`
+    );
     const raw = show?.hive_result_schema;
     if (typeof raw === 'string') {
       try {
-        const arr = JSON.parse(raw) as Array<[string, string] | [string, string, string] | [string, string, string, string]>;
-        return Array.isArray(arr) ? arr.map((c) => ({ name: String(c[0]), type: String(c[1]) })) : [];
+        const arr = JSON.parse(raw) as Array<string[]>;
+        return Array.isArray(arr)
+          ? arr.map((c) => ({ name: String(c[0]), type: String(c[1]) }))
+          : [];
       } catch {
         return [];
       }
@@ -226,7 +246,10 @@ export class TDHiveClient {
   /**
    * Helper that waits for job completion
    */
-  async waitForCompletion(jobId: string, opts?: { pollMs?: number; timeoutMs?: number }): Promise<HiveJobStatus> {
+  async waitForCompletion(
+    jobId: string,
+    opts?: { pollMs?: number; timeoutMs?: number }
+  ): Promise<HiveJobStatus> {
     const poll = opts?.pollMs ?? 2000;
     const timeout = opts?.timeoutMs ?? 15 * 60 * 1000; // 15m default
     const start = Date.now();
@@ -272,7 +295,10 @@ export class TDHiveClient {
 
   private async getJobErrorDetails(jobId: string): Promise<string | undefined> {
     try {
-      const show = await this.request<JobShowResponse>('GET', `/v3/job/show/${encodeURIComponent(jobId)}`);
+      const show = await this.request<JobShowResponse>(
+        'GET',
+        `/v3/job/show/${encodeURIComponent(jobId)}`
+      );
       const parts: string[] = [];
       if (show?.error) parts.push(String(show.error));
       if (show?.debug?.stderr) parts.push(String(show.debug.stderr));
