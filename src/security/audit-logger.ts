@@ -203,7 +203,7 @@ export class AuditLogger {
     const database = entry.database ? `[${entry.database}]` : '';
     const rowCount = entry.rowCount !== undefined ? ` -> ${entry.rowCount} rows` : '';
 
-    console.log(
+    console.error(
       `[${entry.timestamp.toISOString()}] ${status} ${entry.queryType} ${database}${duration}${rowCount}`
     );
 
