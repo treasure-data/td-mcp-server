@@ -15,7 +15,9 @@ describe('listProjects tool', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    MockWorkflowClient.mockReturnValue(mockClient);
+    MockWorkflowClient.mockImplementation(function(this: any) {
+      return mockClient;
+    });
     mockLoadConfig.mockReturnValue({
       td_api_key: 'test_key',
       site: 'us01',

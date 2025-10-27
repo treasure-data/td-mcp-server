@@ -12,10 +12,12 @@ vi.mock('../src/config', () => ({
 
 // Mock the StdioServerTransport to prevent actual stdio operations
 vi.mock('@modelcontextprotocol/sdk/server/stdio.js', () => ({
-  StdioServerTransport: vi.fn().mockImplementation(() => ({
-    start: vi.fn(),
-    close: vi.fn(),
-  })),
+  StdioServerTransport: vi.fn().mockImplementation(function(this: any) {
+    return {
+      start: vi.fn(),
+      close: vi.fn(),
+    };
+  }),
 }));
 
 describe('TDMcpServer', () => {
