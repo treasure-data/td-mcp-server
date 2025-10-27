@@ -21,10 +21,12 @@ vi.mock('../../src/security/audit-logger');
 
 // Mock the StdioServerTransport
 vi.mock('@modelcontextprotocol/sdk/server/stdio.js', () => ({
-  StdioServerTransport: vi.fn().mockImplementation(() => ({
-    start: vi.fn(),
-    close: vi.fn(),
-  })),
+  StdioServerTransport: vi.fn().mockImplementation(function(this: any) {
+    return {
+      start: vi.fn(),
+      close: vi.fn(),
+    };
+  }),
 }));
 
 describe('use_database functionality', () => {
@@ -42,23 +44,27 @@ describe('use_database functionality', () => {
     mockDestroy = vi.fn();
 
     // Mock TDTrinoClient constructor and methods
-    vi.mocked(TDTrinoClient).mockImplementation(() => ({
-      listDatabases: mockListDatabases,
-      testConnection: mockTestConnection,
-      destroy: mockDestroy,
-      database: 'mocked_db',
-      query: vi.fn(),
-      execute: vi.fn(),
-      listTables: vi.fn(),
-      describeTable: vi.fn(),
-    } as any));
+    vi.mocked(TDTrinoClient).mockImplementation(function(this: any) {
+      return {
+        listDatabases: mockListDatabases,
+        testConnection: mockTestConnection,
+        destroy: mockDestroy,
+        database: 'mocked_db',
+        query: vi.fn(),
+        execute: vi.fn(),
+        listTables: vi.fn(),
+        describeTable: vi.fn(),
+      } as any;
+    });
 
     // Mock AuditLogger
-    vi.mocked(AuditLogger).mockImplementation(() => ({
-      logSuccess: vi.fn(),
-      logFailure: vi.fn(),
-      logQuery: vi.fn(),
-    } as any));
+    vi.mocked(AuditLogger).mockImplementation(function(this: any) {
+      return {
+        logSuccess: vi.fn(),
+        logFailure: vi.fn(),
+        logQuery: vi.fn(),
+      } as any;
+    });
 
     server = new TDMcpServer();
   });

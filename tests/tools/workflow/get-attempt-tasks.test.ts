@@ -13,7 +13,7 @@ describe('getAttemptTasks tool', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    
+
     mockLoadConfig.mockReturnValue({
       td_api_key: 'test_key',
       site: 'us01',
@@ -23,7 +23,9 @@ describe('getAttemptTasks tool', () => {
       getAttemptTasks: vi.fn(),
     };
 
-    MockWorkflowClient.mockImplementation(() => mockClient);
+    MockWorkflowClient.mockImplementation(function(this: any) {
+      return mockClient;
+    });
   });
 
   describe('metadata', () => {

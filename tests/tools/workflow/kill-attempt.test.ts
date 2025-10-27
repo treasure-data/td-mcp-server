@@ -18,7 +18,9 @@ describe('killAttempt tool', () => {
       killAttempt: vi.fn(),
     };
 
-    MockWorkflowClient.mockImplementation(() => mockClient);
+    MockWorkflowClient.mockImplementation(function(this: any) {
+      return mockClient;
+    });
   });
 
   describe('metadata', () => {
