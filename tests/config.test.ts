@@ -49,9 +49,31 @@ describe('Configuration', () => {
 
     it('should throw error when API key is missing', () => {
       delete process.env.TD_API_KEY;
+      delete process.env.TDX_ACCESS_TOKEN;
+      delete process.env.TD_ACCESS_TOKEN;
 
       expect(() => loadConfig()).toThrow(ConfigurationError);
-      expect(() => loadConfig()).toThrow('TD_API_KEY is required');
+      expect(() => loadConfig()).toThrow('TD_API_KEY or TDX_ACCESS_TOKEN is required');
+    });
+
+    it('should load config with access token instead of API key', () => {
+      delete process.env.TD_API_KEY;
+      process.env.TDX_ACCESS_TOKEN = 'test-access-token-12345';
+
+      const config = loadConfig();
+
+      expect(config.td_api_key).toBe('');
+      expect(config.td_access_token).toBe('test-access-token-12345');
+    });
+
+    it('should prioritize TDX_ACCESS_TOKEN over TD_ACCESS_TOKEN', () => {
+      delete process.env.TD_API_KEY;
+      process.env.TDX_ACCESS_TOKEN = 'tdx-token-12345';
+      process.env.TD_ACCESS_TOKEN = 'td-token-12345';
+
+      const config = loadConfig();
+
+      expect(config.td_access_token).toBe('tdx-token-12345');
     });
   });
 
@@ -65,14 +87,24 @@ describe('Configuration', () => {
       expect(() => validateConfig(validConfig)).not.toThrow();
     });
 
-    it('should reject empty API key', () => {
+    it('should reject empty API key when no access token', () => {
       const config = { ...validConfig, td_api_key: '' };
-      expect(() => validateConfig(config)).toThrow('TD_API_KEY is required');
+      expect(() => validateConfig(config)).toThrow('TD_API_KEY or TDX_ACCESS_TOKEN is required');
     });
 
-    it('should reject short API key', () => {
+    it('should reject short API key when no access token', () => {
       const config = { ...validConfig, td_api_key: 'short' };
-      expect(() => validateConfig(config)).toThrow('TD_API_KEY appears to be invalid');
+      expect(() => validateConfig(config)).toThrow('TD_API_KEY or TDX_ACCESS_TOKEN is required');
+    });
+
+    it('should accept access token instead of API key', () => {
+      const config = { ...validConfig, td_api_key: '', td_access_token: 'valid-access-token' };
+      expect(() => validateConfig(config)).not.toThrow();
+    });
+
+    it('should reject short access token when no API key', () => {
+      const config = { ...validConfig, td_api_key: '', td_access_token: 'short' };
+      expect(() => validateConfig(config)).toThrow('TD_API_KEY or TDX_ACCESS_TOKEN is required');
     });
 
     it('should reject invalid site', () => {
@@ -144,7 +176,7 @@ describe('Configuration', () => {
   });
 
   describe('getConfigSummary', () => {
-    it('should generate config summary', () => {
+    it('should generate config summary with API key', () => {
       const config: Config = {
         td_api_key: 'test-api-key-12345',
         site: 'jp01',
@@ -156,10 +188,27 @@ describe('Configuration', () => {
       const summary = getConfigSummary(config);
 
       expect(summary).toContain('Site: jp01');
-      expect(summary).toContain('API Key: test...2345');
+      expect(summary).toContain('Auth Type: API Key (TD1)');
+      expect(summary).toContain('Credential: test...2345');
       expect(summary).toContain('Updates Enabled: true');
       expect(summary).toContain('Default Database: my_db');
       expect(summary).toContain('LLM API Base: https://llm.example.com');
+    });
+
+    it('should generate config summary with access token', () => {
+      const config: Config = {
+        td_api_key: '',
+        td_access_token: 'oauth-access-token-12345',
+        site: 'jp01',
+        enable_updates: true,
+        database: 'my_db',
+      };
+
+      const summary = getConfigSummary(config);
+
+      expect(summary).toContain('Site: jp01');
+      expect(summary).toContain('Auth Type: OAuth (Bearer)');
+      expect(summary).toContain('Credential: oaut...2345');
     });
 
     it('should show defaults in summary', () => {

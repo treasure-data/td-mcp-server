@@ -20,6 +20,8 @@ const VALID_SITES: readonly TDSite[] = ['us01', 'jp01', 'eu01', 'ap02', 'ap03', 
 export function loadConfig(): Config {
   const config: Config = {
     td_api_key: process.env.TD_API_KEY || '',
+    // TDX_ACCESS_TOKEN takes priority (Treasure Studio compatibility)
+    td_access_token: process.env.TDX_ACCESS_TOKEN || process.env.TD_ACCESS_TOKEN || '',
     site: (process.env.TD_SITE as TDSite) || 'us01',
     enable_updates: process.env.TD_ENABLE_UPDATES === 'true',
     database: process.env.TD_DATABASE,
@@ -38,13 +40,14 @@ export function loadConfig(): Config {
  * @throws {ConfigurationError} If configuration is invalid
  */
 export function validateConfig(config: Config): void {
-  // Validate API key
-  if (!config.td_api_key) {
-    throw new ConfigurationError('TD_API_KEY is required but not provided');
-  }
+  // Validate credentials: either API key or access token is required
+  const hasApiKey = config.td_api_key && config.td_api_key.length >= 10;
+  const hasAccessToken = config.td_access_token && config.td_access_token.length >= 10;
 
-  if (config.td_api_key.length < 10) {
-    throw new ConfigurationError('TD_API_KEY appears to be invalid (too short)');
+  if (!hasApiKey && !hasAccessToken) {
+    throw new ConfigurationError(
+      'TD_API_KEY or TDX_ACCESS_TOKEN is required but not provided (or too short)'
+    );
   }
 
   // Validate site
@@ -76,6 +79,12 @@ export function getConfigFromArgs(args?: Record<string, unknown>): Config {
   // Support both environment variables and direct args
   const config: Config = {
     td_api_key: (args?.td_api_key as string) || process.env.TD_API_KEY || '',
+    // TDX_ACCESS_TOKEN takes priority (Treasure Studio compatibility)
+    td_access_token:
+      (args?.td_access_token as string) ||
+      process.env.TDX_ACCESS_TOKEN ||
+      process.env.TD_ACCESS_TOKEN ||
+      '',
     site: (args?.site as TDSite) || (process.env.TD_SITE as TDSite) || 'us01',
     enable_updates:
       args?.enable_updates === true ||
@@ -110,9 +119,12 @@ export function maskApiKey(apiKey: string): string {
  * @returns Formatted configuration summary with masked sensitive data
  */
 export function getConfigSummary(config: Config): string {
+  const authType = config.td_access_token ? 'OAuth (Bearer)' : 'API Key (TD1)';
+  const credential = config.td_access_token || config.td_api_key;
   return `TD MCP Server Configuration:
   - Site: ${config.site}
-  - API Key: ${maskApiKey(config.td_api_key)}
+  - Auth Type: ${authType}
+  - Credential: ${maskApiKey(credential)}
   - Updates Enabled: ${config.enable_updates || false}
   - Default Database: ${config.database || 'none'}
   - LLM API Base: ${config.llm_api_base || 'default'}`;
