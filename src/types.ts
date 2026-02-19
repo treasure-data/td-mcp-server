@@ -1,5 +1,6 @@
 export interface Config {
   td_api_key: string;
+  td_access_token?: string; // OAuth access token (TDX_ACCESS_TOKEN)
   site: 'us01' | 'jp01' | 'eu01' | 'ap02' | 'ap03' | 'dev';
   enable_updates?: boolean;
   database?: string;

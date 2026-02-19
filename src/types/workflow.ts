@@ -1,7 +1,16 @@
 // Workflow-related types
 
 export type WorkflowStatus = 'running' | 'success' | 'error' | 'killed' | 'planned';
-export type TaskState = 'running' | 'success' | 'error' | 'blocked' | 'ready' | 'retry_waiting' | 'group_retry_waiting' | 'planned' | 'canceled';
+export type TaskState =
+  | 'running'
+  | 'success'
+  | 'error'
+  | 'blocked'
+  | 'ready'
+  | 'retry_waiting'
+  | 'group_retry_waiting'
+  | 'planned'
+  | 'canceled';
 export type LogLevel = 'ERROR' | 'WARN' | 'INFO' | 'DEBUG';
 
 export interface Workflow {

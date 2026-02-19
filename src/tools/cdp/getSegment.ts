@@ -27,10 +27,10 @@ export const getSegment = {
   
   async execute(args: unknown) {
     const config = loadConfig();
-    
+
     try {
       const parsedArgs = getSegmentSchema.parse(args);
-      const client = createCDPClient(config.td_api_key, config.site);
+      const client = createCDPClient(config.td_api_key, config.site, config.td_access_token);
       
       // Get the segment details
       const segmentDetails = await client.getSegmentDetails(parsedArgs.parent_segment_id, parsedArgs.segment_id);

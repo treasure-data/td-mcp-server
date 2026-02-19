@@ -12,17 +12,23 @@ import {
 import { maskApiKey } from '../../config';
 
 export class CDPClient {
-  private readonly apiKey: string;
+  private readonly credential: string;
   private readonly endpoint: string;
+  private readonly authHeader: string;
 
-  constructor(apiKey: string, site: string) {
-    this.apiKey = apiKey;
+  constructor(apiKey: string, site: string, accessToken?: string) {
+    this.credential = accessToken || apiKey;
+    // OAuth uses Bearer, API key uses TD1
+    this.authHeader = accessToken
+      ? `Bearer ${this.credential}`
+      : `TD1 ${this.credential}`;
+
     const endpoint = CDP_ENDPOINTS[site];
-    
+
     if (!endpoint) {
       throw new Error(`Unknown site: ${site}`);
     }
-    
+
     this.endpoint = endpoint;
   }
 
@@ -32,12 +38,12 @@ export class CDPClient {
     options?: CDPRequestOptions
   ): Promise<T> {
     const url = `${this.endpoint}${path}`;
-    
+
     const headers: Record<string, string> = {
-      'Authorization': `TD1 ${this.apiKey}`,
+      Authorization: this.authHeader,
       'Content-Type': 'application/json',
-      'Accept': 'application/vnd.treasuredata.v1+json',
-      ...(options?.headers || {})
+      Accept: 'application/vnd.treasuredata.v1+json',
+      ...(options?.headers || {}),
     };
 
     try {
@@ -68,8 +74,8 @@ export class CDPClient {
       return data as T;
     } catch (error) {
       if (error instanceof Error) {
-        // Mask API key in error messages
-        error.message = error.message.replace(this.apiKey, maskApiKey(this.apiKey));
+        // Mask credentials in error messages
+        error.message = error.message.replace(this.credential, maskApiKey(this.credential));
       }
       throw error;
     }
@@ -128,6 +134,6 @@ export class CDPClient {
   }
 }
 
-export function createCDPClient(apiKey: string, site: string): CDPClient {
-  return new CDPClient(apiKey, site);
+export function createCDPClient(apiKey: string, site: string, accessToken?: string): CDPClient {
+  return new CDPClient(apiKey, site, accessToken);
 }
