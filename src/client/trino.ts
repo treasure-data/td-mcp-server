@@ -1,4 +1,4 @@
-import { Trino, BasicAuth, Query as TrinoQuery } from 'trino-client';
+import { Trino, Query as TrinoQuery } from 'trino-client';
 import { Config, QueryResult } from '../types';
 import { getEndpointForSite, getTrinoPort, getCatalog } from './endpoints';
 import { version } from '../../package.json';
@@ -6,17 +6,30 @@ import { version } from '../../package.json';
 /**
  * Trino client wrapper for Treasure Data
  * Handles authentication, query execution, and connection management
+ *
+ * Supports two authentication methods:
+ * - OAuth: Authorization: Bearer {access_token}
+ * - API Key: Authorization: TD1 {api_key}
  */
 export class TDTrinoClient {
   private config: Config;
   private catalog: string;
   private client: Trino;
   private defaultDatabase: string;
+  private credential: string;
+  private authHeader: string;
 
   constructor(config: Config) {
     this.config = config;
     this.catalog = getCatalog();
     this.defaultDatabase = config.database || 'information_schema';
+
+    // Determine credential and auth header based on authentication type
+    this.credential = config.td_access_token || config.td_api_key;
+    // OAuth uses Bearer, API key uses TD1
+    this.authHeader = config.td_access_token
+      ? `Bearer ${this.credential}`
+      : `TD1 ${this.credential}`;
 
     // Initialize single Trino client with default database
     const endpoint = getEndpointForSite(this.config.site);
@@ -26,8 +39,7 @@ export class TDTrinoClient {
       server: `${url.protocol}//${url.hostname}:${getTrinoPort()}`,
       catalog: this.catalog,
       schema: this.defaultDatabase, // Set default schema
-      // TD uses API key as username in BasicAuth
-      auth: new BasicAuth(this.config.td_api_key),
+      // Don't use BasicAuth - we pass Authorization header per query
       ssl: {
         rejectUnauthorized: true,
       },
@@ -45,11 +57,11 @@ export class TDTrinoClient {
    */
   async query(sql: string): Promise<QueryResult> {
     try {
-      // Build query object with TD API key as user
+      // Build query object with Authorization header only
+      // td-prestobase extracts credentials from Authorization header (Bearer or TD1)
       const queryObj: TrinoQuery = {
         query: sql,
-        // TD uses API key as the user in X-Trino-User header
-        user: this.config.td_api_key,
+        extraHeaders: { Authorization: this.authHeader },
       };
 
       // Execute the query
@@ -108,11 +120,11 @@ export class TDTrinoClient {
    */
   async execute(sql: string): Promise<{ affectedRows: number; success: boolean }> {
     try {
-      // Build query object with TD API key as user
+      // Build query object with Authorization header only
+      // td-prestobase extracts credentials from Authorization header (Bearer or TD1)
       const queryObj: TrinoQuery = {
         query: sql,
-        // TD uses API key as the user in X-Trino-User header
-        user: this.config.td_api_key,
+        extraHeaders: { Authorization: this.authHeader },
       };
 
       // Execute the statement
@@ -227,8 +239,8 @@ export class TDTrinoClient {
 
   private wrapError(error: unknown): Error {
     if (error instanceof Error) {
-      // Don't expose API key in error messages
-      const message = error.message.replace(this.config.td_api_key, '***');
+      // Don't expose credentials in error messages
+      const message = error.message.replace(this.credential, '***');
       return new Error(message);
     }
     return new Error('Unknown error');

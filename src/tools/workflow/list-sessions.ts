@@ -62,6 +62,7 @@ export const listSessions = {
     const config = loadConfig();
     const client = new WorkflowClient({
       apiKey: config.td_api_key,
+      accessToken: config.td_access_token,
       site: config.site,
     });
 

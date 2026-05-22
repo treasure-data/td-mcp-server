@@ -27,10 +27,10 @@ export const segmentSql = {
   
   async execute(args: unknown) {
     const config = loadConfig();
-    
+
     try {
       const parsedArgs = segmentSqlSchema.parse(args);
-      const client = createCDPClient(config.td_api_key, config.site);
+      const client = createCDPClient(config.td_api_key, config.site, config.td_access_token);
       
       // Get the segment details to retrieve the rule
       const segmentDetails = await client.getSegmentDetails(parsedArgs.parent_segment_id, parsedArgs.segment_id);

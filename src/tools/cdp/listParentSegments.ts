@@ -12,13 +12,13 @@ export const listParentSegmentsTool = {
   },
   handler: async (_args: unknown, _context: unknown) => {
     const config = loadConfig();
-    
-    if (!config.td_api_key) {
-      throw new Error('TD_API_KEY is required');
+
+    if (!config.td_api_key && !config.td_access_token) {
+      throw new Error('TD_API_KEY or TDX_ACCESS_TOKEN is required');
     }
 
     try {
-      const client = createCDPClient(config.td_api_key, config.site);
+      const client = createCDPClient(config.td_api_key, config.site, config.td_access_token);
       const parentSegments = await client.getParentSegments();
 
       return {
