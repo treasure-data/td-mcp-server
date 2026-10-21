@@ -81,8 +81,7 @@ jobs:
           echo "changed=false" >> $GITHUB_OUTPUT
         fi
     
+    # Authenticates via npm trusted publishing (OIDC); requires npm >= 11.5.1
     - name: Publish to npm
       if: steps.version.outputs.changed == 'true'
       run: npm publish --access public
-      env:
-        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
