@@ -43,7 +43,7 @@ export const getParentSegmentTool = {
       };
     } catch (error) {
       if (error instanceof z.ZodError) {
-        throw new Error(`Invalid input: ${error.errors.map(e => e.message).join(', ')}`);
+        throw new Error(`Invalid input: ${error.issues.map(e => e.message).join(', ')}`);
       }
       throw error;
     }
