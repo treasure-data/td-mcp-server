@@ -25,6 +25,10 @@ updates:
     # Allow both direct and indirect (transitive) dependency updates
     allow:
       - dependency-type: "all"
+    # typescript-eslint does not support TypeScript 7 yet (peer: typescript <6.1.0)
+    ignore:
+      - dependency-name: "typescript"
+        versions: [">=7.0.0"]
     # Automatically include security updates
     versioning-strategy: "increase"
     labels:
