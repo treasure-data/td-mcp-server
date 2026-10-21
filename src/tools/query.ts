@@ -83,7 +83,7 @@ export class QueryTool {
         duration
       );
 
-      throw new Error(`Query execution failed: ${errorMessage}`);
+      throw new Error(`Query execution failed: ${errorMessage}`, { cause: error });
     }
   }
 

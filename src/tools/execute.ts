@@ -91,7 +91,7 @@ export class ExecuteTool {
         duration
       );
 
-      throw new Error(`Execute operation failed: ${errorMessage}`);
+      throw new Error(`Execute operation failed: ${errorMessage}`, { cause: error });
     }
   }
 }

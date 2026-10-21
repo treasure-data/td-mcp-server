@@ -88,7 +88,7 @@ export class DescribeTableTool {
 
       this.auditLogger.logFailure('SELECT', query, errorMessage, database, duration);
 
-      throw new Error(`Failed to describe table: ${errorMessage}`);
+      throw new Error(`Failed to describe table: ${errorMessage}`, { cause: error });
     }
   }
 }

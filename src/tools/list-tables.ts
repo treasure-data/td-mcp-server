@@ -67,7 +67,7 @@ export class ListTablesTool {
 
       this.auditLogger.logFailure('SELECT', query, errorMessage, database, duration);
 
-      throw new Error(`Failed to list tables: ${errorMessage}`);
+      throw new Error(`Failed to list tables: ${errorMessage}`, { cause: error });
     }
   }
 }

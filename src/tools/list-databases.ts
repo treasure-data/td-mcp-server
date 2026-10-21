@@ -54,7 +54,7 @@ export class ListDatabasesTool {
 
       this.auditLogger.logFailure('SELECT', query, errorMessage, 'information_schema', duration);
 
-      throw new Error(`Failed to list databases: ${errorMessage}`);
+      throw new Error(`Failed to list databases: ${errorMessage}`, { cause: error });
     }
   }
 }
