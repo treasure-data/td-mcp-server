@@ -66,7 +66,8 @@ describe('listParentSegmentsTool', () => {
 
     const result = await listParentSegmentsTool.handler({}, {});
 
-    expect(cdpClientModule.createCDPClient).toHaveBeenCalledWith('test-key', 'us01');
+    // Third arg is td_access_token (undefined when using API key)
+    expect(cdpClientModule.createCDPClient).toHaveBeenCalledWith('test-key', 'us01', undefined);
     expect(mockClient.getParentSegments).toHaveBeenCalled();
 
     expect(result).toEqual({

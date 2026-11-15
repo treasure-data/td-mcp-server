@@ -44,9 +44,10 @@ describe('TDTrinoClient - Single Client Fix', () => {
     await client.query('SELECT * FROM accounts');
     
     // The query should be executed as-is, without modification
+    // Authorization header is passed per-query, no user field needed
     expect(mockTrinoQuery).toHaveBeenCalledWith({
       query: 'SELECT * FROM accounts',
-      user: 'test-api-key',
+      extraHeaders: { Authorization: 'TD1 test-api-key' },
     });
     
     // Since the client is configured with my_default_db, but the user wants leo_dbt,

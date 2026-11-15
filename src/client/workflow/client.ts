@@ -16,17 +16,23 @@ import type {
 
 export interface WorkflowClientOptions {
   apiKey: string;
+  accessToken?: string; // OAuth access token
   site: TDSite;
   timeout?: number;
 }
 
 export class WorkflowClient {
-  private readonly apiKey: string;
+  private readonly credential: string;
+  private readonly authHeader: string;
   private readonly baseUrl: string;
   private readonly timeout: number;
 
   constructor(options: WorkflowClientOptions) {
-    this.apiKey = options.apiKey;
+    this.credential = options.accessToken || options.apiKey;
+    // OAuth uses Bearer, API key uses TD1
+    this.authHeader = options.accessToken
+      ? `Bearer ${this.credential}`
+      : `TD1 ${this.credential}`;
     this.baseUrl = getWorkflowEndpoint(options.site);
     this.timeout = options.timeout || 30000; // 30 seconds default
   }
@@ -58,9 +64,9 @@ export class WorkflowClient {
       const response = await fetch(url.toString(), {
         method,
         headers: {
-          'Authorization': `TD1 ${this.apiKey}`,
+          Authorization: this.authHeader,
           'Content-Type': 'application/json',
-          'Accept': 'application/json',
+          Accept: 'application/json',
         },
         body: body ? JSON.stringify(body) : undefined,
         signal: controller.signal,
@@ -78,12 +84,15 @@ export class WorkflowClient {
       return await response.json() as T;
     } catch (error) {
       clearTimeout(timeoutId);
-      
-      // Mask API key in error messages
+
+      // Mask credentials in error messages
       if (error instanceof Error) {
-        error.message = error.message.replace(this.apiKey, maskApiKey(this.apiKey));
+        error.message = error.message.replace(
+          this.credential,
+          maskApiKey(this.credential)
+        );
       }
-      
+
       throw error;
     }
   }

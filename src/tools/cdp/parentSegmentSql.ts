@@ -22,10 +22,10 @@ export const parentSegmentSql = {
   
   async execute(args: unknown) {
     const config = loadConfig();
-    
+
     try {
       const parsedArgs = parentSegmentSqlSchema.parse(args);
-      const client = createCDPClient(config.td_api_key, config.site);
+      const client = createCDPClient(config.td_api_key, config.site, config.td_access_token);
       
       // Generate the SQL for the parent segment
       const queryResponse = await client.getSegmentQuery(parsedArgs.parent_segment_id, {

@@ -59,7 +59,7 @@ describe('TDTrinoClient', () => {
           server: 'https://api-presto.treasuredata.co.jp:443',
           catalog: 'td',
           schema: 'information_schema', // Default schema since no database in config
-          auth: expect.any(Object),
+          // Auth is now passed per-query via extraHeaders, not in Trino.create
         })
       );
     });
@@ -130,9 +130,10 @@ describe('TDTrinoClient', () => {
       await client.query('SELECT 1');
 
       // The database parameter is ignored - query executes in default schema context
+      // Authorization header is passed per-query, no user field needed
       expect(mockQuery).toHaveBeenCalledWith({
         query: 'SELECT 1',
-        user: 'test-api-key-12345',
+        extraHeaders: { Authorization: 'TD1 test-api-key-12345' },
       });
     });
 
@@ -277,10 +278,10 @@ describe('TDTrinoClient', () => {
 
         const result = await client.testConnection();
         expect(result).toBe(true);
-        expect(mockQuery).toHaveBeenCalledWith(expect.objectContaining({
+        expect(mockQuery).toHaveBeenCalledWith({
           query: 'SELECT 1',
-          user: 'test-api-key-12345',
-        }));
+          extraHeaders: { Authorization: 'TD1 test-api-key-12345' },
+        });
       });
 
       it('should return false when connection fails', async () => {
@@ -304,10 +305,10 @@ describe('TDTrinoClient', () => {
 
         const databases = await client.listDatabases();
         expect(databases).toEqual(['db1', 'db2', 'db3']);
-        expect(mockQuery).toHaveBeenCalledWith(expect.objectContaining({
+        expect(mockQuery).toHaveBeenCalledWith({
           query: "SELECT schema_name FROM \"td\".information_schema.schemata WHERE catalog_name = 'td' ORDER BY schema_name",
-          user: 'test-api-key-12345',
-        }));
+          extraHeaders: { Authorization: 'TD1 test-api-key-12345' },
+        });
       });
     });
 
@@ -324,10 +325,10 @@ describe('TDTrinoClient', () => {
 
         const tables = await client.listTables('mydb');
         expect(tables).toEqual(['users', 'products', 'orders']);
-        expect(mockQuery).toHaveBeenCalledWith(expect.objectContaining({
+        expect(mockQuery).toHaveBeenCalledWith({
           query: "SELECT table_name FROM \"td\".information_schema.tables WHERE table_catalog = 'td' AND table_schema = 'mydb' ORDER BY table_name",
-          user: 'test-api-key-12345',
-        }));
+          extraHeaders: { Authorization: 'TD1 test-api-key-12345' },
+        });
       });
     });
 
